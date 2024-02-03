@@ -1,0 +1,23 @@
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+LittleFS_MBED	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+init KEYWORD2
+mount KEYWORD2
+unmount	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+LFS_MBED_RP2040_VERSION  LITERAL1
+LFS_MBED_RP2040_VERSION_MAJOR  LITERAL1
+LFS_MBED_RP2040_VERSION_MINOR  LITERAL1
+LFS_MBED_RP2040_VERSION_PATCH  LITERAL1
+LFS_MBED_RP2040_VERSION_INT  LITERAL1

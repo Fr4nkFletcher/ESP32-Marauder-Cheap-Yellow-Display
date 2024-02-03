@@ -1,0 +1,37 @@
+otf2bdf - converts truetype to BDF font format (which you can then
+use as input for the ttf_to_ili9341.pl Perl script)
+
+https://github.com/jirutka/otf2bdf
+
+sudo apt-get install otf2bdf
+
+
+The Perl script uses a bdf_to_ili9341 utility to do its heavy lifting.  To
+build bdf_to_ili9341 from the bdf_to_ili9341.c source, run this command:
+
+gcc -O2 -Wall -o bdf_to_ili9341 bdf_to_ili9341.c
+
+
+
+Per-font encoding:
+
+#bits for horiz advance
+#bits for width
+#bits for height
+#bits for x offset
+#bits for y offset
+#bits in offsets table
+table of offset for all chars
+
+Per-char encoding:
+
+WIDTH
+BBX: width, height
+BBX: x offset, y offset
+pixel data, bit packed:
+if 1st bit = 0, rest is bits for 1 line
+if 1st bit = 1, next 3 bits are #repeat (0 to 5), followed by 1 line
+
+
+
+
