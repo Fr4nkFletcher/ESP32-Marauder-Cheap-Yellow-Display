@@ -1,3 +1,5 @@
+//only tested on macos
+
 name=ESP32 Arduino
 version=
 
