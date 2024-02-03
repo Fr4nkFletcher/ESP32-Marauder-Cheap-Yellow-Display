@@ -2,8 +2,7 @@
 <p align="center"><img alt="Marauder logo" src="https://github.com/justcallmekoko/ESP32Marauder/blob/master/pictures/marauder3L.jpg?raw=true" width="300"></p>
 
 ## ESP32 Marauder Cheap Yellow Display
-
----------------------------------------------------------<br><br>
+Works with https://amazon.com/dp/B0BVFXR313<br><br>
 On the ESP32 jump these pins with a 1k resistor:<br>
 GPIO12 -> 39<br>
 GPIO13 -> 32<br>
