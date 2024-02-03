@@ -3,14 +3,8 @@
 
 ## ESP32 Marauder Cheap Yellow Display
 Works with https://amazon.com/dp/B0BVFXR313<br><br>
-On the ESP32 jump these pins with a 1k resistor:<br>
-GPIO12 -> 39<br>
-GPIO13 -> 32<br>
-GPIO14 -> 25<br>
-GPIO15 -> 33<br>
-<p align="left">
- <img src="https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/screenshots/wiring1.jpg" alt="yes">
-</p><br><br>
+## Edit: Now working without hw mods thanks to https://github.com/ggaljoen/TFT_eSPI
+</p>
 Add libraries to your arduino libraries folder<br><br>
 Configure arduino as explained here<br> https://github.com/justcallmekoko/ESP32Marauder/wiki/arduino-ide-setup#these-next-steps-only-apply-if-you-plan-to-build-the-full-esp32-marauder-firmware-from-source<br><br>
 
