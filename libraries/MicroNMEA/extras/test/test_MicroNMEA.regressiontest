@@ -1,0 +1,140 @@
+$GPGSV,4,1,13,07,18,322,29,08,19,273,,16,74,204,35,18,34,115,28*7B
+Unknown sentence: "$GPGSV,4,1,13,07,18,322,29,08,19,273,,16,74,204,35,18,34,115,28*7B"
+--------------
+$GPGSV,4,2,13,20,22,046,25,21,53,070,33,22,16,154,24,26,48,163,38*7E
+Unknown sentence: "$GPGSV,4,2,13,20,22,046,25,21,53,070,33,22,16,154,24,26,48,163,38*7E"
+--------------
+$GPGSV,4,3,13,27,56,276,38,33,27,195,,37,24,150,,39,23,146,*74
+Unknown sentence: "$GPGSV,4,3,13,27,56,276,38,33,27,195,,37,24,150,,39,23,146,*74"
+--------------
+$GPGSV,4,4,13,40,10,116,*48
+Unknown sentence: "$GPGSV,4,4,13,40,10,116,*48"
+--------------
+$GLGSV,3,1,09,68,09,003,39,69,29,052,23,70,19,112,,75,31,205,36*6D
+Unknown sentence: "$GLGSV,3,1,09,68,09,003,39,69,29,052,23,70,19,112,,75,31,205,36*6D"
+--------------
+$GLGSV,3,2,09,76,52,281,24,77,18,336,32,84,18,067,29,85,66,042,41*69
+Unknown sentence: "$GLGSV,3,2,09,76,52,281,24,77,18,336,32,84,18,067,29,85,66,042,41*69"
+--------------
+$GLGSV,3,3,09,86,50,271,23*52
+Unknown sentence: "$GLGSV,3,3,09,86,50,271,23*52"
+--------------
+$GNGSA,A,3,07,16,18,20,21,22,26,27,,,,,01.3,00.7,01.1*10
+Unknown sentence: "$GNGSA,A,3,07,16,18,20,21,22,26,27,,,,,01.3,00.7,01.1*10"
+--------------
+$GNGSA,A,3,68,69,75,76,77,84,85,86,,,,,01.3,00.7,01.1*14
+Unknown sentence: "$GNGSA,A,3,68,69,75,76,77,84,85,86,,,,,01.3,00.7,01.1*14"
+--------------
+$PORZD,A,004.4*3C
+Unknown sentence: "$PORZD,A,004.4*3C"
+--------------
+$GPGGA,111309.00,5400.6000,N,00247.1000,W,1,16,00.7,042.2,M,49.1,M,,*4A
+Sentence    $GPGGA,111309.00,5400.6000,N,00247.1000,W,1,16,00.7,042.2,M,49.1,M,,*4A
+Valid        true
+TalkerID     P
+MessageID    GGA
+Time         11:13:09.00
+Num sat      16
+HDOP         0.7
+Latitude     54010000 (54.010000 deg)
+Longitude    -2785000 (-2.785000 deg)
+Alt. valid   true
+Altitude     42200 (42.200m)
+--------------
+$GPRMC,111309.00,A,5400.6000,N,00247.1000,W,00.00,302.5,140915,,,A*4C
+Sentence    $GPRMC,111309.00,A,5400.6000,N,00247.1000,W,00.00,302.5,140915,,,A*4C
+Valid        true
+TalkerID     P
+MessageID    RMC
+Date/time    2015-09-14T11:13:09.00
+Latitude     54010000 (54.010000 deg)
+Longitude    -2785000 (-2.785000 deg)
+Alt. valid   false
+--------------
+# Checksum below deliberately wrong
+$GPRMC,111309.00,A,5400.6000,N,00247.1000,W,00.00,302.5,140915,,,A*XX
+Bad checksum for "$GPRMC,111309.00,A,5400.6000,N,00247.1000,W,00.00,302.5,140915,,,A*XX"
+Checksum should be 4C
+--------------
+# Try sentence with higher than normal temporal resolution
+$GPRMC,111309.0033,A,5400.6000,N,00247.1000,W,00.00,302.5,140915,,,A*4C
+Sentence    $GPRMC,111309.0033,A,5400.6000,N,00247.1000,W,00.00,302.5,140915,,,A*4C
+Valid        true
+TalkerID     P
+MessageID    RMC
+Date/time    2015-09-14T11:13:09.00
+Latitude     54010000 (54.010000 deg)
+Longitude    -2785000 (-2.785000 deg)
+Alt. valid   false
+--------------
+# Try sentences with higher than normal latitude/longitude resolution
+$GPRMC,111309.00,A,5400.600088,N,00247.100099,W,00.00,302.5,140915,,,A*4C
+Sentence    $GPRMC,111309.00,A,5400.600088,N,00247.100099,W,00.00,302.5,140915,,,A*4C
+Valid        true
+TalkerID     P
+MessageID    RMC
+Date/time    2015-09-14T11:13:09.00
+Latitude     54010001 (54.010001 deg)
+Longitude    -2785001 (-2.785001 deg)
+Alt. valid   false
+--------------
+$GPGGA,111309.00,5400.600088,N,00247.100099,W,1,16,00.7,042.2,M,49.1,M,,*4A
+Sentence    $GPGGA,111309.00,5400.600088,N,00247.100099,W,1,16,00.7,042.2,M,49.1,M,,*4A
+Valid        true
+TalkerID     P
+MessageID    GGA
+Time         11:13:09.00
+Num sat      16
+HDOP         0.7
+Latitude     54010001 (54.010001 deg)
+Longitude    -2785001 (-2.785001 deg)
+Alt. valid   true
+Altitude     42200 (42.200m)
+--------------
+# Sentence with higher than normal altitude resolution
+$GPGGA,111309.00,5400.6000,N,00247.1000,W,1,16,00.7,042.289,M,49.1,M,,*4B
+Sentence    $GPGGA,111309.00,5400.6000,N,00247.1000,W,1,16,00.7,042.289,M,49.1,M,,*4B
+Valid        true
+TalkerID     P
+MessageID    GGA
+Time         11:13:09.00
+Num sat      16
+HDOP         0.7
+Latitude     54010000 (54.010000 deg)
+Longitude    -2785000 (-2.785000 deg)
+Alt. valid   true
+Altitude     42289 (42.289m)
+--------------
+# Invalid RMC message (issue #1)
+$GPRMC,194812.00,V,,,,,,,290317,,,N*74
+# Message from an invalid fix causing crashes (pull request #4))
+$GPRMC,,V,,,,,,,,,,N*53
+# Test for aritmetic overflow in numSat and HDOP
+$GPGGA,111309.00,5400.6000,N,00247.1000,W,1,400,30.0,042.2,M,49.1,M,,*7D
+Sentence    $GPGGA,111309.00,5400.6000,N,00247.1000,W,1,400,30.0,042.2,M,49.1,M,,*7D
+Valid        true
+TalkerID     P
+MessageID    GGA
+Time         11:13:09.00
+Num sat      255
+HDOP         25.5
+Latitude     54010000 (54.010000 deg)
+Longitude    -2785000 (-2.785000 deg)
+Alt. valid   true
+Altitude     42200 (42.200m)
+--------------
+# Test for aritmetic underflow in numSat and HDOP
+$GPGGA,111309.00,5400.6000,N,00247.1000,W,1,-400,-30.0,042.2,M,49.1,M,,*7D
+Sentence    $GPGGA,111309.00,5400.6000,N,00247.1000,W,1,-400,-30.0,042.2,M,49.1,M,,*7D
+Valid        true
+TalkerID     P
+MessageID    GGA
+Time         11:13:09.00
+Num sat      0
+HDOP         25.5
+Latitude     54010000 (54.010000 deg)
+Longitude    -2785000 (-2.785000 deg)
+Alt. valid   true
+Altitude     42200 (42.200m)
+--------------
+

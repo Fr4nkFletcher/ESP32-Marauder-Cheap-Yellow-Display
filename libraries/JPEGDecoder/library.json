@@ -1,0 +1,29 @@
+{
+  "name": "JPEGDecoder",
+  "version": "2.0.0",
+  "keywords": "jpeg, jpg, decoder, TFT",
+  "description": "A JPEG decoder library, tested on Mega, Due and ESP8266",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/Bodmer/JPEGDecoder.git"
+  },
+  "authors":
+  [
+    {
+        "name": "Bodmer",
+        "email": "bodmer@anola.net",
+        "maintainer": true
+    },
+    {
+        "name": "Makoto Kurauchi",
+        "url": "http://yushakobo.jp"
+    },
+	{
+        "name": "Rich Geldreich",
+        "email": "richgel99@gmail.com"
+    }
+  ],
+  "frameworks": "arduino",
+  "platforms": ["atmelavr","atmelsam","espressif8266"]
+}

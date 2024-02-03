@@ -1,0 +1,30 @@
+{
+  "name": "LittleFS_Mbed_RP2040",
+  "version": "1.1.0",
+  "keywords": "storage, data-storage, littlefs, littlefs-mbed, flash, flash-storage, posix, file-system, file, mbed, mbed-rp2040, nano-rp2040-connect, raspberry-pico, rpi-pico, pico, rp2040",
+  "description": "This library facilitates your usage of LittleFS for the onboard flash. LittleFS supports power fail safety and high performance",
+  "authors":
+  {
+    "name":  "Khoi Hoang",
+    "url":   "https://github.com/khoih-prog",
+    "maintainer": true
+  },
+  "repository":
+  {
+    "type": "git",
+    "url": "//https://github.com/khoih-prog/LittleFS_Mbed_RP2040"
+  },
+  "homepage": "https://github.com/khoih-prog/LittleFS_Mbed_RP2040",
+  "export": {
+    "exclude": [
+      "linux",
+      "extras",
+      "tests"
+    ]
+  },
+  "license": "GPL-3.0-or-later",
+  "frameworks": "*",
+  "platforms": ["raspberrypi"],
+  "examples": "examples/*/*/*.ino",
+  "headers": "LittleFS_Mbed_RP2040.h"
+}

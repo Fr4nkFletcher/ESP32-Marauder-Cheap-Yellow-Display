@@ -1,0 +1,9 @@
+# SwitchLib core library
+
+SwitchLib	KEYWORD1
+getButtonState	KEYWORD2
+getPin	KEYWORD2
+getPullup	KEYWORD2
+justPressed	KEYWORD2
+justReleased	KEYWORD2
+isHeld	KEYWORD2

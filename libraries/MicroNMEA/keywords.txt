@@ -1,0 +1,48 @@
+#######################################
+# Syntax Coloring Map For MicroNMEA
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+MicroNMEA	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+skipField	KEYWORD2
+parseUnsignedInt	KEYWORD2
+parseFloat	KEYWORD2
+parseDegreeMinute	KEYWORD2
+parseToComma	KEYWORD2
+parseField	KEYWORD2
+generateChecksum	KEYWORD2
+testChecksum	KEYWORD2
+sendSentence	KEYWORD2
+clear	KEYWORD2
+getNavSystem	KEYWORD2
+getNumSatellites	KEYWORD2
+getHDOP	KEYWORD2
+isValid	KEYWORD2
+getLatitude	KEYWORD2
+getLongitude	KEYWORD2
+getAltitude	KEYWORD2
+getYear	KEYWORD2
+getMonth	KEYWORD2
+getDay	KEYWORD2
+getHour	KEYWORD2
+getMinute	KEYWORD2
+getSecond	KEYWORD2
+getHundredths	KEYWORD2
+getSpeed	KEYWORD2
+getCourse	KEYWORD2
+process	KEYWORD2
+setBadChecksumHandler	KEYWORD2
+setUnknownSentenceHandler	KEYWORD2
+getSentence	KEYWORD2
+getTalkerID	KEYWORD2
+getMessageID	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
