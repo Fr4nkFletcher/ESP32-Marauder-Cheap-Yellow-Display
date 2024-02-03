@@ -544,6 +544,9 @@ void TFT_eSPI::initBus(void) {
   if (TOUCH_CS >= 0) {
     pinMode(TOUCH_CS, OUTPUT);
     digitalWrite(TOUCH_CS, HIGH); // Chip select high (inactive)
+    pinMode(TOUCH_MOSI, OUTPUT);	
+    pinMode(TOUCH_MISO, INPUT);
+    pinMode(TOUCH_CLK, OUTPUT);
   }
 #endif
 
@@ -3152,7 +3155,7 @@ uint16_t TFT_eSPI::fontsLoaded(void)
 ** Function name:           fontHeight
 ** Description:             return the height of a font (yAdvance for free fonts)
 ***************************************************************************************/
-int16_t TFT_eSPI::fontHeight(int16_t font)
+int16_t TFT_eSPI::fontHeight(uint8_t font)
 {
 #ifdef SMOOTH_FONT
   if(fontLoaded) return gFont.yAdvance;
