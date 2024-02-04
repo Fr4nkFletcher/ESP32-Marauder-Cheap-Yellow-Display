@@ -2,9 +2,17 @@
 <p align="center"><img alt="Marauder logo" src="https://github.com/justcallmekoko/ESP32Marauder/blob/master/pictures/marauder3L.jpg?raw=true" width="300"></p>
 
 ## ESP32 Marauder Cheap Yellow Display
-Works with https://amazon.com/dp/B0BVFXR313<br><br>
+## Web flasher instructions:
+### Visit -> http://espressif.github.io/esptool-js<br>
+Change baud rate -> 115200<br>
+Change flash address -> 10000<br>
+Choose <i>esp32_marauder_v0_13_5_20240203_cyd.bin</i> (use _inverted.bin if your colors come out wrong)<br>
+Program
+<br><br>
+Works with https://amazon.com/dp/B0BVFXR313 or https://amazon.com/dp/B0CLR7MQ91<br><br>
 ## Edit: Now working without hw mods thanks to https://github.com/ggaljoen/TFT_eSPI
 </p>
+Or compile from source.<br><br>
 Add libraries to your arduino libraries folder<br><br>
 Configure arduino as explained here<br> https://github.com/justcallmekoko/ESP32Marauder/wiki/arduino-ide-setup#these-next-steps-only-apply-if-you-plan-to-build-the-full-esp32-marauder-firmware-from-source<br>
 
