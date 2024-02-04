@@ -1,4 +1,4 @@
-# only tested on macos
+# only tested on macos - arduino 1.8.19
 
 name=ESP32 Arduino
 version=
