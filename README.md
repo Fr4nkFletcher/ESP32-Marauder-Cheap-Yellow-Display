@@ -12,7 +12,6 @@ Program
 Works with https://amazon.com/dp/B0BVFXR313 or https://amazon.com/dp/B0CLR7MQ91<br>
 ## Edit: Now working without hw mods thanks to https://github.com/ggaljoen/TFT_eSPI
 </p>
-Or compile from source.<br><br>
 Add libraries to your arduino libraries folder<br><br>
 Configure arduino as explained here<br> https://github.com/justcallmekoko/ESP32Marauder/wiki/arduino-ide-setup#these-next-steps-only-apply-if-you-plan-to-build-the-full-esp32-marauder-firmware-from-source<br>
 
