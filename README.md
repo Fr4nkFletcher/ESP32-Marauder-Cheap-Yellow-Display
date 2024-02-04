@@ -9,7 +9,7 @@ Change flash address -> 10000<br>
 Choose <i>esp32_marauder_v0_13_5_20240203_cyd.bin</i> (use _inverted.bin if your colors come out wrong)<br>
 Program
 <br><br>
-Works with https://amazon.com/dp/B0BVFXR313 or https://amazon.com/dp/B0CLR7MQ91<br>
+Tested on https://amazon.com/dp/B0BVFXR313 or https://amazon.com/dp/B0CLR7MQ91<br>
 ## Edit: Now working without hw mods thanks to https://github.com/ggaljoen/TFT_eSPI
 </p>
 Add libraries to your arduino libraries folder<br><br>
