@@ -6,7 +6,9 @@ Works with https://amazon.com/dp/B0BVFXR313<br><br>
 ## Edit: Now working without hw mods thanks to https://github.com/ggaljoen/TFT_eSPI
 </p>
 Add libraries to your arduino libraries folder<br><br>
-Configure arduino as explained here<br> https://github.com/justcallmekoko/ESP32Marauder/wiki/arduino-ide-setup#these-next-steps-only-apply-if-you-plan-to-build-the-full-esp32-marauder-firmware-from-source<br><br>
+Configure arduino as explained here<br> https://github.com/justcallmekoko/ESP32Marauder/wiki/arduino-ide-setup#these-next-steps-only-apply-if-you-plan-to-build-the-full-esp32-marauder-firmware-from-source<br>
+
+### Make sure upload speed is set to 115200 in Arduino. I use version 1.8.19
 
 I couldn't get this CYD marauder fork to work https://github.com/smoochiee/ESP32Marauder but after a while came up with this.<br>
 
