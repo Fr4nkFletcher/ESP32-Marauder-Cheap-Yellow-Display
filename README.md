@@ -4,13 +4,11 @@
   <img alt="Marauder logo" src="https://github.com/justcallmekoko/ESP32Marauder/blob/master/pictures/marauder3L.jpg?raw=true" width="300">
 </p>
 
-## Web Flasher Instructions
+## Updated Web Flasher Instructions
 
 - **Visit:** [CYM-Web-Flasher](https://fr4nkfletcher.github.io/ESP32-Marauder-Cheap-Yellow-Display/flash.html)
 
 - **Action:** Click **Install** to start the flashing process.
-
-### Note: If you encounter issues with the web flasher, please compile from source.
 
 ## Compatibility
 
