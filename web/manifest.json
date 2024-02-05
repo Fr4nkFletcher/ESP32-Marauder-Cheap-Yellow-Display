@@ -1,5 +1,5 @@
 {
-  "name": "ESPHome",
+  "name": "CYM Web Flasher",
   "builds": [
     {
       "chipFamily": "ESP32",
