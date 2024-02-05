@@ -6,12 +6,8 @@
 
 ## Web Flasher Instructions
 
-- **Visit:** [ESPTool Web Flasher](http://espressif.github.io/esptool-js)
-- **Settings:**
-  - Baud Rate: `115200`
-  - Flash Address: `0x10000`
-- **Firmware:** Select `esp32_marauder_v0_13_5_20240203_cyd.bin`. Use `_inverted.bin` if the display colors are inverted.
-- **Action:** Click **Program** to start the flashing process.
+- **Visit:** [CYM-Web-Flasher](https://fr4nkfletcher.github.io/ESP32-Marauder-Cheap-Yellow-Display/flash.html)
+- **Action:** Click **Install** to start the flashing process.
 
 ### Note: If you encounter issues with the web flasher, please compile from source.
 
