@@ -13,6 +13,8 @@
 - **Firmware:** Select `esp32_marauder_v0_13_5_20240203_cyd.bin`. Use `_inverted.bin` if the display colors are inverted.
 - **Action:** Click **Program** to start the flashing process.
 
+If you encounter issues with the web Flasher, please compile from source.
+
 ## Compatibility
 
 Successfully tested on both of these available on Amazon:
