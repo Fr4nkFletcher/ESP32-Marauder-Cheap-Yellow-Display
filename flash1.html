@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -82,18 +82,21 @@
             <esp-web-install-button class="invisible"></esp-web-install-button>
         </p>
     </div>
- <div class="footer">
-        💻 <a href="https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display">Cheap-Yellow-Marauder</a> 🛠️
+    <div class="footer">
+        <a href="https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display">💻 Cheap-Yellow-Marauder</a> &mdash; Installer powered by <a href="https://esphome.github.io/esp-web-tools/">ESP Web Tools 🛠️</a>.
     </div>
-    <script type="module">
+     <script type="module">
         import 'https://unpkg.com/esp-web-tools@latest/dist/install-button.js';
 
         document.querySelectorAll('input[name="type"]').forEach(radio => {
             radio.addEventListener('change', event => {
                 const button = document.querySelector('esp-web-install-button');
-                button.manifest = `web/manifest_${event.target.value}.json`; // Adjust path as necessary
+                button.manifest = `./manifest_${event.target.value}.json`; // Adjust path as necessary
                 button.addEventListener('connected', () => console.log('Device connected'));
                 button.style.display = 'block'; // Make button visible upon selection
             });
         });
     </script>
+</body>
+</html>
+   
