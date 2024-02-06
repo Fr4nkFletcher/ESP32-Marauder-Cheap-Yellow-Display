@@ -4,6 +4,13 @@
   <img alt="Marauder logo" src="https://github.com/justcallmekoko/ESP32Marauder/blob/master/pictures/marauder3L.jpg?raw=true" width="300">
 </p>
 
+## 🌟 Update Highlights 🌟
+
+- **Version 0.13.7**: The ESP32-Marauder has been updated to the latest version `0.13.7`. This update brings a host of improvements and bug fixes.
+
+- **GPS Functionality**: 🛰 GPS is now [enabled](screenshots/gps5.jpg) and fully operational through the 4-pin connector located near the MicroUSB port of the CYD module. [Check here](https://github.com/justcallmekoko/ESP32Marauder/wiki/gps-modification) for details on supported GPS hardware.
+
+
 ## Updated Web Flasher Instructions
 
 - **Visit:** [CYM-Web-Flasher](https://fr4nkfletcher.github.io/ESP32-Marauder-Cheap-Yellow-Display/flash0.html)
