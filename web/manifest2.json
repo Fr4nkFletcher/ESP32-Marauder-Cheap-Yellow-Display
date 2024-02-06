@@ -1,0 +1,20 @@
+{
+  "name": "CYM Web Flasher",
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "improv": false,
+      "parts": [
+        { "path": "esp32_marauder.ino.bootloader.bin", "offset": 4096 },
+        { "path": "esp32_marauder.ino.partitions.bin", "offset": 32768 },
+        { "path": "esp32_marauder_v0_13_5_20240203_cyd_inverted.bin", "offset": 65536 }
+      ]
+    },
+    {
+      "chipFamily": "ESP8266",
+      "parts": [
+        { "path": "esp8266.bin", "offset": 0 }
+      ]
+    }
+  ]
+}
