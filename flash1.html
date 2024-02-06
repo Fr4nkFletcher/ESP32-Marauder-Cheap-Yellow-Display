@@ -11,35 +11,47 @@
         body, html {
             height: 100%;
             margin: 0;
-        }
-        body {
+            padding: 0;
             display: flex;
             flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        body {
             font-family: 'Poppins', sans-serif;
             background-color: #f0f0f0;
             color: #333;
             transition: background-color 0.3s, color 0.3s;
         }
         .content {
-            flex: 1;
             width: auto;
             max-width: 600px;
-            margin: 20px auto;
+            margin-bottom: auto; /* Adjusted to auto to make content float */
             padding: 20px;
             background: #fff;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             border-radius: 8px;
             overflow: auto;
+            position: relative; /* Ensure it's above the footer */
+            z-index: 1;
+        }
+        h1 {
+            font-size: 1.5em; /* Smaller font size for heading */
+            text-align: center;
+            white-space: nowrap; /* Ensure it stays on one line */
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .footer {
-            text-align: center;
+            width: 100%;
             padding: 12px;
             background: #f8f9fa;
             border-top: 1px solid #e9ecef;
             position: fixed;
             left: 0;
             bottom: 0;
-            width: 100%;
+            text-align: center;
+            z-index: 2; /* Ensure footer is above everything else */
         }
         @media (prefers-color-scheme: dark) {
             body {
@@ -56,7 +68,7 @@
 </head>
 <body>
     <div class="content">
-        <h1>🚀 Cheap-Yellow-Marauder Web Flasher 🚀</h1>
+        <h2>🚀 Cheap-Yellow-Marauder Web Flasher 🚀</h2>
         <p>Choose your hardware</p>
         <ul class="radios">
             <li>
