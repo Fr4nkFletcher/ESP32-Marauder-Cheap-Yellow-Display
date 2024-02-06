@@ -57,11 +57,6 @@ MenuFunctions::MenuFunctions()
     uint16_t touchX, touchY;
   
     bool touched = display_obj.tft.getTouch(&touchX, &touchY, 600);
-
-      Serial.print("y:");
-      Serial.print(touchX);
-      Serial.print(" x:");
-      Serial.print(touchY);
   
     if(!touched)
     {
@@ -505,7 +500,8 @@ void MenuFunctions::main(uint32_t currentTime)
       (wifi_scan_obj.currentScanMode == OTA_UPDATE) ||
       (wifi_scan_obj.currentScanMode == ESP_UPDATE) ||
       (wifi_scan_obj.currentScanMode == SHOW_INFO) ||
-      (wifi_scan_obj.currentScanMode == WIFI_SCAN_GPS_DATA)) {
+      (wifi_scan_obj.currentScanMode == WIFI_SCAN_GPS_DATA) ||
+      (wifi_scan_obj.currentScanMode == WIFI_SCAN_GPS_NMEA)) {
     if (wifi_scan_obj.orient_display) {
       this->orientDisplay();
       wifi_scan_obj.orient_display = false;
@@ -552,7 +548,8 @@ void MenuFunctions::main(uint32_t currentTime)
 
   // getTouch causes a 10ms delay which makes beacon spam less effective
   #ifdef HAS_ILI9341
-    pressed = this->updateTouch(&t_x, &t_y);
+    if (!this->disable_touch)
+      pressed = this->updateTouch(&t_x, &t_y);
   #endif
 
 
@@ -563,7 +560,8 @@ void MenuFunctions::main(uint32_t currentTime)
         (wifi_scan_obj.currentScanMode != OTA_UPDATE) &&
         (wifi_scan_obj.currentScanMode != ESP_UPDATE) &&
         (wifi_scan_obj.currentScanMode != SHOW_INFO) &&
-        (wifi_scan_obj.currentScanMode != WIFI_SCAN_GPS_DATA))
+        (wifi_scan_obj.currentScanMode != WIFI_SCAN_GPS_DATA) &&
+        (wifi_scan_obj.currentScanMode != WIFI_SCAN_GPS_NMEA))
     {
       // Stop the current scan
       if ((wifi_scan_obj.currentScanMode == WIFI_SCAN_PROBE) ||
@@ -594,6 +592,7 @@ void MenuFunctions::main(uint32_t currentTime)
           (wifi_scan_obj.currentScanMode == BT_ATTACK_SWIFTPAIR_SPAM) ||
           (wifi_scan_obj.currentScanMode == BT_ATTACK_SPAM_ALL) ||
           (wifi_scan_obj.currentScanMode == BT_ATTACK_SAMSUNG_SPAM) ||
+          (wifi_scan_obj.currentScanMode == BT_ATTACK_GOOGLE_SPAM) ||
           (wifi_scan_obj.currentScanMode == BT_SCAN_WAR_DRIVE) ||
           (wifi_scan_obj.currentScanMode == BT_SCAN_WAR_DRIVE_CONT) ||
           (wifi_scan_obj.currentScanMode == BT_SCAN_SKIMMERS))
@@ -617,65 +616,70 @@ void MenuFunctions::main(uint32_t currentTime)
   #ifdef HAS_BUTTONS
 
     bool c_btn_press = c_btn.justPressed();
+
+    #ifndef HAS_ILI9341
     
-    if ((c_btn_press) &&
-        (wifi_scan_obj.currentScanMode != WIFI_SCAN_OFF) &&
-        (wifi_scan_obj.currentScanMode != OTA_UPDATE) &&
-        (wifi_scan_obj.currentScanMode != ESP_UPDATE) &&
-        (wifi_scan_obj.currentScanMode != SHOW_INFO) &&
-        (wifi_scan_obj.currentScanMode != WIFI_SCAN_GPS_DATA))
-    {
-      // Stop the current scan
-      if ((wifi_scan_obj.currentScanMode == WIFI_SCAN_PROBE) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_STATION_WAR_DRIVE) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_RAW_CAPTURE) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_STATION) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_AP) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_WAR_DRIVE) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_EVIL_PORTAL) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_SIG_STREN) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_TARGET_AP) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_TARGET_AP_FULL) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_PWN) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_ESPRESSIF) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_ALL) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_DEAUTH) ||
-          (wifi_scan_obj.currentScanMode == WIFI_ATTACK_BEACON_SPAM) ||
-          (wifi_scan_obj.currentScanMode == WIFI_ATTACK_AP_SPAM) ||
-          (wifi_scan_obj.currentScanMode == WIFI_ATTACK_AUTH) ||
-          (wifi_scan_obj.currentScanMode == WIFI_ATTACK_DEAUTH) ||
-          (wifi_scan_obj.currentScanMode == WIFI_ATTACK_DEAUTH_MANUAL) ||
-          (wifi_scan_obj.currentScanMode == WIFI_ATTACK_DEAUTH_TARGETED) ||
-          (wifi_scan_obj.currentScanMode == WIFI_ATTACK_MIMIC) ||
-          (wifi_scan_obj.currentScanMode == WIFI_ATTACK_RICK_ROLL) ||
-          (wifi_scan_obj.currentScanMode == WIFI_ATTACK_BEACON_LIST) ||
-          (wifi_scan_obj.currentScanMode == BT_SCAN_ALL) ||
-          (wifi_scan_obj.currentScanMode == BT_ATTACK_SOUR_APPLE) ||
-          (wifi_scan_obj.currentScanMode == BT_ATTACK_SWIFTPAIR_SPAM) ||
-          (wifi_scan_obj.currentScanMode == BT_ATTACK_SPAM_ALL) ||
-          (wifi_scan_obj.currentScanMode == BT_ATTACK_SAMSUNG_SPAM) ||
-          (wifi_scan_obj.currentScanMode == BT_SCAN_WAR_DRIVE) ||
-          (wifi_scan_obj.currentScanMode == BT_SCAN_WAR_DRIVE_CONT) ||
-          (wifi_scan_obj.currentScanMode == BT_SCAN_SKIMMERS) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_EAPOL) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_ACTIVE_EAPOL) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_ACTIVE_LIST_EAPOL) ||
-          (wifi_scan_obj.currentScanMode == WIFI_PACKET_MONITOR))
+      if ((c_btn_press) &&
+          (wifi_scan_obj.currentScanMode != WIFI_SCAN_OFF) &&
+          (wifi_scan_obj.currentScanMode != OTA_UPDATE) &&
+          (wifi_scan_obj.currentScanMode != ESP_UPDATE) &&
+          (wifi_scan_obj.currentScanMode != SHOW_INFO) &&
+          (wifi_scan_obj.currentScanMode != WIFI_SCAN_GPS_DATA) &&
+          (wifi_scan_obj.currentScanMode != WIFI_SCAN_GPS_NMEA))
       {
-        wifi_scan_obj.StartScan(WIFI_SCAN_OFF);
-  
-        // If we don't do this, the text and button coordinates will be off
-        display_obj.tft.init();
-  
-        // Take us back to the menu
-        changeMenu(current_menu);
+        // Stop the current scan
+        if ((wifi_scan_obj.currentScanMode == WIFI_SCAN_PROBE) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_STATION_WAR_DRIVE) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_RAW_CAPTURE) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_STATION) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_AP) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_WAR_DRIVE) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_EVIL_PORTAL) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_SIG_STREN) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_TARGET_AP) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_TARGET_AP_FULL) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_PWN) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_ESPRESSIF) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_ALL) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_DEAUTH) ||
+            (wifi_scan_obj.currentScanMode == WIFI_ATTACK_BEACON_SPAM) ||
+            (wifi_scan_obj.currentScanMode == WIFI_ATTACK_AP_SPAM) ||
+            (wifi_scan_obj.currentScanMode == WIFI_ATTACK_AUTH) ||
+            (wifi_scan_obj.currentScanMode == WIFI_ATTACK_DEAUTH) ||
+            (wifi_scan_obj.currentScanMode == WIFI_ATTACK_DEAUTH_MANUAL) ||
+            (wifi_scan_obj.currentScanMode == WIFI_ATTACK_DEAUTH_TARGETED) ||
+            (wifi_scan_obj.currentScanMode == WIFI_ATTACK_MIMIC) ||
+            (wifi_scan_obj.currentScanMode == WIFI_ATTACK_RICK_ROLL) ||
+            (wifi_scan_obj.currentScanMode == WIFI_ATTACK_BEACON_LIST) ||
+            (wifi_scan_obj.currentScanMode == BT_SCAN_ALL) ||
+            (wifi_scan_obj.currentScanMode == BT_ATTACK_SOUR_APPLE) ||
+            (wifi_scan_obj.currentScanMode == BT_ATTACK_SWIFTPAIR_SPAM) ||
+            (wifi_scan_obj.currentScanMode == BT_ATTACK_SPAM_ALL) ||
+            (wifi_scan_obj.currentScanMode == BT_ATTACK_SAMSUNG_SPAM) ||
+            (wifi_scan_obj.currentScanMode == BT_ATTACK_GOOGLE_SPAM) ||
+            (wifi_scan_obj.currentScanMode == BT_SCAN_WAR_DRIVE) ||
+            (wifi_scan_obj.currentScanMode == BT_SCAN_WAR_DRIVE_CONT) ||
+            (wifi_scan_obj.currentScanMode == BT_SCAN_SKIMMERS) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_EAPOL) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_ACTIVE_EAPOL) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_ACTIVE_LIST_EAPOL) ||
+            (wifi_scan_obj.currentScanMode == WIFI_PACKET_MONITOR))
+        {
+          wifi_scan_obj.StartScan(WIFI_SCAN_OFF);
+    
+          // If we don't do this, the text and button coordinates will be off
+          display_obj.tft.init();
+    
+          // Take us back to the menu
+          changeMenu(current_menu);
+        }
+    
+        x = -1;
+        y = -1;
+    
+        return;
       }
-  
-      x = -1;
-      y = -1;
-  
-      return;
-    }
+    #endif
 
   #endif
 
@@ -889,34 +893,34 @@ void MenuFunctions::battery2(bool initial)
   display_obj.tft.drawString((String) battery_analog + "%", 204, 0, 2);
 }
 #else
-void MenuFunctions::battery(bool initial){
-  
-}
-/*{
-  uint16_t the_color;
-  if (battery_obj.i2c_supported)
-  {
-    // Could use int compare maybe idk
-    if (((String)battery_obj.battery_level != "25") && ((String)battery_obj.battery_level != "0"))
-      the_color = TFT_GREEN;
-    else
-      the_color = TFT_RED;
+void MenuFunctions::battery(bool initial)
+{
+  #ifdef HAS_BATTERY
+    uint16_t the_color;
+    if (battery_obj.i2c_supported)
+    {
+      // Could use int compare maybe idk
+      if (((String)battery_obj.battery_level != "25") && ((String)battery_obj.battery_level != "0"))
+        the_color = TFT_GREEN;
+      else
+        the_color = TFT_RED;
 
-    if ((battery_obj.battery_level != battery_obj.old_level) || (initial)) {
-      battery_obj.old_level = battery_obj.battery_level;
-      display_obj.tft.fillRect(204, 0, SCREEN_WIDTH, STATUS_BAR_WIDTH, STATUSBAR_COLOR);
-      display_obj.tft.setCursor(0, 1);
-      display_obj.tft.drawXBitmap(186,
-                                  0,
-                                  menu_icons[STATUS_BAT],
-                                  16,
-                                  16,
-                                  STATUSBAR_COLOR,
-                                  the_color);
-      display_obj.tft.drawString((String)battery_obj.battery_level + "%", 204, 0, 2);
+      if ((battery_obj.battery_level != battery_obj.old_level) || (initial)) {
+        battery_obj.old_level = battery_obj.battery_level;
+        display_obj.tft.fillRect(204, 0, SCREEN_WIDTH, STATUS_BAR_WIDTH, STATUSBAR_COLOR);
+        display_obj.tft.setCursor(0, 1);
+        display_obj.tft.drawXBitmap(186,
+                                    0,
+                                    menu_icons[STATUS_BAT],
+                                    16,
+                                    16,
+                                    STATUSBAR_COLOR,
+                                    the_color);
+        display_obj.tft.drawString((String)battery_obj.battery_level + "%", 204, 0, 2);
+      }
     }
-  }
-}*/
+  #endif
+}
 void MenuFunctions::battery2(bool initial)
 {
   MenuFunctions::battery(initial);
@@ -989,18 +993,30 @@ void MenuFunctions::updateStatusBar()
   }
 
   // Draw battery info
-  MenuFunctions::battery(false);
+  //MenuFunctions::battery(false);
+  display_obj.tft.fillRect(190, 0, SCREEN_WIDTH, STATUS_BAR_WIDTH, STATUSBAR_COLOR);
+  
+  #ifdef HAS_ILI9341
+    #ifdef HAS_BUTTONS
+      if (this->disable_touch) {
+        display_obj.tft.setCursor(0, 1);
+        display_obj.tft.drawXBitmap(190,
+                                    0,
+                                    menu_icons[DISABLE_TOUCH],
+                                    16,
+                                    16,
+                                    STATUSBAR_COLOR,
+                                    TFT_RED);
+      }
+    #endif
+  #endif
 
 
   // Draw SD info
-  #ifndef WRITE_PACKETS_SERIAL
-    if (sd_obj.supported)
-      the_color = TFT_GREEN;
-    else
-      the_color = TFT_RED;
-  #else
+  if (sd_obj.supported)
+    the_color = TFT_GREEN;
+  else
     the_color = TFT_RED;
-  #endif
 
   #ifdef HAS_ILI9341
     display_obj.tft.drawXBitmap(170,
@@ -1079,17 +1095,29 @@ void MenuFunctions::drawStatusBar()
   #endif
 
 
-  MenuFunctions::battery2(true);
+  //MenuFunctions::battery2(true);
+  display_obj.tft.fillRect(190, 0, SCREEN_WIDTH, STATUS_BAR_WIDTH, STATUSBAR_COLOR);
+
+  #ifdef HAS_ILI9341
+    #ifdef HAS_BUTTONS
+      if (this->disable_touch) {
+        display_obj.tft.setCursor(0, 1);
+        display_obj.tft.drawXBitmap(190,
+                                    0,
+                                    menu_icons[DISABLE_TOUCH],
+                                    16,
+                                    16,
+                                    STATUSBAR_COLOR,
+                                    TFT_RED);
+      }
+    #endif
+  #endif
 
   // Draw SD info
-  #ifndef WRITE_PACKETS_SERIAL
-    if (sd_obj.supported)
-      the_color = TFT_GREEN;
-    else
-      the_color = TFT_RED;
-  #else
+  if (sd_obj.supported)
+    the_color = TFT_GREEN;
+  else
     the_color = TFT_RED;
-  #endif
 
   #ifdef HAS_ILI9341
     display_obj.tft.drawXBitmap(170,
@@ -1117,8 +1145,7 @@ void MenuFunctions::orientDisplay()
 
   #ifdef HAS_ILI9341
     #ifdef TFT_SHIELD
-      uint16_t calData[5] = { 350, 3465, 188, 3431, 2 }; // tft.setRotation(0); // Portrait with TFT Shield
-      Serial.println("Using TFT Shield 2");
+      uint16_t calData[5] = { 275, 3494, 361, 3528, 4 }; // tft.setRotation(0); // Portrait with TFT Shield
     #else if defined(TFT_DIY)
       uint16_t calData[5] = { 339, 3470, 237, 3438, 2 }; // tft.setRotation(0); // Portrait with DIY TFT
     #endif
@@ -1177,6 +1204,8 @@ void MenuFunctions::displaySetting(String key, Menu* menu, int index) {
 void MenuFunctions::RunSetup()
 {
   extern LinkedList<AccessPoint>* access_points;
+
+  this->disable_touch = false;
   
   #ifdef HAS_ILI9341
     this->initLVGL();
@@ -1638,6 +1667,11 @@ void MenuFunctions::RunSetup()
     this->drawStatusBar();
     wifi_scan_obj.StartScan(BT_ATTACK_SAMSUNG_SPAM, TFT_RED);
   });
+  this->addNodes(&bluetoothAttackMenu, "Google BLE Spam", TFT_PURPLE, NULL, LANGUAGE, [this]() {
+    display_obj.clearScreen();
+    this->drawStatusBar();
+    wifi_scan_obj.StartScan(BT_ATTACK_GOOGLE_SPAM, TFT_RED);
+  });
   this->addNodes(&bluetoothAttackMenu, "BLE Spam All", TFT_MAGENTA, NULL, DEAUTH_SNIFF, [this]() {
     display_obj.clearScreen();
     this->drawStatusBar();
@@ -1676,10 +1710,17 @@ void MenuFunctions::RunSetup()
         wifi_scan_obj.StartScan(WIFI_SCAN_GPS_DATA, TFT_CYAN);
       });
 
+      this->addNodes(&deviceMenu, "NMEA Stream", TFT_ORANGE, NULL, GPS_MENU, [this]() {
+        wifi_scan_obj.currentScanMode = WIFI_SCAN_GPS_NMEA;
+        this->changeMenu(&gpsInfoMenu);
+        wifi_scan_obj.StartScan(WIFI_SCAN_GPS_NMEA, TFT_ORANGE);
+      });
+
       // GPS Info Menu
       gpsInfoMenu.parentMenu = &deviceMenu;
       this->addNodes(&gpsInfoMenu, text09, TFT_LIGHTGREY, NULL, 0, [this]() {
         wifi_scan_obj.currentScanMode = WIFI_SCAN_OFF;
+        wifi_scan_obj.StartScan(WIFI_SCAN_OFF);
         this->changeMenu(gpsInfoMenu.parentMenu);
       }); 
     }
@@ -1712,12 +1753,10 @@ void MenuFunctions::RunSetup()
     wifi_scan_obj.currentScanMode = WIFI_SCAN_OFF;
     this->changeMenu(whichUpdateMenu.parentMenu);
   });
-  #ifndef WRITE_PACKETS_SERIAL
-    if (sd_obj.supported) addNodes(&whichUpdateMenu, text_table1[40], TFT_MAGENTA, NULL, SD_UPDATE, [this]() {
-      wifi_scan_obj.currentScanMode = OTA_UPDATE;
-      this->changeMenu(&confirmMenu);
-    });
-  #endif
+  if (sd_obj.supported) addNodes(&whichUpdateMenu, text_table1[40], TFT_MAGENTA, NULL, SD_UPDATE, [this]() {
+    wifi_scan_obj.currentScanMode = OTA_UPDATE;
+    this->changeMenu(&confirmMenu);
+  });
 
   // Confirm SD update menu
   confirmMenu.parentMenu = &whichUpdateMenu;
@@ -1862,7 +1901,7 @@ void MenuFunctions::displayCurrentMenu(uint8_t start_index)
 
       #endif
 
-      #if defined(MARAUDER_MINI) || defined(MARAUDER_M5STICKC)
+             #if defined(MARAUDER_MINI) || defined(MARAUDER_M5STICKC)
         if ((current_menu->selected == i) || (current_menu->list->get(i).selected))
           display_obj.key[i - start_index].drawButton(true, current_menu->list->get(i).name);
         else 

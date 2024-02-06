@@ -165,26 +165,6 @@ void backlightOff() {
 
 void setup()
 {
-
-  pinMode(16, OUTPUT);  //green
-  pinMode(4, OUTPUT);   //red
-  pinMode(17, OUTPUT);  //blue
-  digitalWrite(16, HIGH);
-  digitalWrite(4, HIGH);
-  digitalWrite(17, HIGH);
-  delay(500);
-  digitalWrite(16, LOW);
-  delay(2000);
-  digitalWrite(16, HIGH);
-  delay(500);
-  digitalWrite(4, LOW);
-  delay(2000);
-  digitalWrite(4, HIGH);
-  delay(500);
-  digitalWrite(17, LOW);
-  delay(2000);
-  digitalWrite(17, HIGH);
-  
   #ifdef MARAUDER_M5STICKC
     axp192_obj.begin();
   #endif
@@ -217,17 +197,6 @@ void setup()
   #endif
 
   Serial.begin(115200);
-
-  // Starts a second serial channel to stream the captured packets
-  #ifdef WRITE_PACKETS_SERIAL
-    
-    #ifdef XIAO_ESP32_S3
-      Serial1.begin(115200, SERIAL_8N1, XIAO_RX1, XIAO_TX1);
-    #else
-      Serial1.begin(115200);
-    #endif
-    
-  #endif
 
   //Serial.println("\n\nHello, World!\n");
 
@@ -313,9 +282,8 @@ void setup()
     display_obj.tft.println(F(text_table0[2]));
   #endif
 
-  #ifdef WRITE_PACKETS_SERIAL
-    buffer_obj = Buffer();
-  #elif defined(HAS_SD)
+  buffer_obj = Buffer();
+  #if defined(HAS_SD)
     // Do some SD stuff
     if(sd_obj.initSD()) {
       #ifdef HAS_SCREEN
@@ -419,6 +387,22 @@ void loop()
     mini = true;
   #endif
 
+  #ifdef HAS_ILI9341
+    #ifdef HAS_BUTTONS
+      if (c_btn.isHeld()) {
+        if (menu_function_obj.disable_touch)
+          menu_function_obj.disable_touch = false;
+        else
+          menu_function_obj.disable_touch = true;
+
+        menu_function_obj.updateStatusBar();
+
+        while (!c_btn.justReleased())
+          delay(1);
+      }
+    #endif
+  #endif
+
   // Update all of our objects
   /*#ifdef HAS_SCREEN
     bool do_draw = display_obj.draw_tft;
@@ -439,13 +423,13 @@ void loop()
     gps_obj.main();
   #endif
   
-  #ifdef WRITE_PACKETS_SERIAL
-    buffer_obj.forceSaveSerial();
-  #elif defined(HAS_SD)
+  // Detect SD card
+  #if defined(HAS_SD)
     sd_obj.main();
-  #else
-    return;
   #endif
+
+  // Save buffer to SD and/or serial
+  buffer_obj.save();
 
   #ifdef HAS_BATTERY
     battery_obj.main(currentTime);
