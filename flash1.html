@@ -53,6 +53,10 @@
             text-align: center;
             z-index: 2; /* Ensure footer is above everything else */
         }
+        esp-web-install-button[install-unsupported] {
+        visibility: inherit;
+      }
+
         @media (prefers-color-scheme: dark) {
             body {
                 background-color: #121212;
@@ -65,6 +69,8 @@
             }
         }
     </style>
+    <script type="module" src="https://unpkg.com/esp-web-tools@8.0.1/dist/web/install-button.js?module">
+    </script>
 </head>
 <body>
     <div class="content">
@@ -83,19 +89,16 @@
         </p>
     </div>
     <div class="footer">
-        <a href="https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display">💻 Cheap-Yellow-Marauder</a> &mdash; Installer powered by <a href="https://esphome.github.io/esp-web-tools/">ESP Web Tools 🛠️</a>.
+        <a href="https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display"> Cheap-Yellow-Marauder</a> &mdash; Installer powered by <a href="https://esphome.github.io/esp-web-tools/">ESP Web Tools 🛠️</a>.
     </div>
-     <script type="module">
-        import 'https://unpkg.com/esp-web-tools@latest/dist/install-button.js';
-
-        document.querySelectorAll('input[name="type"]').forEach(radio => {
-            radio.addEventListener('change', event => {
-                const button = document.querySelector('esp-web-install-button');
-                button.manifest = `./manifest_${event.target.value}.json`; // Adjust path as necessary
-                button.addEventListener('connected', () => console.log('Device connected'));
-                button.style.display = 'block'; // Make button visible upon selection
-            });
-        });
+     <script>
+      document.querySelectorAll('input[name="type"]').forEach(radio =>
+        radio.addEventListener("change", () => {
+          const button = document.querySelector('esp-web-install-button');
+          button.manifest = `web/manifest_${radio.value}.json`;
+          button.classList.remove('invisible');
+        }
+      ));
     </script>
 </body>
 </html>
