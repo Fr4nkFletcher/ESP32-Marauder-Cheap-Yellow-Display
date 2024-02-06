@@ -2,7 +2,7 @@
 
   #define configs_h
 
-  #define POLISH_POTATO
+  #define POLISH_POTATO // nice joke average virginian
 
   //Indicates that it must redirect the stream with the captured packets to serial (1)
   //If not defined, will write packages to SD card if supported
@@ -22,7 +22,7 @@
   //#define XIAO_ESP32_S3
   //// END BOARD TARGETS
 
-  #define MARAUDER_VERSION "v0.13.5"
+  #define MARAUDER_VERSION "v0.13.7"
 
   //// HARDWARE NAMES
   #ifdef MARAUDER_M5STICKC
@@ -91,7 +91,7 @@
     #define HAS_SD
     #define USE_SD
     //#define HAS_TEMP_SENSOR
-    //#define HAS_GPS
+    #define HAS_GPS
   #endif
 
   #if defined(MARAUDER_V6) || defined(MARAUDER_V6_1)
@@ -825,8 +825,8 @@
       #define mac_history_len 512
     #elif defined(MARAUDER_V4)
       #define GPS_SERIAL_INDEX 2
-      #define GPS_TX 4
-      #define GPS_RX 13
+      #define GPS_TX 1
+      #define GPS_RX 3
       #define mac_history_len 512
     #elif defined(MARAUDER_KIT)
       #define GPS_SERIAL_INDEX 2

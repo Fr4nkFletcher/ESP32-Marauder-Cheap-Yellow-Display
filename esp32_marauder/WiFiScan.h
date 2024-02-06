@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef WiFiScan_h
 #define WiFiScan_h
 
@@ -88,6 +90,8 @@
 #define BT_ATTACK_SWIFTPAIR_SPAM 37
 #define BT_ATTACK_SPAM_ALL 38
 #define BT_ATTACK_SAMSUNG_SPAM 39
+#define WIFI_SCAN_GPS_NMEA 40
+#define BT_ATTACK_GOOGLE_SPAM 41
 
 #define GRAPH_REFRESH 100
 
@@ -312,6 +316,7 @@ class WiFiScan
     void broadcastSetSSID(uint32_t current_time, const char* ESSID);
     void RunAPScan(uint8_t scan_mode, uint16_t color);
     void RunGPSInfo();
+    void RunGPSNmea();
     void RunMimicFlood(uint8_t scan_mode, uint16_t color);
     void RunPwnScan(uint8_t scan_mode, uint16_t color);
     void RunBeaconScan(uint8_t scan_mode, uint16_t color);
@@ -384,8 +389,11 @@ class WiFiScan
     void StartScan(uint8_t scan_mode, uint16_t color = 0);
     void StopScan(uint8_t scan_mode);
     const char* generateRandomName();
-    //void addLog(String log, int len);
-    
+
+    bool save_serial = false;
+    void startPcap(String file_name);
+    void startLog(String file_name);
+
     static void getMAC(char *addr, uint8_t* data, uint16_t offset);
     static void pwnSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t type);
     static void beaconSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t type);
@@ -399,7 +407,6 @@ class WiFiScan
     static void activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t type);
     static void eapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t type);
     static void wifiSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t type);
-    static void addPacket(wifi_promiscuous_pkt_t *snifferPacket, int len);
 
     /*#ifdef HAS_BT
       enum EBLEPayloadType
