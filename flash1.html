@@ -8,46 +8,69 @@
     <meta name="color-scheme" content="dark light">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        /* Styles adjusted for clarity and focus on functionality */
         body, html {
             height: 100%;
             margin: 0;
+            padding: 0;
             display: flex;
             flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        body {
             font-family: 'Poppins', sans-serif;
             background-color: #f0f0f0;
             color: #333;
+            transition: background-color 0.3s, color 0.3s;
         }
         .content {
-            margin: auto; /* Center content vertically and horizontally */
+            width: auto;
+            max-width: 600px;
+            margin-bottom: auto; /* Adjusted to auto to make content float */
             padding: 20px;
+            background: #fff;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             border-radius: 8px;
-            background: #fff;
+            overflow: auto;
+            position: relative; /* Ensure it's above the footer */
+            z-index: 1;
+        }
+        h1 {
+            font-size: 1.5em; /* Smaller font size for heading */
+            text-align: center;
+            white-space: nowrap; /* Ensure it stays on one line */
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .footer {
+            width: 100%;
+            padding: 12px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
             position: fixed;
             left: 0;
             bottom: 0;
-            width: 100%;
             text-align: center;
-            padding: 12px;
-            background: #f8f9fa;
+            z-index: 2; /* Ensure footer is above everything else */
         }
         @media (prefers-color-scheme: dark) {
-            body, .footer {
+            body {
                 background-color: #121212;
                 color: #e0e0e0;
+            }
+            .content, .footer {
                 background: #333;
+                color: #e0e0e0;
+                box-shadow: none;
             }
         }
     </style>
 </head>
 <body>
     <div class="content">
-        <h1>🚀 ESP32 Marauder Installer 🚀</h1>
-        <p>Select your hardware version:</p>
-        <ul>
+        <h1>🚀 Cheap-Yellow-Marauder Web Flasher 🚀</h1>
+        <p>Choose your hardware</p>
+        <ul class="radios">
             <li>
                 <label><input type="radio" name="type" value="cyd" /> CYD Micro-USB only</label>
             </li>
@@ -55,9 +78,11 @@
                 <label><input type="radio" name="type" value="cyd2usb" /> CYD2USB</label>
             </li>
         </ul>
-        <esp-web-install-button></esp-web-install-button>
+        <p class="button-row">
+            <esp-web-install-button class="invisible"></esp-web-install-button>
+        </p>
     </div>
-    <div class="footer">
+ <div class="footer">
         💻 <a href="https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display">Cheap-Yellow-Marauder</a> 🛠️
     </div>
     <script type="module">
@@ -72,5 +97,3 @@
             });
         });
     </script>
-</body>
-</html>
