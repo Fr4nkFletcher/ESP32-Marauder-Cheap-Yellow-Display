@@ -66,7 +66,7 @@
         document.querySelectorAll('input[name="type"]').forEach(radio => {
             radio.addEventListener('change', event => {
                 const button = document.querySelector('esp-web-install-button');
-                button.manifest = `./manifest_${event.target.value}.json`; // Adjust path as necessary
+                button.manifest = `web/manifest_${event.target.value}.json`; // Adjust path as necessary
                 button.addEventListener('connected', () => console.log('Device connected'));
                 button.style.display = 'block'; // Make button visible upon selection
             });
