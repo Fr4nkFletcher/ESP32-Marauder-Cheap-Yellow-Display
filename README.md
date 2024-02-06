@@ -6,7 +6,7 @@
 
 ## Updated Web Flasher Instructions
 
-- **Visit:** [CYM-Web-Flasher](https://fr4nkfletcher.github.io/ESP32-Marauder-Cheap-Yellow-Display/flash.html) (or if you're having color issues flash [this](https://fr4nkfletcher.github.io/ESP32-Marauder-Cheap-Yellow-Display/flash_inverted.html))
+- **Visit:** [CYM-Web-Flasher](https://fr4nkfletcher.github.io/ESP32-Marauder-Cheap-Yellow-Display/flash.html) (or if you're having color issues flash [this](https://fr4nkfletcher.github.io/ESP32-Marauder-Cheap-Yellow-Display/flash_inverted.html).)
   
 - **Action:** Click **Install** to start the flashing process.
 
