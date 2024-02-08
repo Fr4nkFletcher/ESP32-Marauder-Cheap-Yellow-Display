@@ -7,7 +7,7 @@
       "parts": [
         { "path": "esp32_marauder.ino.bootloader.bin", "offset": 4096 },
         { "path": "esp32_marauder.ino.partitions.bin", "offset": 32768 },
-        { "path": "esp32_marauder_v0_13_7_20240206_cyd_inverted.bin", "offset": 65536 }
+        { "path": "esp32_marauder_v0_13_7_20240207_cyd_inverted.bin", "offset": 65536 }
       ]
     },
     {
