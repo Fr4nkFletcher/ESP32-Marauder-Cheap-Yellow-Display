@@ -13,7 +13,7 @@
 
 ## Updated Web Flasher Instructions
 
-- **Visit:** [CYM-Web-Flasher](https://fr4nkfletcher.github.io/ESP32-Marauder-Cheap-Yellow-Display/flash0.html)
+- **Visit:** [CYM-Web-Flasher](https://fr4nkfletcher.github.io/ESP32-Marauder-Cheap-Yellow-Display/flash0.html) Update: Input orientation fixed
   
 - **Choose your hardware** and click **Connect** to start the flashing process.
 
