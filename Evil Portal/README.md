@@ -1,4 +1,5 @@
 # Evil portal examples and info
+
 Place the .html landing page of your choice in the root of your SD.
 
 On your Marauder
@@ -52,3 +53,5 @@ It is crucial to acknowledge that using these portals for any unauthorized activ
 By accessing and utilizing the captive WiFi login portals, users take complete responsibility for their actions and the consequences that may arise from them. I expect users to act responsibly, adhere to ethical guidelines, and ensure that their activities remain within the boundaries of the law and ethical norms.
 
 Remember, these portals are aimed at promoting knowledge, improving cybersecurity skills, and raising awareness about the potential vulnerabilities present in network infrastructures. I encourage you to explore the portals, learn from them, and embrace the opportunity to enhance your understanding in a controlled and legal environment.
+
+Don't be foolish.
