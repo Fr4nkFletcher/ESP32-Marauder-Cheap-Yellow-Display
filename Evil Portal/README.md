@@ -1,9 +1,8 @@
-# Evil portal examples and info
+# Evil Portal Examples and Information
 
 Place the .html landing page of your choice in the root of your SD.
 
-On your Marauder
-WiFi -> Sniffers -> Scan APs -> WiFI General -> Add SSIDS (manually) or Select APs -> Select EP HTML File.
+#### On your Marauder: WiFi -> Sniffers -> Scan APs -> WiFI General -> Add SSIDS (manually) or Select APs -> Select EP HTML File.
 
 The ESP32 access point will not have internet access while hosting the portal, as a result there cannot be any requests for stylesheets or javascript such as CDNs for bootstrap and JQuery.
 
