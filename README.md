@@ -4,7 +4,7 @@
   <img alt="Marauder logo" src="https://github.com/justcallmekoko/ESP32Marauder/blob/master/pictures/marauder3L.jpg?raw=true" width="300">
 </p>
 
-## 🌟 Update Highlights 03/16/23 🌟
+## 🌟 Update Highlights 03/16/24 🌟
 
 - **Version 0.13.9 added to the CYM web flasher, will push files needed to compile from source soon** 
   
