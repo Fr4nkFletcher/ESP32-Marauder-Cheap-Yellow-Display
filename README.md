@@ -31,6 +31,8 @@ Add necessary libraries to your Arduino libraries folder. Configure your Arduino
 
 Ensure the upload speed is set to `115200` in Arduino IDE (tested with version 1.8.19).
 
+**If you're having issues or want to do everything yourself, [check Smoochie's tutorial](https://github.com/smoochiee/MARAUDER-FOR-CYD---CHEAP-YELLOW-DISPLAY) for an in-depth walkthrough of the port.**
+
 ## Acknowledgments
 
 A big shoutout to the creators and supporters of the [ESP32 Cheap Yellow Display](https://github.com/witnessmenow/ESP32-Cheap-Yellow-Display) project and the community Discord, especially @cod5fgzj. And of course JustCallMeKoko for the foundational work on the ESP32 Marauder.
