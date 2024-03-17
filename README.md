@@ -4,10 +4,12 @@
   <img alt="Marauder logo" src="https://github.com/justcallmekoko/ESP32Marauder/blob/master/pictures/marauder3L.jpg?raw=true" width="300">
 </p>
 
-## 🌟 Update Highlights 03/16/24 🌟
+## 🌟 Update Highlights 03/17/24 🌟
 
 - **Version 0.13.9 added to the CYM web flasher, will push files needed to compile from source soon** 
-  
+
+- **Added builds without GPS to the web flasher to allow for serial CLI access to the CYM.**
+    
 - **Unrelated to the 0.13.9 release: SwiftPair Spam now 100% functional** Samsung, Google, and BLE spam will still crash on occasion but definitely an improvement and usable now. Waiting 10 seconds before each scan seems to help also.
 
 ## Web Flasher Instructions
