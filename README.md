@@ -37,5 +37,5 @@ A big shoutout to the creators and supporters of the [ESP32 Cheap Yellow Display
 
 <p align="center">
   <img src="https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/screenshots/2.gif" alt="Demo 1">
-  <img src="https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/screenshots/swift.gif" alt="Demo 2">
+  <img src="https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/screenshots/swift2.gif" alt="Demo 2">
 </p>
