@@ -5,7 +5,7 @@
 </p>
 
 ## 🌟 Update Highlights 03/17/24 🌟
-- **Detect Pwnagotchi [enabled](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/screenshots/pwn2.jpg) in the WiFi Sniffers submenu.**
+- **Detect Pwnagotchi [enabled](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/screenshots/pwn2.jpg) in the WiFi Sniffers submenu (currently only for builds without GPS. Fix hopefully soon)**
 
 - **Version 0.13.9 added to the CYM web flasher, will push files needed to compile from source soon** 
 
