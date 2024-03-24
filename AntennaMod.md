@@ -7,7 +7,9 @@ This workaround is relatively simple and the required parts are inexpensive, oft
 ## Required Components
 
 ![Components](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/img/1.jpeg)
-
+1. **ESP/CYD of your choosing**
+2. **UFL to reverse polarity SMA lead with UFL connector removed and 5mm of shield and center exposed and tinned with solder**
+3. **Reverse polarity SMA 2.4GHz antenna**
 ## Step-by-Step Guide
 <!--
 1. **Prepare Your Workspace and Tools:** Make sure you have a steady hand and the right tools. A fine soldering tip and some magnification can help.
