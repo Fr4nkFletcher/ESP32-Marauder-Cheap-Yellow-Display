@@ -46,3 +46,5 @@ A big shoutout to the creators and supporters of the [ESP32 Cheap Yellow Display
 </p>
 
 <p align="left"> <img src="https://komarev.com/ghpvc/?username=Fr4nkFletcher&label=Views&color=0e75b6&style=flat" alt="Fr4nkFletcher" /> </p>
+<br>
+<img src="https://img.shields.io/github/downloads/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/total" alt="Downloads"/></a>
