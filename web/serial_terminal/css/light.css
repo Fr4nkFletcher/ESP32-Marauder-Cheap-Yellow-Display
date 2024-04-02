@@ -1,0 +1,79 @@
+.header {
+  background: #000;
+  color: #fff;
+}
+
+body {
+  background-color: #fff;
+  color: #000;
+}
+
+input, select, button {
+  background-color: #fff;
+  color: #000;
+}
+
+.notSupported, .notSupported a {
+  background-color: red;
+  color: white;
+}
+
+.footer button {
+  border-color: #63338f;
+  background-color: #fff;
+  color: #63338f;
+}
+
+.footer button:hover {
+  background-color: #63338f;
+  color: #fff;
+}
+
+.remix button {
+  border-color: #333;
+  color: #333;
+}
+
+.remix button:hover {
+  background-color: #333;
+}
+
+.firmware {
+  border-color: #63338f;
+  color: #63338f;
+}
+
+.firmware:focus,
+.firmware:hover {
+  background-color: #63338f;
+  color: #fff;
+}
+
+.firmware:disabled {
+  background-color: #ddd;
+  color: #888;
+}
+
+.firmware:disabled:hover {
+  background-color: #ddd;
+}
+
+#commands .buttons button {
+  border-color: #333;
+}
+
+#commands .buttons button:disabled,
+#commands .buttons button:disabled:hover {
+  border-color: #ccc;
+  background-color: #ddd;
+  color: #888;
+}
+
+#commands .buttons button:hover {
+  background-color: #333;
+  color: #fff;
+}
+
+.progress-bar {
+  border-color: #333;
+}

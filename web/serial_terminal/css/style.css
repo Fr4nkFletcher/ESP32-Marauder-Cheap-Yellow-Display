@@ -1,0 +1,383 @@
+/**
+ * Header
+ */
+
+.header {
+  box-sizing: border-box;
+  font-size: 16px;
+  height: 85px;
+  line-height: 40px;
+  padding: 20px 70px 0px 70px; /* TRouBLe */
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+  margin: 0;
+  border-bottom: 5px solid #00a7e9;
+}
+
+.header h1 {
+  flex: 1;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.header button {
+  border: solid 2px #fff;
+  background-color: #000;
+  color: #fff;
+  margin-left: 20px;
+  height: 30px;
+}
+
+.header button:hover {
+  background-color: #fff;
+  color: #000;
+}
+
+button,
+.firmware {
+  height: 25px;
+  font-size: 16px;
+  border-radius: 15px;
+  padding-left: 20px;
+  padding-right: 20px;
+  border-width: 2px;
+}
+
+body {
+  font-family: proxima-nova, sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+input,
+select,
+button,
+label {
+  font-weight: 600;
+  outline: none;
+}
+
+div.left {
+  float: left;
+  display: flex;
+  align-items: center;
+}
+
+div.right {
+  float: right;
+  display: flex;
+  align-items: center;
+}
+
+div.clear {
+  clear: both;
+}
+
+.main {
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-top: 80px;
+}
+
+.hidden {
+  display: none;
+}
+
+.notSupported {
+  padding: 1em;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.subheader {
+  height: 100px;
+  line-height: 100px;
+  padding-left: 70px;
+  padding-right: 70px;
+}
+
+.subheader .title {
+  font-size: 36px;
+  font-weight: 500;
+}
+
+#app.connected #commands {
+  height: 200px;
+}
+
+#app.connected #log {
+  height: calc(100vh - 530px);
+}
+
+#app #commands {
+  height: 0;
+}
+
+#app #log {
+  height: calc(100vh - 330px);
+}
+
+#commands,
+#log {
+  transition: height 0.5s;
+}
+
+#commands {
+  position: relative;
+  margin: 0 auto;
+  overflow-y: auto;
+  padding: 0 60px;
+}
+
+#log {
+  max-width: 100%;
+  font-family: pt-mono, monospace;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  overflow-x: hidden;
+  overflow-x: auto;
+  transition: color 0.1s linear;
+  padding: 0 50px;
+  border: 20px solid #000;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  background-color: #000;
+  color: #cecece;
+}
+
+#log::-webkit-scrollbar {
+  display: none;
+}
+
+.footer {
+  padding-left: 70px;
+  padding-right: 70px;
+}
+
+.footer a {
+  color: blue;
+}
+
+.footer .controls {
+  line-height: 45px;
+}
+
+.footer button {
+  font-size: 14px;
+  margin: 0 10px;
+}
+
+.remix {
+  display: flex;
+  justify-content: center;
+  height: 60px;
+  position: relative;
+}
+
+.remix button {
+  position: absolute;
+  bottom: 11px;
+}
+
+#templates {
+  display: none;
+}
+
+/* On/Off Switch Widget */
+.onoffswitch {
+  display: inline-block;
+  position: relative;
+  width: 50px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  margin-left: 10px;
+}
+
+.onoffswitch-checkbox {
+  display: none;
+}
+
+.onoffswitch-label {
+  display: block;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid #900;
+  border-radius: 15px;
+  transition: border 0.3s ease-in 0s;
+}
+
+.onoffswitch-inner {
+  display: block;
+  width: 200%;
+  margin-left: -100%;
+  transition: margin 0.3s ease-in 0s;
+}
+
+.onoffswitch-inner:before,
+.onoffswitch-inner:after {
+  display: block;
+  float: left;
+  width: 50%;
+  height: 25px;
+  padding: 0;
+  line-height: 25px;
+  font-size: 14px;
+  color: white;
+  font-family: proxima-nova, sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  box-sizing: border-box;
+}
+
+.onoffswitch-inner:before {
+  content: "on";
+  padding-left: 6px;
+  background-color: #8ec641;
+  color: #fff;
+}
+
+.onoffswitch-inner:after {
+  content: "off";
+  padding-right: 6px;
+  background-color: #c64141;
+  color: #fff;
+  text-align: right;
+}
+
+.onoffswitch-switch {
+  display: block;
+  width: 19px;
+  margin: 3px;
+  background: #fff;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 23px;
+  border: 1px solid #900;
+  border-radius: 15px;
+  transition: all 0.3s ease-in 0s;
+}
+
+.onoffswitch-checkbox:checked + .onoffswitch-label {
+  border-color: #71ae1e;
+}
+
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+  margin-left: 0;
+}
+
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+  right: 0px;
+  border-color: #67ac38;
+}
+
+.footer .onoffswitch {
+  margin-right: 20px;
+  top: 7px;
+}
+
+#butClear {
+  margin-top: 10px;
+}
+
+#commands {
+  min-width: 600px;
+  justify-content: center;
+  position: relative;
+  align-items: center;
+}
+
+#commands .upload {
+  width: 600px;
+  display: flex;
+  align-items: center;
+  margin: 5px auto;
+  justify-content: center;
+}
+
+#commands .upload .offset {
+  width: 50px;
+}
+
+#commands .upload label {
+  white-space: nowrap;
+}
+
+.firmware > input {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+.firmware {
+  border-style: solid;
+  margin-left: 20px;
+  margin-right: 20px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.firmware > svg {
+  margin-right: 10px;
+}
+
+.debug-function {
+  color: #8ec641;
+}
+
+.error-message {
+  color: #c64141;
+}
+
+.timestamp {
+  color: #8ec641;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 24px;
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 10px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.progress-bar > div {
+  height: 24px;
+  background-color: #71ae1e;
+  width: 0;
+}
+
+#commands .buttons {
+  display: flex;
+  justify-content: center;
+  width: 600px;
+  margin: 10px auto;
+}
+
+#commands .buttons button {
+  margin-left: 10px;
+  margin-right: 10px;
+  border-width: 2px;
+  border-style: solid;
+}
+.justify {
+  display: flex;
+  justify-content: space-between;
+}
+.center {
+  text-align: center;
+}
