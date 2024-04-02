@@ -1,0 +1,161 @@
+.header {
+  background: #000;
+  color: #fff;
+}
+
+body {
+  background-color: #333;
+  color: #fff;
+}
+
+input, select, button {
+  background-color: #333;
+  color: #fff;
+}
+
+.footer button {
+  border-color: #fff;
+  background-color: #333;
+  color: #fff;
+}
+
+.footer button:hover {
+  background-color: #fff;
+  color: #333;
+}
+
+.remix button {
+  border-color: #fff;
+  color: #fff;
+}
+
+.remix button:hover {
+  background-color: #fff;
+}
+
+
+#commands button {
+  border-color: #fff;
+  background-color: #333;
+  color: #fff;
+}
+
+#commands button:hover {
+  background-color: #fff;
+  color: #333;
+}
+
+.notSupported, .notSupported a {
+  background-color: red;
+  color: white;
+}
+
+.firmware {
+  border-color: #fff;
+  color: #fff;
+}
+
+.firmware:focus,
+.firmware:hover {
+  background-color: #fff;
+  color: #333;
+}
+
+.firmware:disabled {
+  color: #ccc;
+  border-color: #ccc;
+}
+
+.firmware:disabled:hover {
+  background-color: #fff;
+}
+
+input {
+  background-color: #fff;
+  color: #333;
+}
+
+#commands .buttons button:disabled,
+#commands .buttons button:disabled:hover{
+  border-color: #999;
+  background-color: #888;
+  color: #ccc;
+}
+
+#commands .buttons button:hover {
+  background-color: #fff;
+}
+
+.progress-bar {
+  border-color: #fff;
+}
+.terminal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: #000;
+  color: #cecece;
+  font-family: 'proxima-nova', sans-serif;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+.connection-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  box-sizing: border-box;
+}
+
+.connection-controls-left label {
+  position: absolute;
+  transform: translateY(-100%); 
+  color: #FFFFFF;
+  font-family: monospace;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.connection-controls-left,
+.connection-controls-right {
+  display: flex;
+  align-items: center;
+}
+
+.terminal-output {
+  flex-grow: 1;
+  background-color: #252525;
+  color: #cecece;
+  border: 1px solid #111111;
+  padding: 10px;
+  overflow-y: auto;
+  overflow-x: auto;
+  margin-bottom: 10px;
+  white-space: pre;
+  word-wrap: break-word;
+  overflow-wrap: break-word; 
+}
+
+.terminal-input-row {
+  display: flex;
+  align-items: center;
+}
+
+.terminal-input {
+  flex-grow: 1;
+  background-color: #252525;
+  color: #FFFFFF;
+  padding: 5px;
+  border-radius: 0;
+  border: 2px solid #111111;
+  margin-right: 10px;
+}
+
+.dropdown-container {
+    margin-bottom: 5px; 
+}
