@@ -19,6 +19,8 @@
 
 - **For Evil Portal examples, click [here](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/Evil%20Portal/).**
 
+= **How to add an external [antenna](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/AntennaMod.md).**
+
 ## Web Flasher Instructions
 - **Visit:** [CYM-Web-Flasher](https://fr4nkfletcher.github.io/ESP32-Marauder-Cheap-Yellow-Display/flash0.html)
 
