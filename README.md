@@ -3,9 +3,13 @@
 <p align="center">
   <img alt="Marauder logo" src="https://github.com/justcallmekoko/ESP32Marauder/blob/master/pictures/marauder3L.jpg?raw=true" width="300">
 </p>
+<div align="center">  
+  
+  ## 🌟 Update Highlight 04/2/24 - [Webserial Terminal](https://fr4nkfletcher.github.io/ESP32-Marauder-Cheap-Yellow-Display/serial_terminal.html) 🌟
 
-## 🌟 Update Highlights 03/17/24 🌟
-- **Detect Pwnagotchi [enabled](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/screenshots/pwn2.jpg) in the WiFi Sniffers submenu (currently only for builds without GPS. Fix hopefully soon)**
+</div>
+
+  - **Detect Pwnagotchi [enabled](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/screenshots/pwn2.jpg) in the WiFi Sniffers submenu (currently only for builds without GPS. Fix hopefully soon)**
 
 - **Version 0.13.9 added to the CYM web flasher, will push files needed to compile from source soon** 
 
