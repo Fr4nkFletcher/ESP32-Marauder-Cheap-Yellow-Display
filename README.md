@@ -17,7 +17,7 @@
     
 - **Unrelated to the 0.13.9 release: SwiftPair Spam now 100% functional** Samsung, Google, and BLE spam will still crash on occasion but definitely an improvement and usable now. Waiting 10 seconds before each scan seems to help also.
 
-- For Evil Portal examples, click [here](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/Evil%20Portal/README.md)
+- **For Evil Portal examples, click [here](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/Evil%20Portal/README.md).**
 
 ## Web Flasher Instructions
 - **Visit:** [CYM-Web-Flasher](https://fr4nkfletcher.github.io/ESP32-Marauder-Cheap-Yellow-Display/flash0.html)
