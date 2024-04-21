@@ -47,7 +47,7 @@ Ensure the upload speed is set to `115200` in Arduino IDE (tested with version 1
 
 ## Acknowledgments
 
-A big shoutout to the creators and supporters of the [ESP32 Cheap Yellow Display](https://github.com/witnessmenow/ESP32-Cheap-Yellow-Display) project and the community Discord, especially **@cod5fgzj**, [**smoochiee**](https://github.com/smoochiee), and [**ggaljoen**](https://github.com/ggaljoen). And of course JustCallMeKoko for the foundational work on the ESP32 Marauder.
+A big shoutout to the creators and supporters of the [ESP32 Cheap Yellow Display](https://github.com/witnessmenow/ESP32-Cheap-Yellow-Display) project and the community Discord, especially **@cod5fgzj**, [**smoochiee**](https://github.com/smoochiee), [**ggaljoen**](https://github.com/ggaljoen), and [**ATOMNFT**](https://github.com/ATOMNFT). And of course JustCallMeKoko for the foundational work on the ESP32Marauder.
 
 <p align="center">
   <img src="https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/screenshots/2.gif" alt="Demo 1">
