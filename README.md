@@ -5,7 +5,7 @@
 </p>
 <div align="center">  
   
-  ## 🌟 Update Highlight 04/2/24 - [Webserial Terminal](https://fr4nkfletcher.github.io/ESP32-Marauder-Cheap-Yellow-Display/serial_terminal.html) 🌟
+  ## 🌟 Update Highlight 04/22/24 - [Webflasher moved over to Adafruit Web Serial Tools](https://fr4nkfletcher.github.io/Adafruit_WebSerial_ESPTool/) 🌟
 
 </div>
 
@@ -23,7 +23,7 @@
 
 
 ## Web Flasher Instructions
-- **Visit:** [CYM-Web-Flasher](https://fr4nkfletcher.github.io/ESP32-Marauder-Cheap-Yellow-Display/flash0.html)
+- **Visit:** [CYM-Web-Flasher](https://fr4nkfletcher.github.io/Adafruit_WebSerial_ESPTool/)
 
 - **Choose your hardware** and click **Connect** to start the flashing process.
 
