@@ -3,6 +3,11 @@
 <p align="center">
   <img alt="Marauder logo" src="https://github.com/justcallmekoko/ESP32Marauder/blob/master/pictures/marauder3L.jpg?raw=true" width="300">
 </p>
+
+
+![Webflasher](https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/actions/workflows/pages.yml/badge.svg)
+
+
 <div align="center">  
   
   ## 🌟 Update Highlight 04/22/24 - [Webflasher moved over to Adafruit Web Serial Tools](https://fr4nkfletcher.github.io/Adafruit_WebSerial_ESPTool/) 🌟
@@ -25,7 +30,7 @@
 ## Web Flasher Instructions
 - **Visit:** [CYM-Web-Flasher](https://fr4nkfletcher.github.io/Adafruit_WebSerial_ESPTool/)
 
-- **Choose your hardware** and click **Connect** to start the flashing process.
+- **Click Connect** and select **Model, Version, and Firmware**. Select **Program** to start the flashing process.
 
 ## Compatibility
 
