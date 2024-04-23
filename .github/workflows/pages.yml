@@ -33,6 +33,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
+      = name: Install tc
+        run : npm install typescript
       - name: Install Yarn with NPM
         run: npm install -g yarn
       - name: yarn install
