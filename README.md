@@ -32,6 +32,10 @@
 
 - **Click Connect** and select **Model**. Click **Program** to start the flashing process.
 
+<p align="center">
+  <img src="https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/blob/main/assets/sc4.png" alt="Demo 1">
+</p>
+
 ## Compatibility
 
 Successfully tested on both of these available on Amazon:
