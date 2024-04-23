@@ -30,7 +30,7 @@
 ## Web Flasher Instructions
 - **Visit:** [CYM-Web-Flasher](https://fr4nkfletcher.github.io/Adafruit_WebSerial_ESPTool/)
 
-- **Click Connect** and select **Model, Version, and Firmware**. Select **Program** to start the flashing process.
+- **Click Connect** and select **Model**. Click **Program** to start the flashing process.
 
 ## Compatibility
 
