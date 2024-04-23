@@ -36,7 +36,7 @@ jobs:
       - name: Install Yarn with NPM
         run: npm install -g yarn
       - name: npm sd
-        run: npm install -g tsc
+        run: npm install typescript
       - name: yarn install
         run: yarn install
       - name: Compile TypeScript
