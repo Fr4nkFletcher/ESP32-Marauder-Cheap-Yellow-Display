@@ -4,10 +4,10 @@
   <img alt="Marauder logo" src="https://github.com/justcallmekoko/ESP32Marauder/blob/master/pictures/marauder3L.jpg?raw=true" width="300">
 </p>
 
-
+<div align="center">
+  
 ![Webflasher](https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/actions/workflows/pages.yml/badge.svg)
-
-
+</div>
 <div align="center">  
   
   ## 🌟 Update Highlight 04/22/24 - [Webflasher moved over to Adafruit Web Serial Tools](https://fr4nkfletcher.github.io/Adafruit_WebSerial_ESPTool/) 🌟
