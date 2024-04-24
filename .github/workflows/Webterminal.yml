@@ -1,0 +1,61 @@
+name: Webterminal 
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["master"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Build from Source and Deploy
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install node v16
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install Yarn with NPM
+        run: npm install -g yarn
+      - name: yarn install
+        run: yarn install
+      - name: Compile TypeScript
+        run: |
+          set -e
+          rm -rf dist
+          NODE_ENV=production npx tsc --pretty
+          NODE_ENV=production npm exec -- rollup -c
+      - name: Commit Distribution Files
+        uses: stefanzweifel/git-auto-commit-action@v5
+        if: startswith(github.repository, 'adafruit/')
+        with:
+          repository: 'dist'
+          commit_message: "Github Action: Updated dist files"
+          status_options: '--ignored=matching'
+          add_options: '-fA'
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
