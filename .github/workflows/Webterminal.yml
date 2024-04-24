@@ -36,6 +36,8 @@ jobs:
         run: npm install -g yarn
       - name: yarn install
         run: yarn install
+       - name: Install TypeScript
+        run: npm install typescript
       - name: Compile TypeScript
         run: |
           set -e
