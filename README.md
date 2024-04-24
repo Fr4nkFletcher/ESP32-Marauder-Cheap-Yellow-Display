@@ -8,7 +8,7 @@
   
 
   
-  ## 🌟 Update Highlight 04/22/24 - [Webflasher moved over to Adafruit Web Serial Tools](https://fr4nkfletcher.github.io/Adafruit_WebSerial_ESPTool/) 🌟
+  ## 🎩 Update Highlights 04/22/24 - [Webflasher moved over to Adafruit Web Serial Tools](https://fr4nkfletcher.github.io/Adafruit_WebSerial_ESPTool/) 🎩
 
 </div>
 
