@@ -42,7 +42,7 @@ jobs:
         run: |
           set -e
           rm -rf dist
-          NODE_ENV=production npx tsc
+          NODE_ENV=production npx exec -- tsc
           NODE_ENV=production npm npm exec -- rollup -c
       - name: Commit Distribution Files
         uses: stefanzweifel/git-auto-commit-action@v5
