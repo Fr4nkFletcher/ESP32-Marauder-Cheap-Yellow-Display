@@ -36,12 +36,14 @@ jobs:
         run: npm install -g yarn
       - name: yarn install
         run: yarn install
+      - name: Install TypeScript
+        run: npm install typescript --save-dev
       - name: Compile TypeScript
         run: |
           set -e
           rm -rf dist
-          NODE_ENV=production npm exec -- tsc
-          NODE_ENV=production npm exec -- rollup -c
+          NODE_ENV=production npx tsc
+          NODE_ENV=production npm npm exec -- rollup -c
       - name: Commit Distribution Files
         uses: stefanzweifel/git-auto-commit-action@v5
         if: startswith(github.repository, 'adafruit/')
