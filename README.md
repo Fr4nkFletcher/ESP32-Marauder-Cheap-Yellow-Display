@@ -4,9 +4,11 @@
   <img alt="Marauder logo" src="https://github.com/justcallmekoko/ESP32Marauder/blob/master/pictures/marauder3L.jpg?raw=true" width="300">
 </p>
 
-<div align="center">
-  
+<p align="center"> <img src="https://komarev.com/ghpvc/?username=Fr4nkFletcher&label=Views&color=0e75b6&style=flat" alt="Fr4nkFletcher" />
+<img src="https://img.shields.io/github/issues/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display?style=flat-square" /> <img src="https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/actions/workflows/pages.yml/badge.svg" />
+</p>
 
+<div align="center">
   
   ## 🎩 Update Highlights 04/22/24 - [Webflasher moved over to Adafruit Web Serial Tools](https://fr4nkfletcher.github.io/Adafruit_WebSerial_ESPTool/) 🎩
 
@@ -32,7 +34,11 @@
 
 <p align="center">
   <img src="https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/blob/main/assets/sc4.png" alt="Demo 1">
+  
+  For more info on the webflasher visit ---> https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool
 </p>
+
+
 
 ## Compatibility
 
@@ -61,6 +67,3 @@ A big shoutout to the creators and supporters of the [ESP32 Cheap Yellow Display
   <img src="https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/screenshots/swift2.gif" alt="Demo 2">
 </p>
 
-<p align="center"> <img src="https://komarev.com/ghpvc/?username=Fr4nkFletcher&label=Views&color=0e75b6&style=flat" alt="Fr4nkFletcher" />
-<img src="https://img.shields.io/github/issues/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display?style=flat-square" /> <img src="https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/actions/workflows/pages.yml/badge.svg" />
-</p>
