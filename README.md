@@ -10,21 +10,17 @@
 
 <div align="center">
   
-  ## 🎩 Update Highlights 04/26/24 - Web Flasher updated to Marauder v0.13.10 🎩
+  ## 🎩 Update Highlights 04/26/24 — Marauder v0.13.10 🎩
 
 </div>
 
-  - **Detect Pwnagotchi [enabled](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/screenshots/pwn2.jpg) in the WiFi Sniffers submenu (currently only for builds without GPS. Fix hopefully soon)**
-
-- **Version 0.13.9 added to the CYM web flasher, will push files needed to compile from source soon** 
-
-- **Added builds without GPS to the web flasher to allow for serial CLI access to the CYM.**
+  - **Detect Pwnagotchi [enabled](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/screenshots/pwn2.jpg) in the WiFi Sniffers submenu for builds without GPS**
     
-- **Unrelated to the 0.13.9 release: SwiftPair Spam now 100% functional** Samsung, Google, and BLE spam will still crash on occasion but definitely an improvement and usable now. Waiting 10 seconds before each scan seems to help also.
+- **SwiftPair Spam now 100% functional** — Samsung, Google, and BLE spam crashing should now be nonexistent.
 
 - **For Evil Portal examples, click [here](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/Evil%20Portal/).**
 
-- **Information on adding an external [antenna](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/AntennaMod.md)**
+- **For info on adding an external antenna, click [here](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/AntennaMod.md).**
 
 
 ## Web Flasher Instructions
