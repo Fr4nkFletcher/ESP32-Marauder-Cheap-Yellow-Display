@@ -79,6 +79,7 @@ bool SDInterface::initSD() {
         SD.mkdir("/SCRIPTS");
         Serial.println("/SCRIPTS created");
       }
+
     
       return true;
   }
@@ -96,6 +97,13 @@ File SDInterface::getFile(String path) {
     //if (file)
     return file;
   }
+}
+
+bool SDInterface::removeFile(String file_path) {
+  if (SD.remove(file_path))
+    return true;
+  else
+    return false;
 }
 
 void SDInterface::listDirToLinkedList(LinkedList<String>* file_names, String str_dir, String ext) {

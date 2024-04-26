@@ -22,7 +22,7 @@
   //#define XIAO_ESP32_S3
   //// END BOARD TARGETS
 
-  #define MARAUDER_VERSION "v0.13.7"
+  #define MARAUDER_VERSION "v0.13.10"
 
   //// HARDWARE NAMES
   #ifdef MARAUDER_M5STICKC
@@ -85,13 +85,13 @@
     //#define HAS_BATTERY
     #define HAS_BT
     //#define HAS_BUTTONS
-    //#define HAS_NEOPIXEL_LED
+    #define HAS_NEOPIXEL_LED
     #define HAS_PWR_MGMT
     #define HAS_SCREEN
     #define HAS_SD
     #define USE_SD
     //#define HAS_TEMP_SENSOR
-    #define HAS_GPS
+    //#define HAS_GPS
   #endif
 
   #if defined(MARAUDER_V6) || defined(MARAUDER_V6_1)
@@ -379,7 +379,7 @@
     
       #define STATUSBAR_COLOR 0x4A49
     
-      #define KIT_LED_BUILTIN 13
+      #define KIT_LED_BUILTIN 17
     #endif
 
     #if defined(MARAUDER_V6) || defined(MARAUDER_V6_1)
