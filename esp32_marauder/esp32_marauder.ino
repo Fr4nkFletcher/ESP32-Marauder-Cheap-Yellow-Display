@@ -36,6 +36,8 @@ https://www.online-utility.org/image/convert/to/XBM
 #include "Buffer.h"
 
 #ifdef MARAUDER_FLIPPER
+  #include "flipperLED.h" 
+#elif defined(MARAUDER_V4)
   #include "flipperLED.h"
 #elif defined(XIAO_ESP32_S3)
   #include "xiaoLED.h"
@@ -121,6 +123,8 @@ CommandLine cli_obj;
 
 #ifdef MARAUDER_FLIPPER
   flipperLED flipper_led;
+#elif defined(MARAUDER_V4)
+  flipperLED flipper_led;  
 #elif defined(XIAO_ESP32_S3)
   xiaoLED xiao_led;
 #elif defined(MARAUDER_M5STICKC)
@@ -331,6 +335,8 @@ void setup()
   // Do some LED stuff
   #ifdef MARAUDER_FLIPPER
     flipper_led.RunSetup();
+  #elif defined(MARAUDER_V4)
+    flipper_led.RunSetup();  
   #elif defined(XIAO_ESP32_S3)
     xiao_led.RunSetup();
   #elif defined(MARAUDER_M5STICKC)
@@ -445,6 +451,8 @@ void loop()
   }
   #ifdef MARAUDER_FLIPPER
     flipper_led.main();
+  #elif defined(MARAUDER_V4)
+    flipper_led.main();  
   #elif defined(XIAO_ESP32_S3)
     xiao_led.main();
   #elif defined(MARAUDER_M5STICKC)
@@ -469,6 +477,8 @@ void loop()
 
     #ifdef MARAUDER_FLIPPER
       flipper_led.main();
+    #elif defined(MARAUDER_V4)
+    flipper_led.main();  
     #elif defined(XIAO_ESP32_S3)
       xiao_led.main();
     #else

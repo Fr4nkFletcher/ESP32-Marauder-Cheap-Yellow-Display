@@ -85,7 +85,7 @@
     //#define HAS_BATTERY
     #define HAS_BT
     //#define HAS_BUTTONS
-    #define HAS_NEOPIXEL_LED
+    //#define HAS_NEOPIXEL_LED
     #define HAS_PWR_MGMT
     #define HAS_SCREEN
     #define HAS_SD
@@ -379,7 +379,7 @@
     
       #define STATUSBAR_COLOR 0x4A49
     
-      #define KIT_LED_BUILTIN 17
+      #define KIT_LED_BUILTIN 4
     #endif
 
     #if defined(MARAUDER_V6) || defined(MARAUDER_V6_1)
@@ -775,7 +775,7 @@
     #elif defined(MARAUDER_DEV_BOARD_PRO)
       #define PIN 16
     #else
-      #define PIN 25
+      #define PIN 4
     #endif
   
   #endif
