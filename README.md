@@ -14,7 +14,9 @@
 
 </div>
 
-  - **Detect Pwnagotchi [enabled](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/screenshots/pwn2.jpg) in the WiFi Sniffers submenu for builds without GPS**
+- **Enabled the RGB LED for builds w/o GPS** 
+
+- **Detect Pwnagotchi [enabled](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/screenshots/pwn2.jpg) in the WiFi Sniffers submenu for builds without GPS**
     
 - **SwiftPair Spam now 100% functional** — Samsung, Google, and BLE spam crashing should now be nonexistent.
 
