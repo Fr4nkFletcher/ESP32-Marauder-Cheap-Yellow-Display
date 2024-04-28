@@ -8,9 +8,9 @@
 
 #include <Arduino.h>
 
-#define B_PIN 4
-#define G_PIN 5
-#define R_PIN 6
+#define B_PIN 17
+#define G_PIN 16
+#define R_PIN 4
 
 extern Settings settings_obj;
 

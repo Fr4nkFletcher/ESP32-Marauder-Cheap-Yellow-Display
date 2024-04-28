@@ -37,6 +37,8 @@
 #include "Assets.h"
 #ifdef MARAUDER_FLIPPER
   #include "flipperLED.h"
+#elif defined(MARAUDER_V4)
+  #include "flipperLED.h"
 #elif defined(XIAO_ESP32_S3)
   #include "xiaoLED.h"
 #elif defined(MARAUDER_M5STICKC)
@@ -108,12 +110,14 @@ extern EvilPortal evil_portal_obj;
 #ifdef HAS_GPS
   extern GpsInterface gps_obj;
 #endif
-extern Buffer buffer_obj;
+  extern Buffer buffer_obj;
 #ifdef HAS_BATTERY
   extern BatteryInterface battery_obj;
 #endif
-extern Settings settings_obj;
+  extern Settings settings_obj;
 #ifdef MARAUDER_FLIPPER
+  extern flipperLED flipper_led;  
+#elif defined(MARAUDER_V4)
   extern flipperLED flipper_led;
 #elif defined(XIAO_ESP32_S3)
   extern xiaoLED xiao_led;
