@@ -82,7 +82,7 @@
 
   #ifdef MARAUDER_V4
     //#define FLIPPER_ZERO_HAT
-    //#define HAS_BATTERY
+    #define HAS_BATTERY
     #define HAS_BT
     //#define HAS_BUTTONS
     //#define HAS_NEOPIXEL_LED
@@ -91,7 +91,7 @@
     #define HAS_SD
     #define USE_SD
     //#define HAS_TEMP_SENSOR
-    //#define HAS_GPS
+    #define HAS_GPS
   #endif
 
   #if defined(MARAUDER_V6) || defined(MARAUDER_V6_1)
