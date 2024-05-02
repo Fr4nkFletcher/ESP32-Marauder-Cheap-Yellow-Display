@@ -40,7 +40,7 @@
 
 ## Compatibility
 
-Successfully tested on both of these available on Amazon:
+Successfully tested on both of these devices:
 - [Module 1](https://amazon.com/dp/B0BVFXR313)
 - [Module 2](https://amazon.com/dp/B0CLR7MQ91)
 
