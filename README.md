@@ -10,15 +10,9 @@
 
 <div align="center">
   
-  ## 🎩 Update Highlights 06/27/24 — Marauder v1.0.0 🎩
+  ## 🏴‍☠️ Update Highlights 06/27/24 — Marauder v1.0.0 🏴‍☠️
 
 </div>
-
-- **RGB LED enabled thanks to [**lsdlsd88**](https://github.com/lsdlsd88)**
-
-- **Detect Pwnagotchi [enabled](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/screenshots/pwn2.jpg) in the WiFi Sniffers submenu for builds without GPS**
-    
-- **SwiftPair Spam now 100% functional** — Samsung, Google, and BLE spam crashing should now be nonexistent.
 
 - **For Evil Portal examples, click [here](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/Evil%20Portal/).**
 
