@@ -19,26 +19,29 @@
 */
 #include "Arduino.h"
 #include "AsyncEventSource.h"
+#ifndef ESP8266
+  #include <rom/ets_sys.h>
+#endif
 
 static String generateEventMessage(const char *message, const char *event, uint32_t id, uint32_t reconnect){
-  String ev = "";
+  String ev;
 
   if(reconnect){
-    ev += "retry: ";
-    ev += String(reconnect);
-    ev += "\r\n";
+    ev += F("retry: ");
+    ev += reconnect;
+    ev += F("\r\n");
   }
 
   if(id){
-    ev += "id: ";
+    ev += F("id: ");
     ev += String(id);
-    ev += "\r\n";
+    ev += F("\r\n");
   }
 
   if(event != NULL){
-    ev += "event: ";
+    ev += F("event: ");
     ev += String(event);
-    ev += "\r\n";
+    ev += F("\r\n");
   }
 
   if(message != NULL){
@@ -54,9 +57,9 @@ static String generateEventMessage(const char *message, const char *event, uint3
         if(ldata != NULL){
           memcpy(ldata, lineStart, llen);
           ldata[llen] = 0;
-          ev += "data: ";
+          ev += F("data: ");
           ev += ldata;
-          ev += "\r\n\r\n";
+          ev += F("\r\n\r\n");
           free(ldata);
         }
         lineStart = (char *)message + messageLen;
@@ -89,14 +92,14 @@ static String generateEventMessage(const char *message, const char *event, uint3
         if(ldata != NULL){
           memcpy(ldata, lineStart, llen);
           ldata[llen] = 0;
-          ev += "data: ";
+          ev += F("data: ");
           ev += ldata;
-          ev += "\r\n";
+          ev += F("\r\n");
           free(ldata);
         }
         lineStart = nextLine;
         if(lineStart == ((char *)message + messageLen))
-          ev += "\r\n";
+          ev += F("\r\n");
       }
     } while(lineStart < ((char *)message + messageLen));
   }
@@ -137,29 +140,30 @@ size_t AsyncEventSourceMessage::ack(size_t len, uint32_t time) {
   return 0;
 }
 
+// This could also return void as the return value is not used.
+// Leaving as-is for compatibility...
 size_t AsyncEventSourceMessage::send(AsyncClient *client) {
-  const size_t len = _len - _sent;
-  if(client->space() < len){
-    return 0;
-  }
-  size_t sent = client->add((const char *)_data, len);
-  if(client->canSend())
-    client->send();
-  _sent += sent;
-  return sent; 
+    if (_sent >= _len) {
+      return 0;
+    }
+    const size_t len_to_send = _len - _sent;
+    auto position = reinterpret_cast<const char*>(_data + _sent);
+    const size_t sent_now = client->write(position, len_to_send);
+    _sent += sent_now;
+    return sent_now;
 }
 
 // Client
 
 AsyncEventSourceClient::AsyncEventSourceClient(AsyncWebServerRequest *request, AsyncEventSource *server)
-: _messageQueue(ESPAsyncWebServer::LinkedList<AsyncEventSourceMessage *>([](AsyncEventSourceMessage *m){ delete  m; }))
+: _messageQueue(AlternativeLinkedList<AsyncEventSourceMessage *>([](AsyncEventSourceMessage *m){ delete  m; }))
 {
   _client = request->client();
   _server = server;
   _lastId = 0;
-  if(request->hasHeader("Last-Event-ID"))
-    _lastId = atoi(request->getHeader("Last-Event-ID")->value().c_str());
-    
+  if(request->hasHeader(F("Last-Event-ID")))
+    _lastId = atoi(request->getHeader(F("Last-Event-ID"))->value().c_str());
+
   _client->setRxTimeout(0);
   _client->onError(NULL, NULL);
   _client->onAck([](void *r, AsyncClient* c, size_t len, uint32_t time){ (void)c; ((AsyncEventSourceClient*)(r))->_onAck(len, time); }, this);
@@ -173,7 +177,9 @@ AsyncEventSourceClient::AsyncEventSourceClient(AsyncWebServerRequest *request, A
 }
 
 AsyncEventSourceClient::~AsyncEventSourceClient(){
-   _messageQueue.free();
+  _lockmq.lock();
+  _messageQueue.free();
+  _lockmq.unlock();
   close();
 }
 
@@ -184,32 +190,44 @@ void AsyncEventSourceClient::_queueMessage(AsyncEventSourceMessage *dataMessage)
     delete dataMessage;
     return;
   }
+  //length() is not thread-safe, thus acquiring the lock before this call..
+  _lockmq.lock();
   if(_messageQueue.length() >= SSE_MAX_QUEUED_MESSAGES){
-      ets_printf("ERROR: Too many messages queued\n");
+#ifdef ESP8266
+    ets_printf(String(F("ERROR: Too many messages queued\n")).c_str());
+#else
+    log_e("Too many messages queued: deleting message");
+#endif
       delete dataMessage;
   } else {
-      _messageQueue.add(dataMessage);
+    _messageQueue.add(dataMessage);
+    // runqueue trigger when new messages added
+    if(_client->canSend()) {
+      _runQueue();
+    }
   }
-  if(_client->canSend())
-    _runQueue();
+  _lockmq.unlock();
 }
 
 void AsyncEventSourceClient::_onAck(size_t len, uint32_t time){
+  // Same here, acquiring the lock early
+  _lockmq.lock();
   while(len && !_messageQueue.isEmpty()){
     len = _messageQueue.front()->ack(len, time);
     if(_messageQueue.front()->finished())
       _messageQueue.remove(_messageQueue.front());
   }
-
   _runQueue();
+  _lockmq.unlock();
 }
 
 void AsyncEventSourceClient::_onPoll(){
+  _lockmq.lock();
   if(!_messageQueue.isEmpty()){
     _runQueue();
   }
+  _lockmq.unlock();
 }
-
 
 void AsyncEventSourceClient::_onTimeout(uint32_t time __attribute__((unused))){
   _client->close(true);
@@ -234,15 +252,23 @@ void AsyncEventSourceClient::send(const char *message, const char *event, uint32
   _queueMessage(new AsyncEventSourceMessage(ev.c_str(), ev.length()));
 }
 
-void AsyncEventSourceClient::_runQueue(){
-  while(!_messageQueue.isEmpty() && _messageQueue.front()->finished()){
-    _messageQueue.remove(_messageQueue.front());
-  }
+size_t AsyncEventSourceClient::packetsWaiting() const {
+    size_t len;
+    _lockmq.lock();
+    len = _messageQueue.length();
+    _lockmq.unlock();
+    return len;
+}
 
-  for(auto i = _messageQueue.begin(); i != _messageQueue.end(); ++i)
-  {
-    if(!(*i)->sent())
+void AsyncEventSourceClient::_runQueue() {
+  // Calls to this private method now already protected by _lockmq acquisition
+  // so no extra call of _lockmq.lock() here..
+  for (auto i = _messageQueue.begin(); i != _messageQueue.end(); ++i) {
+    // If it crashes here, iterator (i) has been invalidated as _messageQueue
+    // has been changed... (UL 2020-11-15: Not supposed to happen any more ;-) )
+    if (!(*i)->sent()) {
       (*i)->send(_client);
+    }
   }
 }
 
@@ -251,7 +277,7 @@ void AsyncEventSourceClient::_runQueue(){
 
 AsyncEventSource::AsyncEventSource(const String& url)
   : _url(url)
-  , _clients(ESPAsyncWebServer::LinkedList<AsyncEventSourceClient *>([](AsyncEventSourceClient *c){ delete c; }))
+  , _clients(AlternativeLinkedList<AsyncEventSourceClient *>([](AsyncEventSourceClient *c){ delete c; }))
   , _connectcb(NULL)
 {}
 
@@ -261,6 +287,10 @@ AsyncEventSource::~AsyncEventSource(){
 
 void AsyncEventSource::onConnect(ArEventHandlerFunction cb){
   _connectcb = cb;
+}
+
+void AsyncEventSource::authorizeConnect(ArAuthorizeConnectHandler cb){
+  _authorizeConnectHandler = cb;
 }
 
 void AsyncEventSource::_addClient(AsyncEventSourceClient * client){
@@ -276,17 +306,22 @@ void AsyncEventSource::_addClient(AsyncEventSourceClient * client){
     client->write((const char *)temp, 2053);
     free(temp);
   }*/
-  
+  AsyncWebLockGuard l(_client_queue_lock);
   _clients.add(client);
   if(_connectcb)
     _connectcb(client);
 }
 
 void AsyncEventSource::_handleDisconnect(AsyncEventSourceClient * client){
+  AsyncWebLockGuard l(_client_queue_lock);
   _clients.remove(client);
 }
 
 void AsyncEventSource::close(){
+  // While the whole loop is not done, the linked list is locked and so the
+  // iterator should remain valid even when AsyncEventSource::_handleDisconnect()
+  // is called very early
+  AsyncWebLockGuard l(_client_queue_lock);
   for(const auto &c: _clients){
     if(c->connected())
       c->close();
@@ -295,26 +330,25 @@ void AsyncEventSource::close(){
 
 // pmb fix
 size_t AsyncEventSource::avgPacketsWaiting() const {
-  if(_clients.isEmpty())
+  size_t aql = 0;
+  uint32_t nConnectedClients = 0;
+  AsyncWebLockGuard l(_client_queue_lock);
+  if (_clients.isEmpty()) {
     return 0;
-  
-  size_t    aql=0;
-  uint32_t  nConnectedClients=0;
-  
+  }
   for(const auto &c: _clients){
     if(c->connected()) {
-      aql+=c->packetsWaiting();
+      aql += c->packetsWaiting();
       ++nConnectedClients;
     }
   }
-//  return aql / nConnectedClients;
-  return ((aql) + (nConnectedClients/2))/(nConnectedClients); // round up
+  return ((aql) + (nConnectedClients/2)) / (nConnectedClients); // round up
 }
 
-void AsyncEventSource::send(const char *message, const char *event, uint32_t id, uint32_t reconnect){
-
-
+void AsyncEventSource::send(
+    const char *message, const char *event, uint32_t id, uint32_t reconnect){
   String ev = generateEventMessage(message, event, id, reconnect);
+  AsyncWebLockGuard l(_client_queue_lock);
   for(const auto &c: _clients){
     if(c->connected()) {
       c->write(ev.c_str(), ev.length());
@@ -323,22 +357,32 @@ void AsyncEventSource::send(const char *message, const char *event, uint32_t id,
 }
 
 size_t AsyncEventSource::count() const {
-  return _clients.count_if([](AsyncEventSourceClient *c){
-    return c->connected();
-  });
+  size_t n_clients;
+  AsyncWebLockGuard l(_client_queue_lock);
+  n_clients = _clients.count_if([](AsyncEventSourceClient *c){
+                                    return c->connected();
+                                });
+  return n_clients;
 }
 
 bool AsyncEventSource::canHandle(AsyncWebServerRequest *request){
   if(request->method() != HTTP_GET || !request->url().equals(_url)) {
     return false;
   }
-  request->addInterestingHeader("Last-Event-ID");
+  request->addInterestingHeader(F("Last-Event-ID"));
+  request->addInterestingHeader("Cookie");
   return true;
 }
 
 void AsyncEventSource::handleRequest(AsyncWebServerRequest *request){
-  if((_username != "" && _password != "") && !request->authenticate(_username.c_str(), _password.c_str()))
+  if((_username.length() && _password.length()) && !request->authenticate(_username.c_str(), _password.c_str())) {
     return request->requestAuthentication();
+  }
+  if(_authorizeConnectHandler != NULL){
+    if(!_authorizeConnectHandler(request)){
+      return request->send(401);
+    }
+  }
   request->send(new AsyncEventSourceResponse(this));
 }
 
@@ -347,10 +391,10 @@ void AsyncEventSource::handleRequest(AsyncWebServerRequest *request){
 AsyncEventSourceResponse::AsyncEventSourceResponse(AsyncEventSource *server){
   _server = server;
   _code = 200;
-  _contentType = "text/event-stream";
+  _contentType = F("text/event-stream");
   _sendContentLength = false;
-  addHeader("Cache-Control", "no-cache");
-  addHeader("Connection","keep-alive");
+  addHeader(F("Cache-Control"), F("no-cache"));
+  addHeader(F("Connection"), F("keep-alive"));
 }
 
 void AsyncEventSourceResponse::_respond(AsyncWebServerRequest *request){

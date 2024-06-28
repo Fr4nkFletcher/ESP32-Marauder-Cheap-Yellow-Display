@@ -24,6 +24,8 @@
 #include "Arduino.h"
 
 #include <functional>
+#include <list>
+#include <vector>
 #include "FS.h"
 
 #include "StringArray.h"
@@ -38,13 +40,17 @@
 #error Platform not supported
 #endif
 
+#define ASYNCWEBSERVER_VERSION "2.10.4"
+#define ASYNCWEBSERVER_VERSION_MAJOR 2
+#define ASYNCWEBSERVER_VERSION_MINOR 10
+#define ASYNCWEBSERVER_VERSION_REVISION 4
+#define ASYNCWEBSERVER_FORK_mathieucarbou
+
 #ifdef ASYNCWEBSERVER_REGEX
 #define ASYNCWEBSERVER_REGEX_ATTRIBUTE
 #else
 #define ASYNCWEBSERVER_REGEX_ATTRIBUTE __attribute__((warning("ASYNCWEBSERVER_REGEX not defined")))
 #endif
-
-#define DEBUGF(...) //Serial.printf(__VA_ARGS__)
 
 class AsyncWebServer;
 class AsyncWebServerRequest;
@@ -68,6 +74,19 @@ typedef enum {
   HTTP_OPTIONS = 0b01000000,
   HTTP_ANY     = 0b01111111,
 } WebRequestMethod;
+#endif
+
+#ifndef HAVE_FS_FILE_OPEN_MODE
+namespace fs {
+    class FileOpenMode {
+    public:
+        static const char *read;
+        static const char *write;
+        static const char *append;
+    };
+};
+#else
+#include "FileOpenMode.h"
 #endif
 
 //if this value is returned when asked for data, packet will not be sent and you will be asked for data again
@@ -108,6 +127,9 @@ class AsyncWebHeader {
     String _value;
 
   public:
+    AsyncWebHeader() = default;
+    AsyncWebHeader(const AsyncWebHeader &) = default;
+
     AsyncWebHeader(const String& name, const String& value): _name(name), _value(value){}
     AsyncWebHeader(const String& data): _name(), _value(){
       if(!data) return;
@@ -116,10 +138,12 @@ class AsyncWebHeader {
       _name = data.substring(0, index);
       _value = data.substring(index + 2);
     }
-    ~AsyncWebHeader(){}
+
+    AsyncWebHeader &operator=(const AsyncWebHeader &) = default;
+
     const String& name() const { return _name; }
     const String& value() const { return _value; }
-    String toString() const { return String(_name+": "+_value+"\r\n"); }
+    String toString() const { return _name + F(": ") + _value + F("\r\n"); }
 };
 
 /*
@@ -134,7 +158,6 @@ typedef std::function<String(const String&)> AwsTemplateProcessor;
 class AsyncWebServerRequest {
   using File = fs::File;
   using FS = fs::FS;
-  using StringArray = ESPAsyncWebServer::StringArray;
   friend class AsyncWebServer;
   friend class AsyncCallbackWebHandler;
   private:
@@ -142,7 +165,7 @@ class AsyncWebServerRequest {
     AsyncWebServer* _server;
     AsyncWebHandler* _handler;
     AsyncWebServerResponse* _response;
-    StringArray _interestingHeaders;
+    std::vector<String> _interestingHeaders;
     ArDisconnectHandler _onDisconnectfn;
 
     String _temp;
@@ -164,9 +187,9 @@ class AsyncWebServerRequest {
     size_t _contentLength;
     size_t _parsedLength;
 
-    ESPAsyncWebServer::LinkedList<AsyncWebHeader *> _headers;
-    ESPAsyncWebServer::LinkedList<AsyncWebParameter *> _params;
-    ESPAsyncWebServer::LinkedList<String *> _pathParams;
+    std::list<AsyncWebHeader> _headers;
+    AlternativeLinkedList<AsyncWebParameter *> _params;
+    std::vector<String> _pathParams;
 
     uint8_t _multiParseState;
     uint8_t _boundaryPosition;
@@ -216,8 +239,8 @@ class AsyncWebServerRequest {
     const String& contentType() const { return _contentType; }
     size_t contentLength() const { return _contentLength; }
     bool multipart() const { return _isMultipart; }
-    const char * methodToString() const;
-    const char * requestedConnTypeToString() const;
+    const __FlashStringHelper *methodToString() const;
+    const __FlashStringHelper *requestedConnTypeToString() const;
     RequestedConnectionType requestedConnType() const { return _reqconntype; }
     bool isExpectedRequestedConnType(RequestedConnectionType erct1, RequestedConnectionType erct2 = RCT_NOT_USED, RequestedConnectionType erct3 = RCT_NOT_USED);
     void onDisconnect (ArDisconnectHandler fn);
@@ -258,21 +281,24 @@ class AsyncWebServerRequest {
     bool hasHeader(const String& name) const;   // check if header exists
     bool hasHeader(const __FlashStringHelper * data) const;   // check if header exists
 
-    AsyncWebHeader* getHeader(const String& name) const;
-    AsyncWebHeader* getHeader(const __FlashStringHelper * data) const;
-    AsyncWebHeader* getHeader(size_t num) const;
+    AsyncWebHeader* getHeader(const String& name);
+    const AsyncWebHeader* getHeader(const String& name) const;
+    AsyncWebHeader* getHeader(const __FlashStringHelper * data);
+    const AsyncWebHeader* getHeader(const __FlashStringHelper * data) const;
+    AsyncWebHeader* getHeader(size_t num);
+    const AsyncWebHeader* getHeader(size_t num) const;
 
     size_t params() const;                      // get arguments count
     bool hasParam(const String& name, bool post=false, bool file=false) const;
     bool hasParam(const __FlashStringHelper * data, bool post=false, bool file=false) const;
 
     AsyncWebParameter* getParam(const String& name, bool post=false, bool file=false) const;
-    AsyncWebParameter* getParam(const __FlashStringHelper * data, bool post, bool file) const; 
+    AsyncWebParameter* getParam(const __FlashStringHelper * data, bool post, bool file) const;
     AsyncWebParameter* getParam(size_t num) const;
 
     size_t args() const { return params(); }     // get arguments count
     const String& arg(const String& name) const; // get request argument value by name
-    const String& arg(const __FlashStringHelper * data) const; // get request argument value by F(name)    
+    const String& arg(const __FlashStringHelper * data) const; // get request argument value by F(name)
     const String& arg(size_t i) const;           // get request argument value by number
     const String& argName(size_t i) const;       // get request argument name by number
     bool hasArg(const char* name) const;         // check if argument exists
@@ -281,7 +307,7 @@ class AsyncWebServerRequest {
     const String& ASYNCWEBSERVER_REGEX_ATTRIBUTE pathArg(size_t i) const;
 
     const String& header(const char* name) const;// get request header value by name
-    const String& header(const __FlashStringHelper * data) const;// get request header value by F(name)    
+    const String& header(const __FlashStringHelper * data) const;// get request header value by F(name)
     const String& header(size_t i) const;        // get request header value by number
     const String& headerName(size_t i) const;    // get request header name by number
     String urlDecode(const String& text) const;
@@ -337,6 +363,7 @@ class AsyncWebHandler {
     AsyncWebHandler():_username(""), _password(""){}
     AsyncWebHandler& setFilter(ArRequestFilterFunction fn) { _filter = fn; return *this; }
     AsyncWebHandler& setAuthentication(const char *username, const char *password){  _username = String(username);_password = String(password); return *this; };
+    AsyncWebHandler& setAuthentication(const String& username, const String& password){  _username = username;_password = password; return *this; };
     bool filter(AsyncWebServerRequest *request){ return _filter == NULL || _filter(request); }
     virtual ~AsyncWebHandler(){}
     virtual bool canHandle(AsyncWebServerRequest *request __attribute__((unused))){
@@ -359,7 +386,7 @@ typedef enum {
 class AsyncWebServerResponse {
   protected:
     int _code;
-    ESPAsyncWebServer::LinkedList<AsyncWebHeader *> _headers;
+    std::list<AsyncWebHeader> _headers;
     String _contentType;
     size_t _contentLength;
     bool _sendContentLength;
@@ -370,6 +397,8 @@ class AsyncWebServerResponse {
     size_t _writtenLength;
     WebResponseState _state;
     const char* _responseCodeToString(int code);
+public:
+    static const __FlashStringHelper *responseCodeToString(int code);
 
   public:
     AsyncWebServerResponse();
@@ -398,8 +427,8 @@ typedef std::function<void(AsyncWebServerRequest *request, uint8_t *data, size_t
 class AsyncWebServer {
   protected:
     AsyncServer _server;
-    ESPAsyncWebServer::LinkedList<AsyncWebRewrite*> _rewrites;
-    ESPAsyncWebServer::LinkedList<AsyncWebHandler*> _handlers;
+    AlternativeLinkedList<AsyncWebRewrite*> _rewrites;
+    AlternativeLinkedList<AsyncWebHandler*> _handlers;
     AsyncCallbackWebHandler* _catchAllHandler;
 
   public:
@@ -420,7 +449,7 @@ class AsyncWebServer {
 
     AsyncWebHandler& addHandler(AsyncWebHandler* handler);
     bool removeHandler(AsyncWebHandler* handler);
-  
+
     AsyncCallbackWebHandler& on(const char* uri, ArRequestHandlerFunction onRequest);
     AsyncCallbackWebHandler& on(const char* uri, WebRequestMethodComposite method, ArRequestHandlerFunction onRequest);
     AsyncCallbackWebHandler& on(const char* uri, WebRequestMethodComposite method, ArRequestHandlerFunction onRequest, ArUploadHandlerFunction onUpload);
@@ -432,32 +461,32 @@ class AsyncWebServer {
     void onFileUpload(ArUploadHandlerFunction fn); //handle file uploads
     void onRequestBody(ArBodyHandlerFunction fn); //handle posts with plain body content (JSON often transmitted this way as a request)
 
-    void reset(); //remove all writers and handlers, with onNotFound/onFileUpload/onRequestBody 
-  
+    void reset(); //remove all writers and handlers, with onNotFound/onFileUpload/onRequestBody
+
     void _handleDisconnect(AsyncWebServerRequest *request);
     void _attachHandler(AsyncWebServerRequest *request);
     void _rewriteRequest(AsyncWebServerRequest *request);
 };
 
 class DefaultHeaders {
-  using headers_t = ESPAsyncWebServer::LinkedList<AsyncWebHeader *>;
+  using headers_t = std::list<AsyncWebHeader>;
   headers_t _headers;
-  
-  DefaultHeaders()
-  :_headers(headers_t([](AsyncWebHeader *h){ delete h; }))
-  {}
+
 public:
-  using ConstIterator = headers_t::ConstIterator;
+  DefaultHeaders() = default;
+
+  using ConstIterator = headers_t::const_iterator;
 
   void addHeader(const String& name, const String& value){
-    _headers.add(new AsyncWebHeader(name, value));
-  }  
-  
+    _headers.emplace_back(name, value);
+  }
+
   ConstIterator begin() const { return _headers.begin(); }
   ConstIterator end() const { return _headers.end(); }
 
   DefaultHeaders(DefaultHeaders const &) = delete;
   DefaultHeaders &operator=(DefaultHeaders const &) = delete;
+
   static DefaultHeaders &Instance() {
     static DefaultHeaders instance;
     return instance;
