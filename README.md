@@ -10,11 +10,11 @@
 
 <div align="center">
   
-  ## 🎩 Update Highlights 04/26/24 — Marauder v0.13.10 🎩
+  ## 🎩 Update Highlights 06/27/24 — Marauder v1.0.0 🎩
 
 </div>
 
-- **RGB LED enabled for builds w/o GPS thanks to [**lsdlsd88**](https://github.com/lsdlsd88)**
+- **RGB LED enabled thanks to [**lsdlsd88**](https://github.com/lsdlsd88)**
 
 - **Detect Pwnagotchi [enabled](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/screenshots/pwn2.jpg) in the WiFi Sniffers submenu for builds without GPS**
     
