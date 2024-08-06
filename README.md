@@ -29,7 +29,7 @@
   
   For more info on the webflasher visit ---> https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool
 
-  **If you have issues with the web flasher try unplugging and restarting your CYD, then hold RST --> tap BOOT --> release RST. <br>
+  **If you have issues with the web flasher try unplugging and restarting your CYD, then hold RST --> tap BOOT --> release RST.
   You should get a blank screen. Refresh the webflasher and then click Connect to begin the process.**
 </p>
 
