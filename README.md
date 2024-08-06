@@ -25,7 +25,7 @@
 - **Click Connect** and select **Model**. Click **Program** to start the flashing process.
 
 <p align="center">
-  <img src="https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/blob/main/assets/sc12.png" alt="Demo 1">
+  <img src="https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/blob/main/assets/sc21.png" alt="Demo 1">
   
   For more info on the webflasher visit ---> https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool
 </p>
