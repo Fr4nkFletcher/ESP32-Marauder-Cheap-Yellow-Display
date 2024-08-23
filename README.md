@@ -48,6 +48,15 @@ No hardware modifications required thanks to integration with **@ggaljoen's** [T
 
 - **GPS Functionality**: 🛰 GPS is [enabled](screenshots/gps5.jpg) and fully operational through the 4-pin connector located near the MicroUSB port of the CYD module. [Check here](https://github.com/justcallmekoko/ESP32Marauder/wiki/gps-modification) for details on supported GPS hardware.
 
+**GPS Pinout:**
+
+| GPS    |  ->  | CYD    |
+|--------|------|--------|
+| 5V     |  ->  | 5V     |
+| GND    |  ->  | GND    |
+| TX     |  ->  | TX     |
+| RX     |  ->  | TX     |
+
 ## Setup
 
 Add necessary libraries to your Arduino libraries folder. Configure your Arduino environment as detailed in the [ESP32 Marauder Arduino IDE Setup Guide](https://github.com/justcallmekoko/ESP32Marauder/wiki/arduino-ide-setup).
