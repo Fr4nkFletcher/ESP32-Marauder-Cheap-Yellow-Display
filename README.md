@@ -52,7 +52,7 @@ No hardware modifications required thanks to integration with **@ggaljoen's** [T
 
 | GPS    |  ->  | CYD    |
 |--------|------|--------|
-| 5V     |  ->  | 5V     |
+| VCC    |  ->  | VIN    |
 | GND    |  ->  | GND    |
 | TX     |  ->  | TX     |
 | RX     |  ->  | TX     |
