@@ -20,6 +20,8 @@
 
 
 ## Web Flasher Instructions
+-  **Use Chrome or Edge**
+
 - **Visit:** [CYM-Web-Flasher](https://fr4nkfletcher.github.io/Adafruit_WebSerial_ESPTool/)
 
 - **Click Connect** and select **Model**. Click **Program** to start the flashing process.
@@ -29,8 +31,9 @@
   
   For more info on the webflasher visit ---> https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool
 
-  **If you have issues with the web flasher try unplugging and restarting your CYD, then hold RST --> tap BOOT --> release RST.
+  **If you have issues with the web flasher, try unplugging and restarting your CYD, then hold RST --> tap BOOT --> release RST.
   You should get a blank screen. Refresh the webflasher and then click Connect to begin the process.**
+ 
 </p>
 
 
