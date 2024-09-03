@@ -14,6 +14,8 @@
 
 </div>
 
+- **For info on swapping to the ESP-WROOM-32U w/ built-in IPEX/U.FL connector for max range, click [here](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/AntennaModNew.md).**
+
 - **For Evil Portal examples and instructions, click [here](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/evilportal/).**
 
 - **For info on adding an external antenna, click [here](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/AntennaMod.md).**
