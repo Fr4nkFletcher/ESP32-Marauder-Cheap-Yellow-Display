@@ -22,7 +22,7 @@
 
 
 ## Web Flasher Instructions
--  **Use Chrome or Edge**
+-  **Use Chrome**
 
 - **Visit:** [CYM-Web-Flasher](https://fr4nkfletcher.github.io/Adafruit_WebSerial_ESPTool/)
 
