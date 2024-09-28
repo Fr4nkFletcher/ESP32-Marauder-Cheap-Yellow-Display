@@ -29,7 +29,7 @@
 - **Click Connect** and select **Model**. Click **Program** to start the flashing process.
 
 <p align="center">
-  <img src="https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/blob/main/assets/sc002.png" alt="Demo 1">
+  <img src="https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/blob/main/assets/sc002.png?raw=true" alt="CYM Web Flasher Screenshot" width="100%" style="max-width:800px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 
   **If you have issues with the web flasher, try unplugging and restarting your CYD, then hold RST --> tap BOOT --> release RST.
   You should get a blank screen. Refresh the webflasher and then click Connect to begin the process.**
