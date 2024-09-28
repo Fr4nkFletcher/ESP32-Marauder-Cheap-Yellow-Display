@@ -10,7 +10,7 @@
 
 <div align="center">
   
-  ## 🏴‍☠️ Update Highlights 06/27/24 — Marauder v1.0.0 🏴‍☠️
+  ## 🏴‍☠️ Update Highlights 09/28/24 — Flash previous Marauder versions 🏴‍☠️
 
 </div>
 
@@ -29,7 +29,7 @@
 - **Click Connect** and select **Model**. Click **Program** to start the flashing process.
 
 <p align="center">
-  <img src="https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/blob/main/assets/sc21.png" alt="Demo 1">
+  <img src="https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/blob/main/assets/sc002.png" alt="Demo 1">
 
   **If you have issues with the web flasher, try unplugging and restarting your CYD, then hold RST --> tap BOOT --> release RST.
   You should get a blank screen. Refresh the webflasher and then click Connect to begin the process.**
