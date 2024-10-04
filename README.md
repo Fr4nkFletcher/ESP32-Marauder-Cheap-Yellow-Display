@@ -75,7 +75,7 @@ GPS is fully operational through the 4-pin connector near the MicroUSB port. For
 | VCC | -> | VIN |
 | GND | -> | GND |
 | TX  | -> | TX  |
-| RX  | -> | TX  |
+| RX  | -> | RX  |
 
 ## Example Usage
 
