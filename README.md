@@ -16,7 +16,7 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 
 ---
 
-## 🏴‍☠️ Latest Update Highlights (09/28/24)
+## 🏴‍☠️ Latest Update Highlights (09/28/24) 🏴‍☠️
 
 - Flash older Marauder firmware versions
 - [Guide for antenna modification](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/AntennaModNew.md) for ESP-WROOM-32U with built-in IPEX/U.FL connector
