@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/github/issues/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display?style=flat-square" alt="GitHub Issues" />
 </p>
 
-The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yellow Display (CYD) module, offering powerful WiFi and Bluetooth testing features on an affordable and accessible hardware platform.
+The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yellow Display (CYD), offering powerful WiFi and Bluetooth testing features on an affordable and accessible hardware platform.
 
 ---
 
