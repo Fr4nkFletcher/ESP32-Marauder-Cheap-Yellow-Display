@@ -1,4 +1,4 @@
-# ESP32 Marauder - Cheap Yellow Display
+# ESP32 Marauder — Cheap Yellow Display
 
 <p align="center">
   <img alt="Marauder logo" src="https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/img/logo01.png" width="240">
@@ -14,10 +14,11 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 
 ---
 
-## 🏴‍☠️ Latest Update Highlights (09/28/24) 🏴‍☠️
+## 🏴‍☠️ Latest Update Highlights (10/20/24) 🏴‍☠️
 
+- Added compatibility for ESP32-2432S024R 2.4" Type-C Only
 - Flash older Marauder firmware versions
-- [Guide for antenna modification](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/AntennaModNew.md) for ESP-WROOM-32U with built-in IPEX/U.FL connector
+- [Guide for antenna modification](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/AntennaModNew.md) using ESP-WROOM-32U with built-in IPEX/U.FL connector
 - [Evil Portal examples and setup](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/evilportal/)
 - [How to add an external antenna](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/AntennaMod.md)
 
@@ -75,6 +76,7 @@ The project has been successfully tested on:
 
 - [Module 1](https://amazon.com/dp/B0BVFXR313)
 - [Module 2](https://amazon.com/dp/B0CLR7MQ91)
+- [Module 3](https://a.co/d/gWGoaP3)
 
 No hardware modifications are required, thanks to **@ggaljoen's** fork of the [TFT_eSPI](https://github.com/ggaljoen/TFT_eSPI) library.
 
@@ -91,6 +93,7 @@ GPS functionality is fully supported via the 4-pin connector near the MicroUSB p
 | TX  | -> | TX  |
 | RX  | -> | RX  |
 
+On 2.4" models swap RX/TX
 ---
 
 ## Example Usage
