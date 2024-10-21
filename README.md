@@ -93,7 +93,8 @@ GPS functionality is fully supported via the 4-pin connector near the MicroUSB p
 | TX  | -> | TX  |
 | RX  | -> | RX  |
 
-On 2.4" models swap RX/TX
+Note: On 2.4" models swap RX/TX
+
 ---
 
 ## Example Usage
