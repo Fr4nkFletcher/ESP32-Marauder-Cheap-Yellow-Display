@@ -16,7 +16,7 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 
 ## 🏴‍☠️ Latest Update Highlights (10/20/24) 🏴‍☠️
 
-- Added compatibility for ESP32-2432S024R 2.4" USB Type-C Only
+- Added compatibility for ESP32-2432S024R 2.4" Resistive Touch USB Type-C Only
 - Flash older Marauder firmware versions
 - [Guide for antenna modification](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/AntennaModNew.md) using ESP-WROOM-32U with built-in IPEX/U.FL connector
 - [Evil Portal examples and setup](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/evilportal/)
