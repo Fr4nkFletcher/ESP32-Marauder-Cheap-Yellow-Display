@@ -14,9 +14,8 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 
 ---
 
-## 🏴‍☠️ Latest Update Highlights (11/22/24) 🏴‍☠️
-
-- Version 1.1.0 added to the webflasher
+## 🏴‍☠️ Latest Update Highlights — Version 1.1.0 added to the webflasher (11/22/24) 🏴‍☠️
+   
 - Wardriving menu
 - Airtag Sniffing/Spoofing
 - Pwnagotchi Detect
