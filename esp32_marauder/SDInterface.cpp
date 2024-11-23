@@ -80,6 +80,9 @@ bool SDInterface::initSD() {
         Serial.println("/SCRIPTS created");
       }
 
+      this->sd_files = new LinkedList<String>();
+
+      this->sd_files->add("Back");
     
       return true;
   }
@@ -116,12 +119,18 @@ void SDInterface::listDirToLinkedList(LinkedList<String>* file_names, String str
       {
         break;
       }
+
+      if (entry.isDirectory())
+        continue;
+
+      String file_name = entry.name();
       if (ext != "") {
-        String file_name = entry.name();
         if (file_name.endsWith(ext)) {
           file_names->add(file_name);
         }
       }
+      else
+        file_names->add(file_name);
     }
   }
 }
@@ -152,7 +161,7 @@ void SDInterface::runUpdate() {
   #ifdef HAS_SCREEN
     display_obj.tft.setTextWrap(false);
     display_obj.tft.setFreeFont(NULL);
-    display_obj.tft.setCursor(0, 100);
+    display_obj.tft.setCursor(0, TFT_HEIGHT / 3);
     display_obj.tft.setTextSize(1);
     display_obj.tft.setTextColor(TFT_WHITE);
   

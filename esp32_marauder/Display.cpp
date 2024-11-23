@@ -28,16 +28,20 @@ void Display::RunSetup()
     tft.setRotation(1);
   #endif
 
+  #ifdef MARAUDER_REV_FEATHER
+    tft.setRotation(1);
+  #endif
+
   tft.setCursor(0, 0);
 
   #ifdef HAS_ILI9341
 
     #ifdef TFT_SHIELD
       uint16_t calData[5] = { 350, 3465, 188, 3431, 2 }; // tft.setRotation(0); // Portrait with TFT Shield
-      Serial.println(F("Using TFT Shield 5"));
+      //Serial.println(F("Using TFT Shield"));
     #else if defined(TFT_DIY)
-      uint16_t calData[5] = { 339, 3470, 237, 3438, 2 }; // tft.setRotation(0); // Portrait with DIY TFT
-      Serial.println(F("Using TFT DIY"));
+      uint16_t calData[5] = { 477, 3006, 447, 3233, 3 }; // tft.setRotation(0); // Portrait with DIY TFT
+      //Serial.println(F("Using TFT DIY"));
     #endif
     tft.setTouch(calData);
 
@@ -46,12 +50,20 @@ void Display::RunSetup()
   //tft.fillScreen(TFT_BLACK);
   clearScreen();
 
-  Serial.println("SPI_FREQUENCY: " + (String)SPI_FREQUENCY);
-  Serial.println("SPI_READ_FREQUENCY:" + (String)SPI_READ_FREQUENCY);
-  Serial.println("SPI_TOUCH_FREQUENCY: " + (String)SPI_TOUCH_FREQUENCY);
+  //Serial.println("SPI_FREQUENCY: " + (String)SPI_FREQUENCY);
+  //Serial.println("SPI_READ_FREQUENCY:" + (String)SPI_READ_FREQUENCY);
+  //Serial.println("SPI_TOUCH_FREQUENCY: " + (String)SPI_TOUCH_FREQUENCY);
 
   #ifdef KIT
     pinMode(KIT_LED_BUILTIN, OUTPUT);
+  #endif
+
+  #ifdef MARAUDER_REV_FEATHER
+    pinMode(7, OUTPUT);
+
+    delay(10);
+
+    digitalWrite(7, HIGH);
   #endif
 }
 
@@ -442,16 +454,17 @@ void Display::drawJpeg(const char *filename, int xpos, int ypos) {
   //}
 }
 */
+
 /*void Display::setupDraw() {
   this->tft.drawLine(0, 0, 10, 0, TFT_MAGENTA);
   this->tft.drawLine(0, 0, 0, 10, TFT_GREEN);
   this->tft.drawLine(0, 0, 0, 0, TFT_CYAN);
 }*/
 
-uint16_t xlast;
+/*uint16_t xlast;
 uint16_t ylast;
 uint32_t AH;
-/*void Display::drawStylus()
+void Display::drawStylus()
 {
   uint16_t x = 0, y = 0; // To store the touch coordinates
 
@@ -459,7 +472,7 @@ uint32_t AH;
   boolean pressed = tft.getTouch(&x, &y);
 
   if ((x <= 10) && (y <= 10) && (pressed)) {
-    Serial.println(F("Exit draw function"));
+    //Serial.println(F("Exit draw function"));
     this->draw_tft = false;
     this->exit_draw = true;
     return;
@@ -504,18 +517,18 @@ uint32_t AH;
     xlast = x;
     ylast = y;
     AH = 0;
-    Serial.print("x,y = ");
-    Serial.print(x);
-    Serial.print(",");
-    Serial.println(y);
+    //Serial.print("x,y = ");
+    //Serial.print(x);
+    //Serial.print(",");
+    //Serial.println(y);
   } else if ( AH < 5 ) {
     AH++;
   } else if ( AH == 5 ) {
     xlast = 0;
     ylast = 0;
   }
-}
-*/
+}*/
+
 //====================================================================================
 //   Decode and render the Jpeg image onto the TFT screen
 //====================================================================================
