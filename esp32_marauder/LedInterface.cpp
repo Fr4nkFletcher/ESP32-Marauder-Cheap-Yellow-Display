@@ -6,14 +6,14 @@ LedInterface::LedInterface() {
 
 void LedInterface::RunSetup() {
   //Serial.println("Setting neopixel to black...");
-// strip.setBrightness(0);
-// strip.begin();
-//  strip.setPixelColor(0, strip.Color(0, 0, 0));
-//  strip.show();
-  delay(100);
-//  strip.setBrightness(50);
-//  strip.setPixelColor(0, strip.Color(0, 0, 0));
-//  strip.show();
+  strip.setBrightness(0);
+  strip.begin();
+  strip.setPixelColor(0, strip.Color(0, 0, 0));
+  strip.show();
+  //delay(100);
+  strip.setBrightness(50);
+  strip.setPixelColor(0, strip.Color(0, 0, 0));
+  strip.show();
   this->initTime = millis();
 }
 
@@ -50,8 +50,8 @@ uint8_t LedInterface::getMode() {
 }
 
 void LedInterface::setColor(int r, int g, int b) {
-//  strip.setPixelColor(0, strip.Color(r, g, b));
-//  strip.show();  
+  strip.setPixelColor(0, strip.Color(r, g, b));
+  strip.show();  
 }
 
 void LedInterface::sniffLed() {
@@ -67,8 +67,8 @@ void LedInterface::ledOff() {
 }
 
 void LedInterface::rainbow() {
-//  strip.setPixelColor(0, this->Wheel((0 * 256 / 100 + this->wheel_pos) % 256));
-//  strip.show();
+  strip.setPixelColor(0, this->Wheel((0 * 256 / 100 + this->wheel_pos) % 256));
+  strip.show();
 
   this->current_fade_itter++;
 

@@ -10,7 +10,7 @@
 
 #define B_PIN 17
 #define G_PIN 16
-#define R_PIN 4
+#define R_PIN 14
 
 extern Settings settings_obj;
 

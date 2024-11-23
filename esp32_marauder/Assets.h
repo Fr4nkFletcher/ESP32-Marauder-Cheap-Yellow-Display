@@ -1456,6 +1456,7 @@ PROGMEM static const unsigned char menu_icons[][66] = {
   0xd1, 0x45, 0x14, 0x00, 0x51, 0x45, 0x14, 0x00, 0x51, 0x45, 0x14, 0x01, 0xff, 0xd9
 };*/
 //#endif
+
 /*
 #ifdef MARAUDER_MINI
   const uint8_t MarauderTitle[] PROGMEM = {
@@ -1833,4 +1834,5 @@ PROGMEM static const unsigned char menu_icons[][66] = {
     
 #endif
 */
+
 #endif
