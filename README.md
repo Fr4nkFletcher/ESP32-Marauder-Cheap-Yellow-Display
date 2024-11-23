@@ -115,7 +115,7 @@ After flashing, your CYD module will boot into the Marauder interface. Refer to 
 
 ## Acknowledgments
 
-A huge thanks to the creators and supporters of the [ESP32 Cheap Yellow Display](https://github.com/witnessmenow/ESP32-Cheap-Yellow-Display) project and the community Discord, especially **@cod5fgzj**, [**smoochiee**](https://github.com/smoochiee), [**ggaljoen**](https://github.com/ggaljoen), and [**ATOMNFT**](https://github.com/ATOMNFT). And a special mention to [**JustCallMeKoko**](https://github.com/justcallmekoko) for their foundational work on the [ESP32Marauder](https://github.com/justcallmekoko/ESP32Marauder).
+A huge thanks to **@cod5fgzj**, [**smoochiee**](https://github.com/smoochiee), [**ggaljoen**](https://github.com/ggaljoen), and [**ATOMNFT**](https://github.com/ATOMNFT). And a special mention to [**JustCallMeKoko**](https://github.com/justcallmekoko) for their foundational work on the [ESP32Marauder](https://github.com/justcallmekoko/ESP32Marauder).
 
 ---
 
