@@ -14,12 +14,13 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 
 ---
 
-## 🏴‍☠️ Latest Update Highlights — Version 1.1.0 added to the webflasher (11/22/24) 🏴‍☠️
-   
-- Wardriving menu
+## 🏴‍☠️ Latest Update Highlights — v1.1.0 (11/24/24) 🏴‍☠️
+
+- Add Flipper Zero Sniff
 - Airtag Sniffing/Spoofing
-- Pwnagotchi Detect
+- Working Pwnagotchi Detect on all models
 - Flipper BLE Spam
+- Wardriving Menu added
 - Added compatibility for ESP32-2432S024R 2.4" Resistive Touch USB Type-C Only
 - Flash older Marauder firmware versions
 - [Guide for antenna modification](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/AntennaModNew.md) using ESP-WROOM-32U with built-in IPEX/U.FL connector
