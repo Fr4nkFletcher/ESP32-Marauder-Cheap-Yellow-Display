@@ -99,6 +99,7 @@
 #define BT_ATTACK_FLIPPER_SPAM 42
 #define BT_SCAN_AIRTAG 43
 #define BT_SPOOF_AIRTAG 44
+#define BT_SCAN_FLIPPER 45
 
 #define GRAPH_REFRESH 100
 
@@ -166,6 +167,11 @@ struct AirTag {
     std::vector<uint8_t> payload; // Payload data
     uint16_t payloadSize;
     bool selected;
+};
+
+struct Flipper {
+  String mac;
+  String name;
 };
 
 class WiFiScan
@@ -390,6 +396,7 @@ class WiFiScan
     int clearSSIDs();
     int clearAPs();
     int clearAirtags();
+    int clearFlippers();
     int clearStations();
     bool addSSID(String essid);
     int generateSSIDs(int count = 20);
