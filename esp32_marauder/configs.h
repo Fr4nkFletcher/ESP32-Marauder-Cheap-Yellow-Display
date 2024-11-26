@@ -929,7 +929,7 @@
     #elif defined(MARAUDER_REV_FEATHER)
       #define PIN 33
     #else
-      #define PIN 25
+      #define PIN 4
     #endif
   
   #endif
