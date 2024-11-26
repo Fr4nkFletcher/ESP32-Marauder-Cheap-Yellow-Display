@@ -504,7 +504,7 @@
     
       #define STATUSBAR_COLOR 0x4A49
     
-      #define KIT_LED_BUILTIN 17
+      #define KIT_LED_BUILTIN 4
     #endif 
 
     #ifdef MARAUDER_KIT
@@ -563,7 +563,7 @@
     
       #define STATUSBAR_COLOR 0x4A49
     
-      #define KIT_LED_BUILTIN 17
+      #define KIT_LED_BUILTIN 4
     #endif
   
     #ifdef MARAUDER_MINI

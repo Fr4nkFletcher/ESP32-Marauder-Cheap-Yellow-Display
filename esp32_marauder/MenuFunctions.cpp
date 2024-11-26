@@ -400,13 +400,15 @@ MenuFunctions::MenuFunctions()
         // Start spoofing airtag
         if (do_that_thang) {
           menu_function_obj.deinitLVGL();
+          
+          lv_obj_del_async(lv_obj_get_parent(lv_obj_get_parent(btn)));
           wifi_scan_obj.StartScan(WIFI_SCAN_OFF);
           display_obj.clearScreen();
           menu_function_obj.orientDisplay();
           display_obj.clearScreen();
           menu_function_obj.drawStatusBar();
           wifi_scan_obj.StartScan(BT_SPOOF_AIRTAG, TFT_WHITE);
-          return;
+
         }
       }
       else {
@@ -675,6 +677,7 @@ void MenuFunctions::main(uint32_t currentTime)
           (wifi_scan_obj.currentScanMode == WIFI_ATTACK_BEACON_LIST) ||
           (wifi_scan_obj.currentScanMode == BT_SCAN_ALL) ||
           (wifi_scan_obj.currentScanMode == BT_SCAN_AIRTAG) ||
+          (wifi_scan_obj.currentScanMode == BT_SCAN_FLIPPER) ||
           (wifi_scan_obj.currentScanMode == BT_ATTACK_SOUR_APPLE) ||
           (wifi_scan_obj.currentScanMode == BT_ATTACK_SWIFTPAIR_SPAM) ||
           (wifi_scan_obj.currentScanMode == BT_ATTACK_SPAM_ALL) ||
@@ -742,6 +745,7 @@ void MenuFunctions::main(uint32_t currentTime)
             (wifi_scan_obj.currentScanMode == WIFI_ATTACK_BEACON_LIST) ||
             (wifi_scan_obj.currentScanMode == BT_SCAN_ALL) ||
             (wifi_scan_obj.currentScanMode == BT_SCAN_AIRTAG) ||
+            (wifi_scan_obj.currentScanMode == BT_SCAN_FLIPPER) ||
             (wifi_scan_obj.currentScanMode == BT_ATTACK_SOUR_APPLE) ||
             (wifi_scan_obj.currentScanMode == BT_ATTACK_SWIFTPAIR_SPAM) ||
             (wifi_scan_obj.currentScanMode == BT_ATTACK_SPAM_ALL) ||
@@ -1539,7 +1543,7 @@ void MenuFunctions::RunSetup()
       wifi_scan_obj.StartScan(WIFI_SCAN_SIG_STREN, TFT_CYAN);
     });
   #endif
-
+  
   // Build Wardriving menu
   wardrivingMenu.parentMenu = &wifiMenu; // Main Menu is second menu parent
   this->addNodes(&wardrivingMenu, text09, TFT_LIGHTGREY, NULL, 0, [this]() {
@@ -1564,7 +1568,7 @@ void MenuFunctions::RunSetup()
       });
     }
   #endif
-
+  
   // Build WiFi attack menu
   wifiAttackMenu.parentMenu = &wifiMenu; // Main Menu is second menu parent
   this->addNodes(&wifiAttackMenu, text09, TFT_LIGHTGREY, NULL, 0, [this]() {
@@ -1953,6 +1957,11 @@ void MenuFunctions::RunSetup()
     this->drawStatusBar();
     wifi_scan_obj.StartScan(BT_SCAN_ALL, TFT_GREEN);
   });
+  this->addNodes(&bluetoothSnifferMenu, "Flipper Sniff", TFT_ORANGE, NULL, FLIPPER, [this]() {
+    display_obj.clearScreen();
+    this->drawStatusBar();
+    wifi_scan_obj.StartScan(BT_SCAN_FLIPPER, TFT_ORANGE);
+  });
   this->addNodes(&bluetoothSnifferMenu, "Airtag Sniff", TFT_WHITE, NULL, BLUETOOTH_SNIFF, [this]() {
     display_obj.clearScreen();
     this->drawStatusBar();
@@ -2024,53 +2033,52 @@ void MenuFunctions::RunSetup()
   #endif
 
   #ifndef HAS_ILI9341
+    #ifdef HAS_BT
     // Select Airtag on Mini
-    this->addNodes(&bluetoothAttackMenu, "Spoof Airtag", TFT_WHITE, NULL, ATTACKS, [this](){
-        // Clear nodes and add back button
-        airtagMenu.list->clear();
-        this->addNodes(&airtagMenu, text09, TFT_LIGHTGREY, NULL, 0, [this]() {
-        this->changeMenu(airtagMenu.parentMenu);
-      });
-
-      // Add buttons for all airtags
-      // Find out how big our menu is going to be
-      int menu_limit;
-      if (airtags->size() <= BUTTON_ARRAY_LEN)
-        menu_limit = airtags->size();
-      else
-        menu_limit = BUTTON_ARRAY_LEN;
-
-      // Create the menu nodes for all of the list items
-      for (int i = 0; i < menu_limit; i++) {
-        this->addNodes(&airtagMenu, airtags->get(i).mac, TFT_WHITE, NULL, BLUETOOTH, [this, i](){
-          AirTag new_at = airtags->get(i);
-          new_at.selected = true;
-
-          airtags->set(i, new_at);
-
-          // Set all other airtags to "Not Selected"
-          for (int x = 0; x < airtags->size(); x++) {
-            if (x != i) {
-              AirTag new_atx = airtags->get(x);
-              new_atx.selected = false;
-              airtags->set(x, new_atx);
-            }
-          }
-
-          // Start the spoof
-          display_obj.clearScreen();
-          this->drawStatusBar();
-          wifi_scan_obj.StartScan(BT_SPOOF_AIRTAG, TFT_WHITE);
-
+      this->addNodes(&bluetoothAttackMenu, "Spoof Airtag", TFT_WHITE, NULL, ATTACKS, [this](){
+          // Clear nodes and add back button
+          airtagMenu.list->clear();
+          this->addNodes(&airtagMenu, text09, TFT_LIGHTGREY, NULL, 0, [this]() {
+          this->changeMenu(airtagMenu.parentMenu);
         });
-      }
-      this->changeMenu(&airtagMenu);
-    });
+        // Add buttons for all airtags
+        // Find out how big our menu is going to be
+        int menu_limit;
+        if (airtags->size() <= BUTTON_ARRAY_LEN)
+          menu_limit = airtags->size();
+        else
+          menu_limit = BUTTON_ARRAY_LEN;
+        // Create the menu nodes for all of the list items
+        for (int i = 0; i < menu_limit; i++) {
+          this->addNodes(&airtagMenu, airtags->get(i).mac, TFT_WHITE, NULL, BLUETOOTH, [this, i](){
+            AirTag new_at = airtags->get(i);
+            new_at.selected = true;
+            airtags->set(i, new_at);
+            // Set all other airtags to "Not Selected"
+            for (int x = 0; x < airtags->size(); x++) {
+              if (x != i) {
+                AirTag new_atx = airtags->get(x);
+                new_atx.selected = false;
+                airtags->set(x, new_atx);
+             }
+           }
+
+            
+           // Start the spoof
+           display_obj.clearScreen();
+           this->drawStatusBar();
+           wifi_scan_obj.StartScan(BT_SPOOF_AIRTAG, TFT_WHITE);
+
+         });
+       }
+       this->changeMenu(&airtagMenu);
+     });
 
     airtagMenu.parentMenu = &bluetoothAttackMenu;
-    this->addNodes(&airtagMenu, text09, TFT_LIGHTGREY, NULL, 0, [this]() {
-      this->changeMenu(airtagMenu.parentMenu);
-    });
+      this->addNodes(&airtagMenu, text09, TFT_LIGHTGREY, NULL, 0, [this]() {
+        this->changeMenu(airtagMenu.parentMenu);
+      });
+    #endif
 
   #endif
 
