@@ -4000,108 +4000,151 @@ void WiFiScan::beaconListSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t 
 }
 
 void WiFiScan::broadcastCustomBeacon(uint32_t current_time, AccessPoint custom_ssid) {
-  set_channel = random(1,12); 
-  esp_wifi_set_channel(set_channel, WIFI_SECOND_CHAN_NONE);
-  delay(1);  
+    // Set a random channel
+    set_channel = random(1, 12);
+    esp_wifi_set_channel(set_channel, WIFI_SECOND_CHAN_NONE);
+    delay(1);
 
-  if (custom_ssid.beacon->size() == 0)
-    return;
+    // Validate beacon pointer and size
+    if (custom_ssid.beacon == nullptr || custom_ssid.beacon->size() < 2) {
+        Serial.println("Error: Invalid or uninitialized beacon data");
+        return;
+    }
 
+    // Randomize SRC MAC
+    for (int i = 10; i <= 15; i++) {
+        packet[i] = packet[i + 6] = random(256); // Randomize MAC addresses
+    }
 
-  // Randomize SRC MAC
-  // Randomize SRC MAC
-  packet[10] = packet[16] = random(256);
-  packet[11] = packet[17] = random(256);
-  packet[12] = packet[18] = random(256);
-  packet[13] = packet[19] = random(256);
-  packet[14] = packet[20] = random(256);
-  packet[15] = packet[21] = random(256);
+    // Validate ESSID
+    if (custom_ssid.essid.length() == 0 || custom_ssid.essid.length() >= 33) {
+        Serial.println("Error: Invalid ESSID length");
+        return;
+    }
 
-  char ESSID[custom_ssid.essid.length() + 1] = {};
-  custom_ssid.essid.toCharArray(ESSID, custom_ssid.essid.length() + 1);
+    // Convert ESSID to char array
+    char ESSID[custom_ssid.essid.length() + 1] = {};
+    custom_ssid.essid.toCharArray(ESSID, custom_ssid.essid.length() + 1);
 
-  int realLen = strlen(ESSID);
-  int ssidLen = random(realLen, 33);
-  int numSpace = ssidLen - realLen;
-  //int rand_len = sizeof(rand_reg);
-  int fullLen = ssidLen;
-  packet[37] = fullLen;
+    int realLen = strlen(ESSID);
+    int ssidLen = random(realLen, 33); // Add spaces up to 32 characters
+    int numSpace = ssidLen - realLen;
+    int fullLen = ssidLen;
 
-  // Insert my tag
-  for(int i = 0; i < realLen; i++)
-    packet[38 + i] = ESSID[i];
+    // Declare postSSID locally
+    uint8_t postSSID[13] = {0x01, 0x08, 0x82, 0x84, 0x8b, 0x96, 0x24, 0x30, 0x48, 0x6c, 0x03, 0x01, 0x04};
 
-  for(int i = 0; i < numSpace; i++)
-    packet[38 + realLen + i] = 0x20;
+    // Ensure packet size is sufficient
+    if ((50 + fullLen + sizeof(postSSID)) >= sizeof(packet)) {
+        Serial.println("Error: Packet size exceeds buffer capacity");
+        return;
+    }
 
-  /////////////////////////////
-  
-  packet[50 + fullLen] = set_channel;
+    // Insert ESSID into packet
+    packet[37] = fullLen;
+    for (int i = 0; i < realLen; i++) {
+        packet[38 + i] = ESSID[i];
+    }
 
-  uint8_t postSSID[13] = {0x01, 0x08, 0x82, 0x84, 0x8b, 0x96, 0x24, 0x30, 0x48, 0x6c, //supported rate
-                      0x03, 0x01, 0x04 /*DSSS (Current Channel)*/ };
+    // Pad with spaces
+    for (int i = 0; i < numSpace; i++) {
+        packet[38 + realLen + i] = 0x20;
+    }
 
+    // Add the current channel
+    packet[50 + fullLen] = set_channel;
 
+    // Add supported rates and other post-SSID data
+    for (int i = 0; i < sizeof(postSSID); i++) {
+        if ((38 + fullLen + i) >= sizeof(packet)) {
+            Serial.println("Error: postSSID data exceeds packet size");
+            return;
+        }
+        packet[38 + fullLen + i] = postSSID[i];
+    }
 
-  // Add everything that goes after the SSID
-  //for(int i = 0; i < 12; i++) 
-  //  packet[38 + fullLen + i] = postSSID[i];
+    // Insert beacon data from AccessPoint
+    packet[34] = custom_ssid.beacon->get(0);
+    packet[35] = custom_ssid.beacon->get(1);
 
-  packet[34] = custom_ssid.beacon->get(0);
-  packet[35] = custom_ssid.beacon->get(1);
-  
+    // Calculate the packet size dynamically
+    int packet_size = 38 + fullLen + sizeof(postSSID);
 
-  esp_wifi_80211_tx(WIFI_IF_AP, packet, sizeof(packet), false);
-  esp_wifi_80211_tx(WIFI_IF_AP, packet, sizeof(packet), false);
-  esp_wifi_80211_tx(WIFI_IF_AP, packet, sizeof(packet), false);
+    // Transmit the packet multiple times
+    esp_wifi_80211_tx(WIFI_IF_AP, packet, packet_size, false);
+    esp_wifi_80211_tx(WIFI_IF_AP, packet, packet_size, false);
+    esp_wifi_80211_tx(WIFI_IF_AP, packet, packet_size, false);
 
-  packets_sent = packets_sent + 3;
+    packets_sent += 3; // Update packet counter
 }
 
 void WiFiScan::broadcastCustomBeacon(uint32_t current_time, ssid custom_ssid) {
-  set_channel = custom_ssid.channel;
-  esp_wifi_set_channel(set_channel, WIFI_SECOND_CHAN_NONE);
-  delay(1);  
+    // Validate BSSID size
+    if (sizeof(custom_ssid.bssid) != 6) {
+        Serial.println("Error: Invalid BSSID size");
+        return;
+    }
 
-  // Randomize SRC MAC
-  packet[10] = packet[16] = custom_ssid.bssid[0];
-  packet[11] = packet[17] = custom_ssid.bssid[1];
-  packet[12] = packet[18] = custom_ssid.bssid[2];
-  packet[13] = packet[19] = custom_ssid.bssid[3];
-  packet[14] = packet[20] = custom_ssid.bssid[4];
-  packet[15] = packet[21] = custom_ssid.bssid[5];
+    // Set the channel for the beacon
+    set_channel = custom_ssid.channel;
+    esp_wifi_set_channel(set_channel, WIFI_SECOND_CHAN_NONE);
+    delay(1);
 
-  char ESSID[custom_ssid.essid.length() + 1] = {};
-  custom_ssid.essid.toCharArray(ESSID, custom_ssid.essid.length() + 1);
+    // Set SRC MAC (randomize or reuse BSSID as needed)
+    memcpy(&packet[10], custom_ssid.bssid, 6);
+    memcpy(&packet[16], custom_ssid.bssid, 6);
 
-  int ssidLen = strlen(ESSID);
-  //int rand_len = sizeof(rand_reg);
-  int fullLen = ssidLen;
-  packet[37] = fullLen;
+    // Validate ESSID
+    if (custom_ssid.essid.length() == 0 || custom_ssid.essid.length() > 32) {
+        Serial.println("Error: Invalid ESSID length");
+        return;
+    }
 
-  // Insert my tag
-  for(int i = 0; i < ssidLen; i++)
-    packet[38 + i] = ESSID[i];
+    // Convert ESSID to char array
+    char ESSID[custom_ssid.essid.length() + 1] = {};
+    custom_ssid.essid.toCharArray(ESSID, custom_ssid.essid.length() + 1);
 
-  /////////////////////////////
-  
-  packet[50 + fullLen] = set_channel;
+    int ssidLen = strlen(ESSID);
+    int fullLen = ssidLen;
 
-  uint8_t postSSID[13] = {0x01, 0x08, 0x82, 0x84, 0x8b, 0x96, 0x24, 0x30, 0x48, 0x6c, //supported rate
-                      0x03, 0x01, 0x04 /*DSSS (Current Channel)*/ };
+    // Declare postSSID locally
+    uint8_t postSSID[13] = {0x01, 0x08, 0x82, 0x84, 0x8b, 0x96, 0x24, 0x30, 0x48, 0x6c, 0x03, 0x01, 0x04};
 
+    // Ensure packet size is within bounds
+    int packet_size = 38 + fullLen + sizeof(postSSID);
+    if (packet_size > sizeof(packet)) {
+        Serial.println("Error: Packet size exceeds buffer capacity");
+        return;
+    }
 
+    // Insert ESSID into the packet
+    packet[37] = fullLen;
+    for (int i = 0; i < ssidLen; i++) {
+        packet[38 + i] = ESSID[i];
+    }
 
-  // Add everything that goes after the SSID
-  for(int i = 0; i < 12; i++) 
-    packet[38 + fullLen + i] = postSSID[i];
-  
+    // Add the current channel
+    packet[50 + fullLen] = set_channel;
 
-  esp_wifi_80211_tx(WIFI_IF_AP, packet, sizeof(packet), false);
-  esp_wifi_80211_tx(WIFI_IF_AP, packet, sizeof(packet), false);
-  esp_wifi_80211_tx(WIFI_IF_AP, packet, sizeof(packet), false);
+    // Add post-SSID data
+    for (int i = 0; i < sizeof(postSSID); i++) {
+        if ((38 + fullLen + i) >= sizeof(packet)) {
+            Serial.println("Error: PostSSID data exceeds packet size");
+            return;
+        }
+        packet[38 + fullLen + i] = postSSID[i];
+    }
 
-  packets_sent = packets_sent + 3;
+    // Transmit the packet multiple times
+    esp_wifi_80211_tx(WIFI_IF_AP, packet, packet_size, false);
+    esp_wifi_80211_tx(WIFI_IF_AP, packet, packet_size, false);
+    esp_wifi_80211_tx(WIFI_IF_AP, packet, packet_size, false);
+
+    // Update packet counter
+    packets_sent += 3;
+
+    // Debug output for tracking
+    Serial.printf("Custom beacon sent: ESSID=%s, Channel=%d, PacketSize=%d\n", ESSID, set_channel, packet_size);
 }
 
 // Function to send beacons with random ESSID length
