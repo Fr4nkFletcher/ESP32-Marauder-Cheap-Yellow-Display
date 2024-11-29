@@ -203,140 +203,147 @@ extern "C" {
 
 
   class bluetoothScanAllCallback: public NimBLEAdvertisedDeviceCallbacks {
-  
-      void onResult(NimBLEAdvertisedDevice *advertisedDevice) {
+  void onResult(NimBLEAdvertisedDevice *advertisedDevice) {
 
-        extern WiFiScan wifi_scan_obj;
-  
-        //#ifdef HAS_SCREEN
-        //  int buf = display_obj.display_buffer->size();
-        //#else
-        int buf = 0;
-        //#endif
-          
-        String display_string = "";
+    extern WiFiScan wifi_scan_obj;
 
-        if (wifi_scan_obj.currentScanMode == BT_SCAN_AIRTAG) {
-          uint8_t* payLoad = advertisedDevice->getPayload();
-          size_t len = advertisedDevice->getPayloadLength();
+    //#ifdef HAS_SCREEN
+    //  int buf = display_obj.display_buffer->size();
+    //#else
+    int buf = 0;
+    //#endif
 
-          bool match = false;
-          for (int i = 0; i <= len - 4; i++) {
-            if (payLoad[i] == 0x1E && payLoad[i+1] == 0xFF && payLoad[i+2] == 0x4C && payLoad[i+3] == 0x00) {
-              match = true;
-              break;
-            }
-            if (payLoad[i] == 0x4C && payLoad[i+1] == 0x00 && payLoad[i+2] == 0x12 && payLoad[i+3] == 0x19) {
-              match = true;
-              break;
-            }
-          }
+    String display_string = "";
 
-          if (match) {
-            String mac = advertisedDevice->getAddress().toString().c_str();
-            mac.toUpperCase();
+    if (wifi_scan_obj.currentScanMode == BT_SCAN_AIRTAG) {
+      uint8_t* payLoad = advertisedDevice->getPayload();
+      size_t len = advertisedDevice->getPayloadLength();
+      
 
-            for (int i = 0; i < airtags->size(); i++) {
-              if (mac == airtags->get(i).mac)
-                return;
-            }
-
-            int rssi = advertisedDevice->getRSSI();
-            Serial.print("RSSI: ");
-            Serial.print(rssi);
-            Serial.print(" MAC: ");
-            Serial.println(mac);
-            Serial.print("Len: ");
-            Serial.print(len);
-            Serial.print(" Payload: ");
-            for (size_t i = 0; i < len; i++) {
-              Serial.printf("%02X ", payLoad[i]);
-            }
-            Serial.println("\n");
-
-            AirTag airtag;
-            airtag.mac = mac;
-            airtag.payload.assign(payLoad, payLoad + len);
-            airtag.payloadSize = len;
-
-            airtags->add(airtag);
-
-
-            #ifdef HAS_SCREEN
-              //display_string.concat("RSSI: ");
-              display_string.concat((String)rssi);
-              display_string.concat(" MAC: ");
-              display_string.concat(mac);
-              uint8_t temp_len = display_string.length();
-              for (uint8_t i = 0; i < 40 - temp_len; i++)
-              {
-                display_string.concat(" ");
-              }
-              display_obj.display_buffer->add(display_string);
-            #endif
-          }
+      bool match = false;
+      for (int i = 0; i <= len - 4; i++) {
+        if (payLoad[i] == 0x1E && payLoad[i+1] == 0xFF && payLoad[i+2] == 0x4C && payLoad[i+3] == 0x00) {
+          match = true;
+          break;
         }
-        else if (wifi_scan_obj.currentScanMode == BT_SCAN_FLIPPER) {
-          uint8_t* payLoad = advertisedDevice->getPayload();
-          size_t len = advertisedDevice->getPayloadLength();
-          bool match = false;
-          String color = "";
-          for (int i = 0; i <= len - 4; i++) {
-            if (payLoad[i] == 0x81 && payLoad[i+1] == 0x30) {
-              match = true;
-              color = "Black";
-              break;
-            }
-            if (payLoad[i] == 0x82 && payLoad[i+1] == 0x30) {
-              match = true;
-              color = "White";
-              break;
-            }
-            if (payLoad[i] == 0x83 && payLoad[i+1] == 0x30) {
-              color = "Transparent";
-              match = true;
-              break;
-            }
-          }
-          if (match) {
-            String mac = advertisedDevice->getAddress().toString().c_str();
-            String name = advertisedDevice->getName().c_str();
-            mac.toUpperCase();
-            for (int i = 0; i < flippers->size(); i++) {
-              if (mac == flippers->get(i).mac)
-                return;
-            }
-            int rssi = advertisedDevice->getRSSI();
-            Serial.print("RSSI: ");
-            Serial.print(rssi);
-            Serial.print(" MAC: ");
-            Serial.println(mac);
-            Serial.print("Name: ");
-            Serial.println(name);
-            Flipper flipper;
-            flipper.mac = mac;
-            flipper.name = name;
-            flippers->add(flipper);
-            /*#ifdef HAS_SCREEN
-              //display_string.concat("RSSI: ");
-              display_string.concat((String)rssi);
-              display_string.concat(" Flipper: ");
-              display_string.concat(name);
-              uint8_t temp_len = display_string.length();
-              for (uint8_t i = 0; i < 40 - temp_len; i++)
-              {
-                display_string.concat(" ");
-              }
-              display_obj.display_buffer->add(display_string);
-            #endif*/
-            #ifdef HAS_SCREEN
-              display_obj.display_buffer->add(String("Flipper: ") + name + ",                 ");
-              display_obj.display_buffer->add("       MAC: " + String(mac) + ",             ");
-              display_obj.display_buffer->add("      RSSI: " + String(rssi) + ",               ");
-              display_obj.display_buffer->add("     Color: " + String(color) + "                ");
-            #endif
-          }
+        if (payLoad[i] == 0x4C && payLoad[i+1] == 0x00 && payLoad[i+2] == 0x12 && payLoad[i+3] == 0x19) {
+          match = true;
+          break;
         }
+      }
+
+      if (match) {
+        String mac = advertisedDevice->getAddress().toString().c_str();
+        mac.toUpperCase();
+
+        for (int i = 0; i < airtags->size(); i++) {
+          if (mac == airtags->get(i).mac)
+            return;
+        }
+
+        int rssi = advertisedDevice->getRSSI();
+        Serial.print("RSSI: ");
+        Serial.print(rssi);
+        Serial.print(" MAC: ");
+        Serial.println(mac);
+        Serial.print("Len: ");
+        Serial.print(len);
+        Serial.print(" Payload: ");
+        for (size_t i = 0; i < len; i++) {
+          Serial.printf("%02X ", payLoad[i]);
+        }
+        Serial.println("\n");
+
+        AirTag airtag;
+        airtag.mac = mac;
+        airtag.payload.assign(payLoad, payLoad + len);
+        airtag.payloadSize = len;
+
+        airtags->add(airtag);
+
+        // Log the AirTag data
+        wifi_scan_obj.startLog("bt_scan_airtag");
+        String header_line = "AirTag Sniffer Log\n";
+        buffer_obj.append(header_line);
+        buffer_obj.append("MAC: " + mac + ", RSSI: " + String(rssi) + ", Payload: ");
+        for (size_t i = 0; i < len; i++) {
+        buffer_obj.append(String(payLoad[i], HEX) + " ");
+        }
+        buffer_obj.append("\n");
+
+        #ifdef HAS_SCREEN
+          //display_string.concat("RSSI: ");
+          display_string.concat((String)rssi);
+          display_string.concat(" MAC: ");
+          display_string.concat(mac);
+          uint8_t temp_len = display_string.length();
+          for (uint8_t i = 0; i < 40 - temp_len; i++) {
+            display_string.concat(" ");
+          }
+          display_obj.display_buffer->add(display_string);
+        #endif
+      }
+    }
+    else if (wifi_scan_obj.currentScanMode == BT_SCAN_FLIPPER) {
+      uint8_t* payLoad = advertisedDevice->getPayload();
+      size_t len = advertisedDevice->getPayloadLength();
+      bool match = false;
+      String color = "";
+      for (int i = 0; i <= len - 4; i++) {
+        if (payLoad[i] == 0x81 && payLoad[i+1] == 0x30) {
+          match = true;
+          color = "Black";
+          break;
+        }
+        if (payLoad[i] == 0x82 && payLoad[i+1] == 0x30) {
+          match = true;
+          color = "White";
+          break;
+        }
+        if (payLoad[i] == 0x83 && payLoad[i+1] == 0x30) {
+          color = "Transparent";
+          match = true;
+          break;
+        }
+      }
+      if (match) {
+        String mac = advertisedDevice->getAddress().toString().c_str();
+        String name = advertisedDevice->getName().c_str();
+        mac.toUpperCase();
+        for (int i = 0; i < flippers->size(); i++) {
+          if (mac == flippers->get(i).mac)
+            return;
+        }
+        int rssi = advertisedDevice->getRSSI();
+        Serial.print("RSSI: ");
+        Serial.print(rssi);
+        Serial.print(" MAC: ");
+        Serial.println(mac);
+        Serial.print("Name: ");
+        Serial.println(name);
+        Flipper flipper;
+        flipper.mac = mac;
+        flipper.name = name;
+        flippers->add(flipper);
+
+        // Save log to SD card with Flipper Sniffer Log format if not already started
+        
+        wifi_scan_obj.startLog("bt_scan_flipper");
+        String header_line = "Flipper Sniffer Log\n";
+        buffer_obj.append(header_line);
+        
+        String log_line = mac + "," + name + "," + color + "," + String(rssi) + "\n";
+        buffer_obj.append(log_line);
+
+        #ifdef HAS_SCREEN
+          display_obj.display_buffer->add(String("Flipper: ") + name + ",                 ");
+          display_obj.display_buffer->add("       MAC: " + String(mac) + ",             ");
+          display_obj.display_buffer->add("      RSSI: " + String(rssi) + ",               ");
+          display_obj.display_buffer->add("     Color: " + String(color) + "                ");
+        #endif
+      }
+    }
+    
         else if (wifi_scan_obj.currentScanMode == BT_SCAN_ALL) {
           if (buf >= 0)
           {
@@ -2163,42 +2170,47 @@ void WiFiScan::setBaseMacAddress(uint8_t macAddr[6]) {
 }
 
 void WiFiScan::executeSpoofAirtag() {
-  #ifdef HAS_BT
+#ifdef HAS_BT
     for (int i = 0; i < airtags->size(); i++) {
-      if (airtags->get(i).selected) {
+        if (airtags->get(i).selected) {
+            uint8_t macAddr[6];
+            // Convert the MAC string to a uint8 array
+            convertMacStringToUint8(airtags->get(i).mac, macAddr);
 
-        uint8_t macAddr[6];
+            // Adjust MAC address as needed (e.g., decrement the last byte)
+            macAddr[5] -= 2;
 
-        convertMacStringToUint8(airtags->get(i).mac, macAddr);
+            // Ensure the first byte complies with the unicast requirement
+            macAddr[0] &= 0xFE; // Clear the multicast bit (second LSB)
 
+            // Log the MAC address for debugging
+            Serial.println("Using MAC: " + macToString(macAddr));
 
-        macAddr[5] -= 2;
-        delay(5);
+            // Set the valid unicast MAC address
+            this->setBaseMacAddress(macAddr);
 
-        // Do this because ESP32 BT addr is Base MAC + 2
-        
-        this->setBaseMacAddress(macAddr);
-        delay(5);
-        NimBLEDevice::init("");
-        delay(5);
-        NimBLEServer *pServer = NimBLEDevice::createServer();
-        delay(5);
-        pAdvertising = pServer->getAdvertising();
-        delay(5);
-        //NimBLEAdvertisementData advertisementData = getSwiftAdvertisementData();
-        NimBLEAdvertisementData advertisementData = this->GetUniversalAdvertisementData(Airtag);
-        pAdvertising->setAdvertisementData(advertisementData);
-        pAdvertising->start();
-        delay(100);
-        pAdvertising->stop();
-        delay(5);
-        NimBLEDevice::deinit();
+            // Initialize NimBLE with the adjusted MAC address
+            NimBLEDevice::init("");
+            NimBLEServer *pServer = NimBLEDevice::createServer();
+            pAdvertising = pServer->getAdvertising();
 
-        break;
-      }
+            // Set up advertisement data
+            NimBLEAdvertisementData advertisementData = this->GetUniversalAdvertisementData(Airtag);
+            pAdvertising->setAdvertisementData(advertisementData);
+
+            // Start and stop advertising
+            pAdvertising->start();
+            delay(10);
+            pAdvertising->stop();
+
+            // Deinitialize NimBLE to clean up
+            NimBLEDevice::deinit();
+            break;
+        }
     }
-  #endif
+#endif
 }
+
 
 void WiFiScan::executeSwiftpairSpam(EBLEPayloadType type) {
   #ifdef HAS_BT
@@ -2678,7 +2690,7 @@ void WiFiScan::RunBluetoothScan(uint8_t scan_mode, uint16_t color)
         pBLEScan->setAdvertisedDeviceCallbacks(new bluetoothScanAllCallback(), true);
       }
       else if (scan_mode == BT_SCAN_AIRTAG) {
-        this->clearAirtags();
+        this->clearAirtags();;
         pBLEScan->setAdvertisedDeviceCallbacks(new bluetoothScanAllCallback(), true);
       }
     }
@@ -4000,151 +4012,108 @@ void WiFiScan::beaconListSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t 
 }
 
 void WiFiScan::broadcastCustomBeacon(uint32_t current_time, AccessPoint custom_ssid) {
-    // Set a random channel
-    set_channel = random(1, 12);
-    esp_wifi_set_channel(set_channel, WIFI_SECOND_CHAN_NONE);
-    delay(1);
+  set_channel = random(1,12); 
+  esp_wifi_set_channel(set_channel, WIFI_SECOND_CHAN_NONE);
+  delay(1);  
 
-    // Validate beacon pointer and size
-    if (custom_ssid.beacon == nullptr || custom_ssid.beacon->size() < 2) {
-        Serial.println("Error: Invalid or uninitialized beacon data");
-        return;
-    }
+  if (custom_ssid.beacon->size() == 0)
+    return;
 
-    // Randomize SRC MAC
-    for (int i = 10; i <= 15; i++) {
-        packet[i] = packet[i + 6] = random(256); // Randomize MAC addresses
-    }
 
-    // Validate ESSID
-    if (custom_ssid.essid.length() == 0 || custom_ssid.essid.length() >= 33) {
-        Serial.println("Error: Invalid ESSID length");
-        return;
-    }
+  // Randomize SRC MAC
+  // Randomize SRC MAC
+  packet[10] = packet[16] = random(256);
+  packet[11] = packet[17] = random(256);
+  packet[12] = packet[18] = random(256);
+  packet[13] = packet[19] = random(256);
+  packet[14] = packet[20] = random(256);
+  packet[15] = packet[21] = random(256);
 
-    // Convert ESSID to char array
-    char ESSID[custom_ssid.essid.length() + 1] = {};
-    custom_ssid.essid.toCharArray(ESSID, custom_ssid.essid.length() + 1);
+  char ESSID[custom_ssid.essid.length() + 1] = {};
+  custom_ssid.essid.toCharArray(ESSID, custom_ssid.essid.length() + 1);
 
-    int realLen = strlen(ESSID);
-    int ssidLen = random(realLen, 33); // Add spaces up to 32 characters
-    int numSpace = ssidLen - realLen;
-    int fullLen = ssidLen;
+  int realLen = strlen(ESSID);
+  int ssidLen = random(realLen, 33);
+  int numSpace = ssidLen - realLen;
+  //int rand_len = sizeof(rand_reg);
+  int fullLen = ssidLen;
+  packet[37] = fullLen;
 
-    // Declare postSSID locally
-    uint8_t postSSID[13] = {0x01, 0x08, 0x82, 0x84, 0x8b, 0x96, 0x24, 0x30, 0x48, 0x6c, 0x03, 0x01, 0x04};
+  // Insert my tag
+  for(int i = 0; i < realLen; i++)
+    packet[38 + i] = ESSID[i];
 
-    // Ensure packet size is sufficient
-    if ((50 + fullLen + sizeof(postSSID)) >= sizeof(packet)) {
-        Serial.println("Error: Packet size exceeds buffer capacity");
-        return;
-    }
+  for(int i = 0; i < numSpace; i++)
+    packet[38 + realLen + i] = 0x20;
 
-    // Insert ESSID into packet
-    packet[37] = fullLen;
-    for (int i = 0; i < realLen; i++) {
-        packet[38 + i] = ESSID[i];
-    }
+  /////////////////////////////
+  
+  packet[50 + fullLen] = set_channel;
 
-    // Pad with spaces
-    for (int i = 0; i < numSpace; i++) {
-        packet[38 + realLen + i] = 0x20;
-    }
+  uint8_t postSSID[13] = {0x01, 0x08, 0x82, 0x84, 0x8b, 0x96, 0x24, 0x30, 0x48, 0x6c, //supported rate
+                      0x03, 0x01, 0x04 /*DSSS (Current Channel)*/ };
 
-    // Add the current channel
-    packet[50 + fullLen] = set_channel;
 
-    // Add supported rates and other post-SSID data
-    for (int i = 0; i < sizeof(postSSID); i++) {
-        if ((38 + fullLen + i) >= sizeof(packet)) {
-            Serial.println("Error: postSSID data exceeds packet size");
-            return;
-        }
-        packet[38 + fullLen + i] = postSSID[i];
-    }
 
-    // Insert beacon data from AccessPoint
-    packet[34] = custom_ssid.beacon->get(0);
-    packet[35] = custom_ssid.beacon->get(1);
+  // Add everything that goes after the SSID
+  //for(int i = 0; i < 12; i++) 
+  //  packet[38 + fullLen + i] = postSSID[i];
 
-    // Calculate the packet size dynamically
-    int packet_size = 38 + fullLen + sizeof(postSSID);
+  packet[34] = custom_ssid.beacon->get(0);
+  packet[35] = custom_ssid.beacon->get(1);
+  
 
-    // Transmit the packet multiple times
-    esp_wifi_80211_tx(WIFI_IF_AP, packet, packet_size, false);
-    esp_wifi_80211_tx(WIFI_IF_AP, packet, packet_size, false);
-    esp_wifi_80211_tx(WIFI_IF_AP, packet, packet_size, false);
+  esp_wifi_80211_tx(WIFI_IF_AP, packet, sizeof(packet), false);
+  esp_wifi_80211_tx(WIFI_IF_AP, packet, sizeof(packet), false);
+  esp_wifi_80211_tx(WIFI_IF_AP, packet, sizeof(packet), false);
 
-    packets_sent += 3; // Update packet counter
+  packets_sent = packets_sent + 3;
 }
 
 void WiFiScan::broadcastCustomBeacon(uint32_t current_time, ssid custom_ssid) {
-    // Validate BSSID size
-    if (sizeof(custom_ssid.bssid) != 6) {
-        Serial.println("Error: Invalid BSSID size");
-        return;
-    }
+  set_channel = custom_ssid.channel;
+  esp_wifi_set_channel(set_channel, WIFI_SECOND_CHAN_NONE);
+  delay(1);  
 
-    // Set the channel for the beacon
-    set_channel = custom_ssid.channel;
-    esp_wifi_set_channel(set_channel, WIFI_SECOND_CHAN_NONE);
-    delay(1);
+  // Randomize SRC MAC
+  packet[10] = packet[16] = custom_ssid.bssid[0];
+  packet[11] = packet[17] = custom_ssid.bssid[1];
+  packet[12] = packet[18] = custom_ssid.bssid[2];
+  packet[13] = packet[19] = custom_ssid.bssid[3];
+  packet[14] = packet[20] = custom_ssid.bssid[4];
+  packet[15] = packet[21] = custom_ssid.bssid[5];
 
-    // Set SRC MAC (randomize or reuse BSSID as needed)
-    memcpy(&packet[10], custom_ssid.bssid, 6);
-    memcpy(&packet[16], custom_ssid.bssid, 6);
+  char ESSID[custom_ssid.essid.length() + 1] = {};
+  custom_ssid.essid.toCharArray(ESSID, custom_ssid.essid.length() + 1);
 
-    // Validate ESSID
-    if (custom_ssid.essid.length() == 0 || custom_ssid.essid.length() > 32) {
-        Serial.println("Error: Invalid ESSID length");
-        return;
-    }
+  int ssidLen = strlen(ESSID);
+  //int rand_len = sizeof(rand_reg);
+  int fullLen = ssidLen;
+  packet[37] = fullLen;
 
-    // Convert ESSID to char array
-    char ESSID[custom_ssid.essid.length() + 1] = {};
-    custom_ssid.essid.toCharArray(ESSID, custom_ssid.essid.length() + 1);
+  // Insert my tag
+  for(int i = 0; i < ssidLen; i++)
+    packet[38 + i] = ESSID[i];
 
-    int ssidLen = strlen(ESSID);
-    int fullLen = ssidLen;
+  /////////////////////////////
+  
+  packet[50 + fullLen] = set_channel;
 
-    // Declare postSSID locally
-    uint8_t postSSID[13] = {0x01, 0x08, 0x82, 0x84, 0x8b, 0x96, 0x24, 0x30, 0x48, 0x6c, 0x03, 0x01, 0x04};
+  uint8_t postSSID[13] = {0x01, 0x08, 0x82, 0x84, 0x8b, 0x96, 0x24, 0x30, 0x48, 0x6c, //supported rate
+                      0x03, 0x01, 0x04 /*DSSS (Current Channel)*/ };
 
-    // Ensure packet size is within bounds
-    int packet_size = 38 + fullLen + sizeof(postSSID);
-    if (packet_size > sizeof(packet)) {
-        Serial.println("Error: Packet size exceeds buffer capacity");
-        return;
-    }
 
-    // Insert ESSID into the packet
-    packet[37] = fullLen;
-    for (int i = 0; i < ssidLen; i++) {
-        packet[38 + i] = ESSID[i];
-    }
 
-    // Add the current channel
-    packet[50 + fullLen] = set_channel;
+  // Add everything that goes after the SSID
+  for(int i = 0; i < 12; i++) 
+    packet[38 + fullLen + i] = postSSID[i];
+  
 
-    // Add post-SSID data
-    for (int i = 0; i < sizeof(postSSID); i++) {
-        if ((38 + fullLen + i) >= sizeof(packet)) {
-            Serial.println("Error: PostSSID data exceeds packet size");
-            return;
-        }
-        packet[38 + fullLen + i] = postSSID[i];
-    }
+  esp_wifi_80211_tx(WIFI_IF_AP, packet, sizeof(packet), false);
+  esp_wifi_80211_tx(WIFI_IF_AP, packet, sizeof(packet), false);
+  esp_wifi_80211_tx(WIFI_IF_AP, packet, sizeof(packet), false);
 
-    // Transmit the packet multiple times
-    esp_wifi_80211_tx(WIFI_IF_AP, packet, packet_size, false);
-    esp_wifi_80211_tx(WIFI_IF_AP, packet, packet_size, false);
-    esp_wifi_80211_tx(WIFI_IF_AP, packet, packet_size, false);
-
-    // Update packet counter
-    packets_sent += 3;
-
-    // Debug output for tracking
-    Serial.printf("Custom beacon sent: ESSID=%s, Channel=%d, PacketSize=%d\n", ESSID, set_channel, packet_size);
+  packets_sent = packets_sent + 3;
 }
 
 // Function to send beacons with random ESSID length
