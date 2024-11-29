@@ -14,8 +14,9 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 
 ---
 
-## 🏴‍☠️ Latest Update Highlights — v1.1.0 (11/24/24) 🏴‍☠️
+## 🏴‍☠️ Latest Update Highlights — v1.1.0 (11/28/24) 🏴‍☠️
 
+- Add logging to SD for Flipper/AirTag sniff
 - Add Flipper Zero Sniff
 - Airtag Sniffing/Spoofing
 - Working Pwnagotchi Detect on all models
