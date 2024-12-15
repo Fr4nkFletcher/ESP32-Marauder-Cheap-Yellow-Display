@@ -386,7 +386,6 @@ void CommandLine::runCommand(String input) {
       }
     #endif
   }
-  /*
   // LED command
   else if (cmd_args.get(0) == LED_CMD) {
     int hex_arg = this->argSearch(&cmd_args, "-s");
@@ -401,21 +400,13 @@ void CommandLine::runCommand(String input) {
         //Serial.println(r);
         //Serial.println(g);
         //Serial.println(b);
-        led_obj.setColor(r, g, b);
-        led_obj.setMode(MODE_CUSTOM);
-      }
-      else if (pat_arg != -1) {
-        String pat_name = cmd_args.get(pat_arg + 1);
-        pat_name.toLowerCase();
-        if (pat_name == "rainbow") {
-          led_obj.setMode(MODE_RAINBOW);
-        }
+        //led_obj.setColor(r, g, b);
+        //led_obj.setMode(MODE_CUSTOM);
       }
     #else
       Serial.println("This hardware does not support neopixel");
     #endif
   }
-  */
   // ls command
   else if (cmd_args.get(0) == LS_CMD) {
     #ifdef HAS_SD

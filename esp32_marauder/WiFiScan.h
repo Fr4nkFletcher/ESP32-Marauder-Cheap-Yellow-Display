@@ -122,7 +122,7 @@ extern Buffer buffer_obj;
 #endif
 extern Settings settings_obj;
 #ifdef MARAUDER_FLIPPER
-  extern flipperLED flipper_led;  
+  extern flipperLED flipper_led;
 #elif defined(MARAUDER_V4)
   extern flipperLED flipper_led;
 #elif defined(XIAO_ESP32_S3)
@@ -419,6 +419,8 @@ class WiFiScan
     void RunLoadSSIDList();
     void RunSaveAPList(bool save_as = true);
     void RunLoadAPList();
+    void RunSaveATList(bool save_as = true);
+    void RunLoadATList();
     void channelHop();
     uint8_t currentScanMode = 0;
     void main(uint32_t currentTime);
