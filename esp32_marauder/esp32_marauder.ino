@@ -35,7 +35,7 @@ https://www.online-utility.org/image/convert/to/XBM
 #include "Buffer.h"
 
 #ifdef MARAUDER_FLIPPER
-  #include "flipperLED.h" 
+  #include "flipperLED.h"
 #elif defined(MARAUDER_V4)
   #include "flipperLED.h"
 #elif defined(XIAO_ESP32_S3)
@@ -186,6 +186,9 @@ void setup()
 
   Serial.begin(115200);
 
+  while(!Serial)
+    delay(10);
+
   Serial.println("ESP-IDF version is: " + String(esp_get_idf_version()));
 
   #ifdef HAS_SCREEN
@@ -330,6 +333,8 @@ void setup()
   #ifdef HAS_SCREEN
     menu_function_obj.RunSetup();
   #endif
+
+  wifi_scan_obj.StartScan(WIFI_SCAN_OFF);
   
   Serial.println(F("CLI Ready"));
   cli_obj.RunSetup();

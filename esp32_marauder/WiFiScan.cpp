@@ -203,147 +203,149 @@ extern "C" {
 
 
   class bluetoothScanAllCallback: public NimBLEAdvertisedDeviceCallbacks {
-  void onResult(NimBLEAdvertisedDevice *advertisedDevice) {
+  
+      void onResult(NimBLEAdvertisedDevice *advertisedDevice) {
 
-    extern WiFiScan wifi_scan_obj;
+        extern WiFiScan wifi_scan_obj;
+  
+        //#ifdef HAS_SCREEN
+        //  int buf = display_obj.display_buffer->size();
+        //#else
+        int buf = 0;
+        //#endif
+          
+        String display_string = "";
 
-    //#ifdef HAS_SCREEN
-    //  int buf = display_obj.display_buffer->size();
-    //#else
-    int buf = 0;
-    //#endif
+        if (wifi_scan_obj.currentScanMode == BT_SCAN_AIRTAG) {
+          uint8_t* payLoad = advertisedDevice->getPayload();
+          size_t len = advertisedDevice->getPayloadLength();
 
-    String display_string = "";
-
-    if (wifi_scan_obj.currentScanMode == BT_SCAN_AIRTAG) {
-      uint8_t* payLoad = advertisedDevice->getPayload();
-      size_t len = advertisedDevice->getPayloadLength();
-      
-
-      bool match = false;
-      for (int i = 0; i <= len - 4; i++) {
-        if (payLoad[i] == 0x1E && payLoad[i+1] == 0xFF && payLoad[i+2] == 0x4C && payLoad[i+3] == 0x00) {
-          match = true;
-          break;
-        }
-        if (payLoad[i] == 0x4C && payLoad[i+1] == 0x00 && payLoad[i+2] == 0x12 && payLoad[i+3] == 0x19) {
-          match = true;
-          break;
-        }
-      }
-
-      if (match) {
-        String mac = advertisedDevice->getAddress().toString().c_str();
-        mac.toUpperCase();
-
-        for (int i = 0; i < airtags->size(); i++) {
-          if (mac == airtags->get(i).mac)
-            return;
-        }
-
-        int rssi = advertisedDevice->getRSSI();
-        Serial.print("RSSI: ");
-        Serial.print(rssi);
-        Serial.print(" MAC: ");
-        Serial.println(mac);
-        Serial.print("Len: ");
-        Serial.print(len);
-        Serial.print(" Payload: ");
-        for (size_t i = 0; i < len; i++) {
-          Serial.printf("%02X ", payLoad[i]);
-        }
-        Serial.println("\n");
-
-        AirTag airtag;
-        airtag.mac = mac;
-        airtag.payload.assign(payLoad, payLoad + len);
-        airtag.payloadSize = len;
-
-        airtags->add(airtag);
-
-        // Log the AirTag data
-        wifi_scan_obj.startLog("bt_scan_airtag");
-        String header_line = "AirTag Sniffer Log\n";
-        buffer_obj.append(header_line);
-        buffer_obj.append("MAC: " + mac + ", RSSI: " + String(rssi) + ", Payload: ");
-        for (size_t i = 0; i < len; i++) {
-        buffer_obj.append(String(payLoad[i], HEX) + " ");
-        }
-        buffer_obj.append("\n");
-
-        #ifdef HAS_SCREEN
-          //display_string.concat("RSSI: ");
-          display_string.concat((String)rssi);
-          display_string.concat(" MAC: ");
-          display_string.concat(mac);
-          uint8_t temp_len = display_string.length();
-          for (uint8_t i = 0; i < 40 - temp_len; i++) {
-            display_string.concat(" ");
+          bool match = false;
+          for (int i = 0; i <= len - 4; i++) {
+            if (payLoad[i] == 0x1E && payLoad[i+1] == 0xFF && payLoad[i+2] == 0x4C && payLoad[i+3] == 0x00) {
+              match = true;
+              break;
+            }
+            if (payLoad[i] == 0x4C && payLoad[i+1] == 0x00 && payLoad[i+2] == 0x12 && payLoad[i+3] == 0x19) {
+              match = true;
+              break;
+            }
           }
-          display_obj.display_buffer->add(display_string);
-        #endif
-      }
-    }
-    else if (wifi_scan_obj.currentScanMode == BT_SCAN_FLIPPER) {
-      uint8_t* payLoad = advertisedDevice->getPayload();
-      size_t len = advertisedDevice->getPayloadLength();
-      bool match = false;
-      String color = "";
-      for (int i = 0; i <= len - 4; i++) {
-        if (payLoad[i] == 0x81 && payLoad[i+1] == 0x30) {
-          match = true;
-          color = "Black";
-          break;
-        }
-        if (payLoad[i] == 0x82 && payLoad[i+1] == 0x30) {
-          match = true;
-          color = "White";
-          break;
-        }
-        if (payLoad[i] == 0x83 && payLoad[i+1] == 0x30) {
-          color = "Transparent";
-          match = true;
-          break;
-        }
-      }
-      if (match) {
-        String mac = advertisedDevice->getAddress().toString().c_str();
-        String name = advertisedDevice->getName().c_str();
-        mac.toUpperCase();
-        for (int i = 0; i < flippers->size(); i++) {
-          if (mac == flippers->get(i).mac)
-            return;
-        }
-        int rssi = advertisedDevice->getRSSI();
-        Serial.print("RSSI: ");
-        Serial.print(rssi);
-        Serial.print(" MAC: ");
-        Serial.println(mac);
-        Serial.print("Name: ");
-        Serial.println(name);
-        Flipper flipper;
-        flipper.mac = mac;
-        flipper.name = name;
-        flippers->add(flipper);
 
-        // Save log to SD card with Flipper Sniffer Log format if not already started
-        
-        wifi_scan_obj.startLog("bt_scan_flipper");
-        String header_line = "Flipper Sniffer Log\n";
-        buffer_obj.append(header_line);
-        
-        String log_line = mac + "," + name + "," + color + "," + String(rssi) + "\n";
-        buffer_obj.append(log_line);
+          if (match) {
+            String mac = advertisedDevice->getAddress().toString().c_str();
+            mac.toUpperCase();
 
-        #ifdef HAS_SCREEN
-          display_obj.display_buffer->add(String("Flipper: ") + name + ",                 ");
-          display_obj.display_buffer->add("       MAC: " + String(mac) + ",             ");
-          display_obj.display_buffer->add("      RSSI: " + String(rssi) + ",               ");
-          display_obj.display_buffer->add("     Color: " + String(color) + "                ");
-        #endif
-      }
-    }
-    
+            for (int i = 0; i < airtags->size(); i++) {
+              if (mac == airtags->get(i).mac)
+                return;
+            }
+
+            int rssi = advertisedDevice->getRSSI();
+            Serial.print("RSSI: ");
+            Serial.print(rssi);
+            Serial.print(" MAC: ");
+            Serial.println(mac);
+            Serial.print("Len: ");
+            Serial.print(len);
+            Serial.print(" Payload: ");
+            for (size_t i = 0; i < len; i++) {
+              Serial.printf("%02X ", payLoad[i]);
+            }
+            Serial.println("\n");
+
+            AirTag airtag;
+            airtag.mac = mac;
+            airtag.payload.assign(payLoad, payLoad + len);
+            airtag.payloadSize = len;
+
+            airtags->add(airtag);
+
+
+            #ifdef HAS_SCREEN
+              //display_string.concat("RSSI: ");
+              display_string.concat((String)rssi);
+              display_string.concat(" MAC: ");
+              display_string.concat(mac);
+              uint8_t temp_len = display_string.length();
+              for (uint8_t i = 0; i < 40 - temp_len; i++)
+              {
+                display_string.concat(" ");
+              }
+              display_obj.display_buffer->add(display_string);
+            #endif
+          }
+        }
+        else if (wifi_scan_obj.currentScanMode == BT_SCAN_FLIPPER) {
+          uint8_t* payLoad = advertisedDevice->getPayload();
+          size_t len = advertisedDevice->getPayloadLength();
+
+          bool match = false;
+          String color = "";
+          for (int i = 0; i <= len - 4; i++) {
+            if (payLoad[i] == 0x81 && payLoad[i+1] == 0x30) {
+              match = true;
+              color = "Black";
+              break;
+            }
+            if (payLoad[i] == 0x82 && payLoad[i+1] == 0x30) {
+              match = true;
+              color = "White";
+              break;
+            }
+            if (payLoad[i] == 0x83 && payLoad[i+1] == 0x30) {
+              color = "Transparent";
+              match = true;
+              break;
+            }
+          }
+
+          if (match) {
+            String mac = advertisedDevice->getAddress().toString().c_str();
+            String name = advertisedDevice->getName().c_str();
+            mac.toUpperCase();
+
+            for (int i = 0; i < flippers->size(); i++) {
+              if (mac == flippers->get(i).mac)
+                return;
+            }
+
+            int rssi = advertisedDevice->getRSSI();
+            Serial.print("RSSI: ");
+            Serial.print(rssi);
+            Serial.print(" MAC: ");
+            Serial.println(mac);
+            Serial.print("Name: ");
+            Serial.println(name);
+
+            Flipper flipper;
+            flipper.mac = mac;
+            flipper.name = name;
+
+            flippers->add(flipper);
+
+
+            /*#ifdef HAS_SCREEN
+              //display_string.concat("RSSI: ");
+              display_string.concat((String)rssi);
+              display_string.concat(" Flipper: ");
+              display_string.concat(name);
+              uint8_t temp_len = display_string.length();
+              for (uint8_t i = 0; i < 40 - temp_len; i++)
+              {
+                display_string.concat(" ");
+              }
+              display_obj.display_buffer->add(display_string);
+            #endif*/
+
+            #ifdef HAS_SCREEN
+              display_obj.display_buffer->add(String("Flipper: ") + name + ",                 ");
+              display_obj.display_buffer->add("       MAC: " + String(mac) + ",             ");
+              display_obj.display_buffer->add("      RSSI: " + String(rssi) + ",               ");
+              display_obj.display_buffer->add("     Color: " + String(color) + "                ");
+            #endif
+          }
+        }
         else if (wifi_scan_obj.currentScanMode == BT_SCAN_ALL) {
           if (buf >= 0)
           {
@@ -829,9 +831,11 @@ void WiFiScan::startWiFiAttacks(uint8_t scan_mode, uint16_t color, String title_
     display_obj.initScrollValues(true);
     display_obj.tft.setTextWrap(false);
     display_obj.tft.setTextColor(TFT_BLACK, color);
-    #ifdef HAS_ILI9341
+    #ifdef HAS_FULL_SCREEN
       display_obj.tft.fillRect(0,16,TFT_WIDTH,16, color);
       display_obj.tft.drawCentreString((String)title_string,TFT_WIDTH / 2,16,2);
+    #endif
+    #ifdef HAS_ILI9341
       display_obj.touchToExit();
     #endif
     display_obj.tft.setTextColor(TFT_GREEN, TFT_BLACK);
@@ -865,7 +869,7 @@ void WiFiScan::startWiFiAttacks(uint8_t scan_mode, uint16_t color, String title_
   #ifdef MARAUDER_FLIPPER
     flipper_led.attackLED();
   #elif defined(MARAUDER_V4)
-    flipper_led.attackLED();  
+    flipper_led.attackLED();
   #elif defined(XIAO_ESP32_S3)
     xiao_led.attackLED();
   #elif defined(MARAUDER_M5STICKC)
@@ -912,6 +916,7 @@ bool WiFiScan::shutdownWiFi() {
 bool WiFiScan::shutdownBLE() {
   #ifdef HAS_BT
     if (this->ble_initialized) {
+      Serial.println("Shutting down BLE");
       pAdvertising->stop();
       pBLEScan->stop();
       
@@ -921,7 +926,7 @@ bool WiFiScan::shutdownBLE() {
       #ifdef MARAUDER_FLIPPER
         flipper_led.offLED();
       #elif defined(MARAUDER_V4)
-        flipper_led.offLED(); 
+        flipper_led.offLED();
       #elif defined(XIAO_ESP32_S3)
         xiao_led.offLED();
       #elif defined(MARAUDER_M5STICKC)
@@ -1187,6 +1192,111 @@ void WiFiScan::parseBSSID(const char* bssidStr, uint8_t* bssid) {
          &bssid[3], &bssid[4], &bssid[5]);
 }
 
+void WiFiScan::RunLoadATList() {
+  #ifdef HAS_SD
+    // Prepare to access the file
+    File file = sd_obj.getFile("/Airtags_0.log");
+    if (!file) {
+      Serial.println("Could not open /Airtags_0.log");
+      #ifdef HAS_SCREEN
+        display_obj.tft.setTextWrap(false);
+        display_obj.tft.setFreeFont(NULL);
+        display_obj.tft.setCursor(0, 100);
+        display_obj.tft.setTextSize(1);
+        display_obj.tft.setTextColor(TFT_CYAN);
+      
+        display_obj.tft.println("Could not open /Airtags_0.log");
+      #endif
+      return;
+    }
+
+    // Prepare JSON
+    DynamicJsonDocument doc(10048);
+    DeserializationError error = deserializeJson(doc, file);
+    if (error) {
+      Serial.print("JSON deserialize error: ");
+      Serial.println(error.c_str());
+      file.close();
+      #ifdef HAS_SCREEN
+        display_obj.tft.setTextWrap(false);
+        display_obj.tft.setFreeFont(NULL);
+        display_obj.tft.setCursor(0, 100);
+        display_obj.tft.setTextSize(1);
+        display_obj.tft.setTextColor(TFT_CYAN);
+      
+        display_obj.tft.println("Could not deserialize JSON");
+        display_obj.tft.println(error.c_str());
+      #endif
+      return;
+    }
+
+    JsonArray array = doc.as<JsonArray>();
+    for (JsonObject obj : array) {
+      AirTag at;
+      at.mac = obj["mac"].as<String>();
+      at.payloadSize = obj["payload_size"];
+      at.payload = hexStringToByteArray(obj["payload"].as<String>());
+      at.selected = false;
+      airtags->add(at);
+    }
+
+    file.close();
+
+    //doc.clear();
+
+    #ifdef HAS_SCREEN
+      display_obj.tft.setTextWrap(false);
+      display_obj.tft.setFreeFont(NULL);
+      display_obj.tft.setCursor(0, 100);
+      display_obj.tft.setTextSize(1);
+      display_obj.tft.setTextColor(TFT_CYAN);
+    
+      display_obj.tft.print("Loaded Airtags: ");
+      display_obj.tft.println((String)airtags->size());
+    #endif
+    Serial.print("Loaded Airtags:");
+    Serial.println((String)airtags->size());
+  #endif
+}
+
+void WiFiScan::RunSaveATList(bool save_as) {
+  if (save_as) {
+    sd_obj.removeFile("/Airtags_0.log");
+
+    this->startLog("Airtags");
+
+    DynamicJsonDocument jsonDocument(2048);
+
+    JsonArray jsonArray = jsonDocument.to<JsonArray>();
+    
+    for (int i = 0; i < airtags->size(); i++) {
+      const AirTag& at = airtags->get(i);
+      JsonObject jsonAt = jsonArray.createNestedObject();
+      jsonAt["mac"] = at.mac;
+      jsonAt["payload"] = byteArrayToHexString(at.payload);
+      jsonAt["payload_size"] = at.payloadSize;
+    }
+
+    String jsonString;
+    serializeJson(jsonArray, jsonString);
+
+    buffer_obj.append(jsonString);
+
+    #ifdef HAS_SCREEN
+      display_obj.tft.setTextWrap(false);
+      display_obj.tft.setFreeFont(NULL);
+      display_obj.tft.setCursor(0, 100);
+      display_obj.tft.setTextSize(1);
+      display_obj.tft.setTextColor(TFT_CYAN);
+    
+      display_obj.tft.print("Saved Airtags: ");
+      display_obj.tft.println((String)airtags->size());
+    #endif
+    Serial.print("Saved Airtags:");
+    Serial.println((String)airtags->size());
+  }
+}
+
 void WiFiScan::RunLoadAPList() {
   #ifdef HAS_SD
     File file = sd_obj.getFile("/APs_0.log");
@@ -1387,9 +1497,11 @@ void WiFiScan::RunEvilPortal(uint8_t scan_mode, uint16_t color)
     display_obj.initScrollValues(true);
     display_obj.tft.setTextWrap(false);
     display_obj.tft.setTextColor(TFT_WHITE, color);
-    #ifdef HAS_ILI9341
+    #ifdef HAS_FULL_SCREEN
       display_obj.tft.fillRect(0,16,240,16, color);
       display_obj.tft.drawCentreString(" Evil Portal ",120,16,2);
+    #endif
+    #ifdef HAS_ILI9341
       display_obj.touchToExit();
     #endif
     display_obj.tft.setTextColor(TFT_MAGENTA, TFT_BLACK);
@@ -1433,9 +1545,11 @@ void WiFiScan::RunAPScan(uint8_t scan_mode, uint16_t color)
     display_obj.initScrollValues(true);
     display_obj.tft.setTextWrap(false);
     display_obj.tft.setTextColor(TFT_WHITE, color);
-    #ifdef HAS_ILI9341
+    #ifdef HAS_FULL_SCREEN
       display_obj.tft.fillRect(0,16,240,16, color);
       display_obj.tft.drawCentreString(text_table4[44],120,16,2);
+    #endif
+    #ifdef HAS_ILI9341
       display_obj.touchToExit();
     #endif
     display_obj.tft.setTextColor(TFT_GREEN, TFT_BLACK);
@@ -1895,9 +2009,11 @@ void WiFiScan::RunPacketMonitor(uint8_t scan_mode, uint16_t color)
       display_obj.initScrollValues(true);
       display_obj.tft.setTextWrap(false);
       display_obj.tft.setTextColor(TFT_WHITE, color);
-      #ifdef HAS_ILI9341
+      #ifdef HAS_FULL_SCREEN
         display_obj.tft.fillRect(0,16,240,16, color);
         display_obj.tft.drawCentreString(text_table4[38],120,16,2);
+      #endif
+      #ifdef HAS_ILI9341
         display_obj.touchToExit();
       #endif
       display_obj.tft.setTextColor(TFT_GREEN, TFT_BLACK);
@@ -1976,9 +2092,11 @@ void WiFiScan::RunEapolScan(uint8_t scan_mode, uint16_t color)
       display_obj.initScrollValues(true);
       display_obj.tft.setTextWrap(false);
       display_obj.tft.setTextColor(TFT_WHITE, color);
-      #ifdef HAS_ILI9341
+      #ifdef HAS_FULL_SCREEN
         display_obj.tft.fillRect(0,16,240,16, color);
         display_obj.tft.drawCentreString(text_table4[38],120,16,2);
+      #endif
+      #ifdef HAS_ILI9341
         display_obj.touchToExit();
       #endif
       display_obj.tft.setTextColor(TFT_GREEN, TFT_BLACK);
@@ -2039,9 +2157,11 @@ void WiFiScan::RunMimicFlood(uint8_t scan_mode, uint16_t color) {
     display_obj.initScrollValues(true);
     display_obj.tft.setTextWrap(false);
     display_obj.tft.setTextColor(TFT_BLACK, color);
-    #ifdef HAS_ILI9341
+    #ifdef HAS_FULL_SCREEN
       display_obj.tft.fillRect(0,16,240,16, color);
       display_obj.tft.drawCentreString(" Mimic Flood ",120,16,2);
+    #endif
+    #ifdef HAS_ILI9341
       display_obj.touchToExit();
     #endif
     display_obj.tft.setTextColor(TFT_GREEN, TFT_BLACK);
@@ -2083,9 +2203,11 @@ void WiFiScan::RunPwnScan(uint8_t scan_mode, uint16_t color)
     display_obj.initScrollValues(true);
     display_obj.tft.setTextWrap(false);
     display_obj.tft.setTextColor(TFT_WHITE, color);
-    #ifdef HAS_ILI9341
+    #ifdef HAS_FULL_SCREEN
       display_obj.tft.fillRect(0,16,240,16, color);
       display_obj.tft.drawCentreString(text_table4[37],120,16,2);
+    #endif
+    #ifdef HAS_ILI9341
       display_obj.touchToExit();
     #endif
     display_obj.tft.setTextColor(TFT_GREEN, TFT_BLACK);
@@ -2170,47 +2292,40 @@ void WiFiScan::setBaseMacAddress(uint8_t macAddr[6]) {
 }
 
 void WiFiScan::executeSpoofAirtag() {
-#ifdef HAS_BT
+  #ifdef HAS_BT
     for (int i = 0; i < airtags->size(); i++) {
-        if (airtags->get(i).selected) {
-            uint8_t macAddr[6];
-            // Convert the MAC string to a uint8 array
-            convertMacStringToUint8(airtags->get(i).mac, macAddr);
+      if (airtags->get(i).selected) {
 
-            // Adjust MAC address as needed (e.g., decrement the last byte)
-            macAddr[5] -= 2;
+        uint8_t macAddr[6];
 
-            // Ensure the first byte complies with the unicast requirement
-            macAddr[0] &= 0xFE; // Clear the multicast bit (second LSB)
+        convertMacStringToUint8(airtags->get(i).mac, macAddr);
 
-            // Log the MAC address for debugging
-            Serial.println("Using MAC: " + macToString(macAddr));
+        macAddr[5] -= 2;
 
-            // Set the valid unicast MAC address
-            this->setBaseMacAddress(macAddr);
+        // Do this because ESP32 BT addr is Base MAC + 2
+        
+        this->setBaseMacAddress(macAddr);
 
-            // Initialize NimBLE with the adjusted MAC address
-            NimBLEDevice::init("");
-            NimBLEServer *pServer = NimBLEDevice::createServer();
-            pAdvertising = pServer->getAdvertising();
+        NimBLEDevice::init("");
 
-            // Set up advertisement data
-            NimBLEAdvertisementData advertisementData = this->GetUniversalAdvertisementData(Airtag);
-            pAdvertising->setAdvertisementData(advertisementData);
+        NimBLEServer *pServer = NimBLEDevice::createServer();
 
-            // Start and stop advertising
-            pAdvertising->start();
-            delay(10);
-            pAdvertising->stop();
+        pAdvertising = pServer->getAdvertising();
 
-            // Deinitialize NimBLE to clean up
-            NimBLEDevice::deinit();
-            break;
-        }
+        //NimBLEAdvertisementData advertisementData = getSwiftAdvertisementData();
+        NimBLEAdvertisementData advertisementData = this->GetUniversalAdvertisementData(Airtag);
+        pAdvertising->setAdvertisementData(advertisementData);
+        pAdvertising->start();
+        delay(10);
+        pAdvertising->stop();
+
+        NimBLEDevice::deinit();
+
+        break;
+      }
     }
-#endif
+  #endif
 }
-
 
 void WiFiScan::executeSwiftpairSpam(EBLEPayloadType type) {
   #ifdef HAS_BT
@@ -2350,7 +2465,7 @@ void WiFiScan::RunBeaconScan(uint8_t scan_mode, uint16_t color)
     display_obj.initScrollValues(true);
     display_obj.tft.setTextWrap(false);
     display_obj.tft.setTextColor(TFT_WHITE, color);
-    #ifdef HAS_ILI9341
+    #ifdef HAS_FULL_SCREEN
       display_obj.tft.fillRect(0,16,240,16, color);
       if (scan_mode == WIFI_SCAN_AP)
         display_obj.tft.drawCentreString(text_table4[38],120,16,2);
@@ -2358,7 +2473,9 @@ void WiFiScan::RunBeaconScan(uint8_t scan_mode, uint16_t color)
         this->clearMacHistory();
         display_obj.tft.drawCentreString("Wardrive", 120, 16, 2);
       }
-      display_obj.touchToExit();
+      #ifdef HAS_ILI9341
+        display_obj.touchToExit();
+      #endif
     #endif
     display_obj.tft.setTextColor(TFT_GREEN, TFT_BLACK);
     display_obj.setupScrollArea(display_obj.TOP_FIXED_AREA_2, BOT_FIXED_AREA);
@@ -2411,9 +2528,11 @@ void WiFiScan::RunStationScan(uint8_t scan_mode, uint16_t color)
     display_obj.initScrollValues(true);
     display_obj.tft.setTextWrap(false);
     display_obj.tft.setTextColor(TFT_WHITE, color);
-    #ifdef HAS_ILI9341
+    #ifdef HAS_FULL_SCREEN
       display_obj.tft.fillRect(0,16,240,16, color);
       display_obj.tft.drawCentreString(text_table1[59],120,16,2);
+    #endif
+    #ifdef HAS_ILI9341
       display_obj.touchToExit();
     #endif
     display_obj.tft.setTextColor(TFT_GREEN, TFT_BLACK);
@@ -2457,13 +2576,15 @@ void WiFiScan::RunRawScan(uint8_t scan_mode, uint16_t color)
     display_obj.initScrollValues(true);
     display_obj.tft.setTextWrap(false);
     display_obj.tft.setTextColor(TFT_WHITE, color);
-    #ifdef HAS_ILI9341
+    #ifdef HAS_FULL_SCREEN
       display_obj.tft.fillRect(0,16,240,16, color);
       if (scan_mode != WIFI_SCAN_SIG_STREN)
         display_obj.tft.drawCentreString(text_table1[58],120,16,2);
       else
         display_obj.tft.drawCentreString("Signal Monitor", 120, 16, 2);
-      display_obj.touchToExit();
+      #ifdef HAS_ILI9341
+        display_obj.touchToExit();
+      #endif
     #endif
     display_obj.tft.setTextColor(TFT_GREEN, TFT_BLACK);
     display_obj.setupScrollArea(display_obj.TOP_FIXED_AREA_2, BOT_FIXED_AREA);
@@ -2505,9 +2626,11 @@ void WiFiScan::RunDeauthScan(uint8_t scan_mode, uint16_t color)
     display_obj.initScrollValues(true);
     display_obj.tft.setTextWrap(false);
     display_obj.tft.setTextColor(TFT_BLACK, color);
-    #ifdef HAS_ILI9341
+    #ifdef HAS_FULL_SCREEN
       display_obj.tft.fillRect(0,16,240,16, color);
       display_obj.tft.drawCentreString(text_table4[39],120,16,2);
+    #endif
+    #ifdef HAS_ILI9341
       display_obj.touchToExit();
     #endif
     display_obj.tft.setTextColor(TFT_RED, TFT_BLACK);
@@ -2566,9 +2689,11 @@ void WiFiScan::RunProbeScan(uint8_t scan_mode, uint16_t color)
     display_obj.initScrollValues(true);
     display_obj.tft.setTextWrap(false);
     display_obj.tft.setTextColor(TFT_BLACK, color);
-    #ifdef HAS_ILI9341
+    #ifdef HAS_FULL_SCREEN
       display_obj.tft.fillRect(0,16,240,16, color);
       display_obj.tft.drawCentreString(text_table4[40],120,16,2);
+    #endif
+    #ifdef HAS_ILI9341
       display_obj.touchToExit();
     #endif
     display_obj.tft.setTextColor(TFT_GREEN, TFT_BLACK);
@@ -2602,9 +2727,11 @@ void WiFiScan::RunSourApple(uint8_t scan_mode, uint16_t color) {
       display_obj.initScrollValues(true);
       display_obj.tft.setTextWrap(false);
       display_obj.tft.setTextColor(TFT_BLACK, color);
-      #ifdef HAS_ILI9341
+      #ifdef HAS_FULL_SCREEN
         display_obj.tft.fillRect(0,16,240,16, color);
         display_obj.tft.drawCentreString("Sour Apple",120,16,2);
+      #endif
+      #ifdef HAS_ILI9341
         display_obj.touchToExit();
       #endif
       display_obj.tft.setTextColor(TFT_GREEN, TFT_BLACK);
@@ -2624,7 +2751,7 @@ void WiFiScan::RunSwiftpairSpam(uint8_t scan_mode, uint16_t color) {
       display_obj.initScrollValues(true);
       display_obj.tft.setTextWrap(false);
       display_obj.tft.setTextColor(TFT_BLACK, color);
-      #ifdef HAS_ILI9341
+      #ifdef HAS_FULL_SCREEN
         display_obj.tft.fillRect(0,16,240,16, color);
         if (scan_mode == BT_ATTACK_SWIFTPAIR_SPAM)
           display_obj.tft.drawCentreString("Swiftpair Spam",120,16,2);
@@ -2638,7 +2765,9 @@ void WiFiScan::RunSwiftpairSpam(uint8_t scan_mode, uint16_t color) {
           display_obj.tft.drawCentreString("BLE Spam Flipper", 120, 16, 2);
         else if (scan_mode == BT_SPOOF_AIRTAG)
           display_obj.tft.drawCentreString("BLE Spoof Airtag", 120, 16, 2);
-        display_obj.touchToExit();
+        #ifdef HAS_ILI9341
+          display_obj.touchToExit();
+        #endif
       #endif
       display_obj.tft.setTextColor(TFT_GREEN, TFT_BLACK);
     #endif
@@ -2670,7 +2799,7 @@ void WiFiScan::RunBluetoothScan(uint8_t scan_mode, uint16_t color)
         display_obj.initScrollValues(true);
         display_obj.tft.setTextWrap(false);
         display_obj.tft.setTextColor(TFT_BLACK, color);
-        #ifdef HAS_ILI9341
+        #ifdef HAS_FULL_SCREEN
           display_obj.tft.fillRect(0,16,240,16, color);
           if (scan_mode == BT_SCAN_ALL)
             display_obj.tft.drawCentreString(text_table4[41],120,16,2);
@@ -2678,19 +2807,21 @@ void WiFiScan::RunBluetoothScan(uint8_t scan_mode, uint16_t color)
             display_obj.tft.drawCentreString("Airtag Sniff",120,16,2);
           else if (scan_mode == BT_SCAN_FLIPPER)
             display_obj.tft.drawCentreString("Flipper Sniff", 120, 16, 2);
-          display_obj.touchToExit();
+          #ifdef HAS_ILI9341
+            display_obj.touchToExit();
+          #endif
         #endif
         display_obj.tft.setTextColor(TFT_CYAN, TFT_BLACK);
         display_obj.setupScrollArea(display_obj.TOP_FIXED_AREA_2, BOT_FIXED_AREA);
       #endif
       if (scan_mode == BT_SCAN_ALL)
         pBLEScan->setAdvertisedDeviceCallbacks(new bluetoothScanAllCallback(), false);
-      else if (scan_mode == BT_SCAN_FLIPPER) {
-        this->clearFlippers();
+      else if (scan_mode == BT_SCAN_AIRTAG) {
+        this->clearAirtags();
         pBLEScan->setAdvertisedDeviceCallbacks(new bluetoothScanAllCallback(), true);
       }
-      else if (scan_mode == BT_SCAN_AIRTAG) {
-        this->clearAirtags();;
+      else if (scan_mode == BT_SCAN_FLIPPER) {
+        this->clearFlippers();
         pBLEScan->setAdvertisedDeviceCallbacks(new bluetoothScanAllCallback(), true);
       }
     }
@@ -2717,13 +2848,15 @@ void WiFiScan::RunBluetoothScan(uint8_t scan_mode, uint16_t color)
         display_obj.initScrollValues(true);
         display_obj.tft.setTextWrap(false);
         display_obj.tft.setTextColor(TFT_BLACK, color);
-        #ifdef HAS_ILI9341
+        #ifdef HAS_FULL_SCREEN
           display_obj.tft.fillRect(0,16,240,16, color);
           if (scan_mode == BT_SCAN_WAR_DRIVE)
             display_obj.tft.drawCentreString("BT Wardrive",120,16,2);
           else if (scan_mode == BT_SCAN_WAR_DRIVE_CONT)
             display_obj.tft.drawCentreString("BT Wardrive Continuous",120,16,2);
-          display_obj.touchToExit();
+          #ifdef HAS_ILI9341
+            display_obj.touchToExit();
+          #endif
         #endif
         display_obj.tft.setTextColor(TFT_CYAN, TFT_BLACK);
         display_obj.setupScrollArea(display_obj.TOP_FIXED_AREA_2, BOT_FIXED_AREA);
@@ -2949,6 +3082,13 @@ void WiFiScan::apSnifferCallbackFull(void* buf, wifi_promiscuous_pkt_type_t type
         //  display_string.concat((char)snifferPacket->payload[i + 38]);
         //  essid.concat((char)snifferPacket->payload[i + 38]);
         //}
+        #ifdef HAS_FULL_SCREEN
+          display_string.concat(snifferPacket->rx_ctrl.rssi);
+          display_string.concat(" ");
+          display_string.concat(snifferPacket->rx_ctrl.channel);
+          display_string.concat(" ");
+        #endif
+
         Serial.print(" ESSID: ");
         if (snifferPacket->payload[37] <= 0)
           display_string.concat(addr);
@@ -3354,6 +3494,12 @@ void WiFiScan::beaconSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t type
         Serial.print(addr);
         Serial.print(" ESSID Len: " + (String)snifferPacket->payload[37]);
         Serial.print(" ESSID: ");
+        #ifdef HAS_FULL_SCREEN
+          display_string.concat(snifferPacket->rx_ctrl.rssi);
+          display_string.concat(" ");
+          display_string.concat(snifferPacket->rx_ctrl.channel);
+          display_string.concat(" ");
+        #endif
         if (snifferPacket->payload[37] <= 0)
           display_string.concat(addr);
         else {
