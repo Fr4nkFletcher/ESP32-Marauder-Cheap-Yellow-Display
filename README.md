@@ -14,8 +14,10 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 
 ---
 
-## 🏴‍☠️ Latest Update Highlights — v1.1.0 (11/28/24) 🏴‍☠️
+## 🏴‍☠️ Latest Update Highlights — v1.2.0 (12/15/24) 🏴‍☠️
 
+- Add support for Adafruit MAX17048 battery monitor
+- Update Save/Load Files menu to add for saving and loading AirTags
 - Add logging to SD for Flipper/AirTag sniff
 - Add Flipper Zero Sniff
 - Airtag Sniffing/Spoofing
