@@ -1301,7 +1301,7 @@ void MenuFunctions::orientDisplay()
 
   #ifdef HAS_ILI9341
     #ifdef TFT_SHIELD
-      uint16_t calData[5] = { 350, 3465, 188, 3431, 2 }; // tft.setRotation(0); // Portrait with TFT Shield
+      uint16_t calData[5] = { 481, 3053, 433, 3296, 3 }; // tft.setRotation(0); // Portrait with TFT Shield
     #else if defined(TFT_DIY)
       uint16_t calData[5] = { 339, 3470, 237, 3438, 2 }; // tft.setRotation(0); // Portrait with DIY TFT
     #endif
@@ -1587,6 +1587,7 @@ void MenuFunctions::RunSetup()
       wifi_scan_obj.StartScan(WIFI_SCAN_SIG_STREN, TFT_CYAN);
     });
   #endif
+  
   
   // Build Wardriving menu
   wardrivingMenu.parentMenu = &wifiMenu; // Main Menu is second menu parent

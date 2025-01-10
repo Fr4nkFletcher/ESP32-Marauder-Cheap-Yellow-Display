@@ -14,20 +14,17 @@
 
 #ifndef MAIN_NIMBLEDEVICE_H_
 #define MAIN_NIMBLEDEVICE_H_
+#include "sdkconfig.h"
+#if defined(CONFIG_BT_ENABLED)
 
 #include "nimconfig.h"
-#if defined(CONFIG_BT_ENABLED)
 
 #if defined(CONFIG_BT_NIMBLE_ROLE_OBSERVER)
 #include "NimBLEScan.h"
 #endif
 
 #if defined(CONFIG_BT_NIMBLE_ROLE_BROADCASTER)
-#  if CONFIG_BT_NIMBLE_EXT_ADV
-#    include "NimBLEExtAdvertising.h"
-#  else
-#    include "NimBLEAdvertising.h"
-#  endif
+#include "NimBLEAdvertising.h"
 #endif
 
 #if defined(CONFIG_BT_NIMBLE_ROLE_CENTRAL)
@@ -42,9 +39,7 @@
 #include "NimBLESecurity.h"
 #include "NimBLEAddress.h"
 
-#ifdef ESP_PLATFORM
-#  include "esp_bt.h"
-#endif
+#include "esp_bt.h"
 
 #include <map>
 #include <string>
@@ -97,7 +92,6 @@ class NimBLEDevice {
 public:
     static void             init(const std::string &deviceName);
     static void             deinit(bool clearAll = false);
-    static void             setDeviceName(const std::string &deviceName);
     static bool             getInitialized();
     static NimBLEAddress    getAddress();
     static std::string      toString();
@@ -116,17 +110,8 @@ public:
     static NimBLEServer*    getServer();
 #endif
 
-#ifdef ESP_PLATFORM
     static void             setPower(esp_power_level_t powerLevel, esp_ble_power_type_t powerType=ESP_BLE_PWR_TYPE_DEFAULT);
     static int              getPower(esp_ble_power_type_t powerType=ESP_BLE_PWR_TYPE_DEFAULT);
-    static void             setOwnAddrType(uint8_t own_addr_type, bool useNRPA=false);
-    static void             setScanDuplicateCacheSize(uint16_t cacheSize);
-    static void             setScanFilterMode(uint8_t type);
-#else
-    static void             setPower(int dbm);
-    static int              getPower();
-#endif
-
     static void             setCustomGapHandler(gap_event_handler handler);
     static void             setSecurityAuth(bool bonding, bool mitm, bool sc);
     static void             setSecurityAuth(uint8_t auth_req);
@@ -136,27 +121,20 @@ public:
     static void             setSecurityPasskey(uint32_t pin);
     static uint32_t         getSecurityPasskey();
     static void             setSecurityCallbacks(NimBLESecurityCallbacks* pCallbacks);
+    static void             setOwnAddrType(uint8_t own_addr_type, bool useNRPA=false);
     static int              startSecurity(uint16_t conn_id);
     static int              setMTU(uint16_t mtu);
     static uint16_t         getMTU();
     static bool             isIgnored(const NimBLEAddress &address);
     static void             addIgnored(const NimBLEAddress &address);
     static void             removeIgnored(const NimBLEAddress &address);
+    static void             setScanDuplicateCacheSize(uint16_t cacheSize);
+    static void             setScanFilterMode(uint8_t type);
 
 #if defined(CONFIG_BT_NIMBLE_ROLE_BROADCASTER)
-#  if CONFIG_BT_NIMBLE_EXT_ADV
-    static NimBLEExtAdvertising* getAdvertising();
-    static bool                  startAdvertising(uint8_t inst_id,
-                                                  int duration = 0,
-                                                  int max_events = 0);
-    static bool                  stopAdvertising(uint8_t inst_id);
-    static bool                  stopAdvertising();
-#  endif
-#  if !CONFIG_BT_NIMBLE_EXT_ADV || defined(_DOXYGEN_)
-    static NimBLEAdvertising*    getAdvertising();
-    static bool                  startAdvertising();
-    static bool                  stopAdvertising();
-#  endif
+    static NimBLEAdvertising* getAdvertising();
+    static void               startAdvertising();
+    static void               stopAdvertising();
 #endif
 
 #if defined( CONFIG_BT_NIMBLE_ROLE_CENTRAL)
@@ -193,10 +171,6 @@ private:
 
 #if defined(CONFIG_BT_NIMBLE_ROLE_BROADCASTER)
     friend class NimBLEAdvertising;
-#  if CONFIG_BT_NIMBLE_EXT_ADV
-    friend class NimBLEExtAdvertising;
-    friend class NimBLEExtAdvertisement;
-#  endif
 #endif
 
     static void        onReset(int reason);
@@ -213,11 +187,7 @@ private:
 #endif
 
 #if defined(CONFIG_BT_NIMBLE_ROLE_BROADCASTER)
-#  if CONFIG_BT_NIMBLE_EXT_ADV
-    static NimBLEExtAdvertising*      m_bleAdvertising;
-#  else
     static NimBLEAdvertising*         m_bleAdvertising;
-#  endif
 #endif
 
 #if defined( CONFIG_BT_NIMBLE_ROLE_CENTRAL)
@@ -229,10 +199,8 @@ private:
     static ble_gap_event_listener     m_listener;
     static gap_event_handler          m_customGapHandler;
     static uint8_t                    m_own_addr_type;
-#ifdef ESP_PLATFORM
     static uint16_t                   m_scanDuplicateSize;
     static uint8_t                    m_scanFilterMode;
-#endif
     static std::vector<NimBLEAddress> m_whiteList;
 };
 
