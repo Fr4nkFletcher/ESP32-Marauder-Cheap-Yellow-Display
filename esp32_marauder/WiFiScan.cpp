@@ -1581,7 +1581,7 @@ void WiFiScan::RunAPScan(uint8_t scan_mode, uint16_t color)
     display_obj.tft.setRotation(1);
     
     #ifdef TFT_SHIELD
-      uint16_t calData[5] = { 188, 3408, 286, 3498, 1 }; // Landscape TFT Shield
+      uint16_t calData[5] = { 410, 3305, 499, 3045, 0 }; // Landscape TFT Shield
       Serial.println("Using TFT Shield");
     #else if defined(TFT_DIY)
       uint16_t calData[5] = { 213, 3469, 320, 3446, 1 }; // Landscape TFT DIY
@@ -1977,7 +1977,7 @@ void WiFiScan::RunPacketMonitor(uint8_t scan_mode, uint16_t color)
   
     #ifdef HAS_SCREEN
       #ifdef TFT_SHIELD
-        uint16_t calData[5] = { 188, 3408, 286, 3498, 1 }; // Landscape TFT Shield
+        uint16_t calData[5] = { 410, 3305, 499, 3045, 0 }; // Landscape TFT Shield
         Serial.println("Using TFT Shield");
       #else if defined(TFT_DIY)
         uint16_t calData[5] = { 213, 3469, 320, 3446, 1 }; // Landscape TFT DIY
@@ -2061,7 +2061,7 @@ void WiFiScan::RunEapolScan(uint8_t scan_mode, uint16_t color)
   
     #ifdef HAS_SCREEN
       #ifdef TFT_SHIELD
-        uint16_t calData[5] = { 188, 3408, 286, 3498, 1 }; // Landscape TFT Shield
+        uint16_t calData[5] = { 410, 3305, 499, 3045, 0 }; // Landscape TFT Shield
         //Serial.println("Using TFT Shield");
       #else if defined(TFT_DIY)
         uint16_t calData[5] = { 213, 3469, 320, 3446, 1 }; // Landscape TFT DIY

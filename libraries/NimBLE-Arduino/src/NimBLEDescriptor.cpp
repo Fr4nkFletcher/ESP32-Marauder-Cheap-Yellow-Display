@@ -11,9 +11,11 @@
  *  Created on: Jun 22, 2017
  *      Author: kolban
  */
+#include "sdkconfig.h"
+#if defined(CONFIG_BT_ENABLED)
 
 #include "nimconfig.h"
-#if defined(CONFIG_BT_ENABLED) && defined(CONFIG_BT_NIMBLE_ROLE_PERIPHERAL)
+#if defined(CONFIG_BT_NIMBLE_ROLE_PERIPHERAL)
 
 #include "NimBLEService.h"
 #include "NimBLEDescriptor.h"
@@ -28,32 +30,28 @@ static NimBLEDescriptorCallbacks defaultCallbacks;
 
 
 /**
- * @brief Construct a descriptor
- * @param [in] uuid - UUID (const char*) for the descriptor.
- * @param [in] properties - Properties for the descriptor.
- * @param [in] max_len - The maximum length in bytes that the descriptor value can hold. (Default: 512 bytes for esp32, 20 for all others).
- * @param [in] pCharacteristic - pointer to the characteristic instance this descriptor belongs to.
+ * @brief NimBLEDescriptor constructor.
  */
 NimBLEDescriptor::NimBLEDescriptor(const char* uuid, uint16_t properties, uint16_t max_len,
-                                   NimBLECharacteristic* pCharacteristic)
-: NimBLEDescriptor(NimBLEUUID(uuid), properties, max_len, pCharacteristic) {
+                                    NimBLECharacteristic* pCharacteristic)
+: NimBLEDescriptor(NimBLEUUID(uuid), max_len, properties, pCharacteristic) {
 }
 
 
 /**
- * @brief Construct a descriptor
- * @param [in] uuid - UUID (const char*) for the descriptor.
- * @param [in] properties - Properties for the descriptor.
- * @param [in] max_len - The maximum length in bytes that the descriptor value can hold. (Default: 512 bytes for esp32, 20 for all others).
- * @param [in] pCharacteristic - pointer to the characteristic instance this descriptor belongs to.
+ * @brief NimBLEDescriptor constructor.
  */
 NimBLEDescriptor::NimBLEDescriptor(NimBLEUUID uuid, uint16_t properties, uint16_t max_len,
                                     NimBLECharacteristic* pCharacteristic)
-:   m_value(std::min(CONFIG_NIMBLE_CPP_ATT_VALUE_INIT_LENGTH , (int)max_len), max_len) {
+{
     m_uuid               = uuid;
+    m_value.attr_len     = 0;                           // Initial length is 0.
+    m_value.attr_max_len = max_len;                     // Maximum length of the data.
     m_handle             = NULL_HANDLE;                 // Handle is initially unknown.
     m_pCharacteristic    = pCharacteristic;
     m_pCallbacks         = &defaultCallbacks;           // No initial callback.
+    m_value.attr_value   = (uint8_t*) calloc(max_len,1);  // Allocate storage for the value.
+    m_valMux             = portMUX_INITIALIZER_UNLOCKED;
     m_properties         = 0;
     m_removed            = 0;
 
@@ -89,6 +87,7 @@ NimBLEDescriptor::NimBLEDescriptor(NimBLEUUID uuid, uint16_t properties, uint16_
  * @brief NimBLEDescriptor destructor.
  */
 NimBLEDescriptor::~NimBLEDescriptor() {
+    free(m_value.attr_value);   // Release the storage we created in the constructor.
 } // ~NimBLEDescriptor
 
 /**
@@ -105,7 +104,7 @@ uint16_t NimBLEDescriptor::getHandle() {
  * @return The length (in bytes) of the value of this descriptor.
  */
 size_t NimBLEDescriptor::getLength() {
-    return m_value.size();
+    return m_value.attr_len;
 } // getLength
 
 
@@ -119,14 +118,10 @@ NimBLEUUID NimBLEDescriptor::getUUID() {
 
 /**
  * @brief Get the value of this descriptor.
- * @return The NimBLEAttValue of this descriptor.
+ * @return A pointer to the value of this descriptor.
  */
-NimBLEAttValue NimBLEDescriptor::getValue(time_t *timestamp) {
-    if (timestamp != nullptr) {
-        m_value.getValue(timestamp);
-    }
-
-    return m_value;
+uint8_t* NimBLEDescriptor::getValue() {
+    return m_value.attr_value;
 } // getValue
 
 
@@ -135,7 +130,7 @@ NimBLEAttValue NimBLEDescriptor::getValue(time_t *timestamp) {
  * @return A std::string instance containing a copy of the descriptor's value.
  */
 std::string NimBLEDescriptor::getStringValue() {
-    return std::string(m_value);
+    return std::string((char *) m_value.attr_value, m_value.attr_len);
 }
 
 
@@ -150,12 +145,8 @@ NimBLECharacteristic* NimBLEDescriptor::getCharacteristic() {
 
 int NimBLEDescriptor::handleGapEvent(uint16_t conn_handle, uint16_t attr_handle,
                                      struct ble_gatt_access_ctxt *ctxt, void *arg) {
-    (void)conn_handle;
-    (void)attr_handle;
-
     const ble_uuid_t *uuid;
     int rc;
-    struct ble_gap_conn_desc desc;
     NimBLEDescriptor* pDescriptor = (NimBLEDescriptor*)arg;
 
     NIMBLE_LOGD(LOG_TAG, "Descriptor %s %s event", pDescriptor->getUUID().toString().c_str(),
@@ -165,36 +156,29 @@ int NimBLEDescriptor::handleGapEvent(uint16_t conn_handle, uint16_t attr_handle,
     if(ble_uuid_cmp(uuid, &pDescriptor->getUUID().getNative()->u) == 0){
         switch(ctxt->op) {
             case BLE_GATT_ACCESS_OP_READ_DSC: {
-                rc = ble_gap_conn_find(conn_handle, &desc);
-                assert(rc == 0);
-
-                 // If the packet header is only 8 bytes this is a follow up of a long read
-                 // so we don't want to call the onRead() callback again.
-                if(ctxt->om->om_pkthdr_len > 8 ||
-                   pDescriptor->m_value.size() <= (ble_att_mtu(desc.conn_handle) - 3)) {
+                // If the packet header is only 8 bytes this is a follow up of a long read
+                // so we don't want to call the onRead() callback again.
+                if(ctxt->om->om_pkthdr_len > 8) {
                     pDescriptor->m_pCallbacks->onRead(pDescriptor);
                 }
-
-                ble_npl_hw_enter_critical();
-                rc = os_mbuf_append(ctxt->om, pDescriptor->m_value.data(), pDescriptor->m_value.size());
-                ble_npl_hw_exit_critical(0);
+                portENTER_CRITICAL(&pDescriptor->m_valMux);
+                rc = os_mbuf_append(ctxt->om, pDescriptor->getValue(), pDescriptor->getLength());
+                portEXIT_CRITICAL(&pDescriptor->m_valMux);
                 return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
             }
 
             case BLE_GATT_ACCESS_OP_WRITE_DSC: {
-                uint16_t att_max_len = pDescriptor->m_value.max_size();
-
-                if (ctxt->om->om_len > att_max_len) {
+                if (ctxt->om->om_len > pDescriptor->m_value.attr_max_len) {
                     return BLE_ATT_ERR_INVALID_ATTR_VALUE_LEN;
                 }
 
-                uint8_t buf[att_max_len];
+                uint8_t buf[pDescriptor->m_value.attr_max_len];
                 size_t len = ctxt->om->om_len;
                 memcpy(buf, ctxt->om->om_data,len);
                 os_mbuf *next;
                 next = SLIST_NEXT(ctxt->om, om_next);
                 while(next != NULL){
-                    if((len + next->om_len) > att_max_len) {
+                    if((len + next->om_len) > pDescriptor->m_value.attr_max_len) {
                         return BLE_ATT_ERR_INVALID_ATTR_VALUE_LEN;
                     }
                     memcpy(&buf[len], next->om_data, next->om_len);
@@ -246,22 +230,28 @@ void NimBLEDescriptor::setHandle(uint16_t handle) {
  * @param [in] length The length of the data in bytes.
  */
 void NimBLEDescriptor::setValue(const uint8_t* data, size_t length) {
-    m_value.setValue(data, length);
+    if (length > m_value.attr_max_len) {
+        NIMBLE_LOGE(LOG_TAG, "Size %d too large, must be no bigger than %d", length, m_value.attr_max_len);
+        return;
+    }
+    portENTER_CRITICAL(&m_valMux);
+    m_value.attr_len = length;
+    memcpy(m_value.attr_value, data, length);
+    portEXIT_CRITICAL(&m_valMux);
 } // setValue
 
 
 /**
- * @brief Set the value of the descriptor from a `std::vector<uint8_t>`.\n
- * @param [in] vec The std::vector<uint8_t> reference to set the descriptor value from.
+ * @brief Set the value of the descriptor.
+ * @param [in] value The value of the descriptor in string form.
  */
-void NimBLEDescriptor::setValue(const std::vector<uint8_t>& vec) {
-    return setValue((uint8_t*)&vec[0], vec.size());
+void NimBLEDescriptor::setValue(const std::string &value) {
+    setValue((uint8_t*) value.data(), value.length());
 } // setValue
-
 
 /**
  * @brief Set the characteristic this descriptor belongs to.
- * @param [in] pChar A pointer to the characteristic this descriptor belongs to.
+ * @param [in] pChar A pointer to the characteristic this descriptior belongs to.
  */
 void NimBLEDescriptor::setCharacteristic(NimBLECharacteristic* pChar) {
     m_pCharacteristic = pChar;
@@ -287,7 +277,6 @@ NimBLEDescriptorCallbacks::~NimBLEDescriptorCallbacks() {}
  * @param [in] pDescriptor The descriptor that is the source of the event.
  */
 void NimBLEDescriptorCallbacks::onRead(NimBLEDescriptor* pDescriptor) {
-    (void)pDescriptor;
     NIMBLE_LOGD("NimBLEDescriptorCallbacks", "onRead: default");
 } // onRead
 
@@ -297,8 +286,8 @@ void NimBLEDescriptorCallbacks::onRead(NimBLEDescriptor* pDescriptor) {
  * @param [in] pDescriptor The descriptor that is the source of the event.
  */
 void NimBLEDescriptorCallbacks::onWrite(NimBLEDescriptor* pDescriptor) {
-    (void)pDescriptor;
     NIMBLE_LOGD("NimBLEDescriptorCallbacks", "onWrite: default");
 } // onWrite
 
-#endif /* CONFIG_BT_ENABLED && CONFIG_BT_NIMBLE_ROLE_PERIPHERAL */
+#endif // #if defined(CONFIG_BT_NIMBLE_ROLE_PERIPHERAL)
+#endif /* CONFIG_BT_ENABLED */
