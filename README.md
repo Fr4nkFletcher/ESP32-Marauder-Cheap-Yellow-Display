@@ -14,9 +14,9 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 
 ---
 
-## 🏴‍☠️ Latest Update Highlights — v1.2.0 (01/18/24) 🏴‍☠️
+## 🏴‍☠️ Latest Update Highlights — Added ESP32-035 (01/18/24) 🏴‍☠️
 
-- Add support for 3.5" ESP32-3248S035R ST7796/XPT2046 Resistive Touch Display
+- Add support for ESP32-3248S035R 3.5" ST7796/XPT2046 Resistive Touch Display
 - Add support for Adafruit MAX17048 battery monitor
 - Update Save/Load Files menu to add for saving and loading AirTags
 - Add logging to SD for Flipper/AirTag sniff
@@ -26,8 +26,7 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 - Flipper BLE Spam
 - Wardriving Menu added
 - Added compatibility for ESP32-2432S024R 2.4" Resistive Touch USB Type-C Only
-- Flash older Marauder firmware versions
-- [Guide for antenna modification](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/AntennaModNew.md) using ESP-WROOM-32U with built-in IPEX/U.FL connector
+- [Guide for antenna modification](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/AntennaModNew.md) using ESP-WROOM-32U with built-in IPEX/U.FL
 - [Evil Portal examples and setup](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/evilportal/)
 - [How to add an external antenna](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/AntennaMod.md)
 
