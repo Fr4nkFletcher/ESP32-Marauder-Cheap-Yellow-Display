@@ -1300,9 +1300,13 @@ void MenuFunctions::orientDisplay()
   display_obj.tft.setCursor(0, 0);
 
   #ifdef HAS_ILI9341
-    #ifdef TFT_SHIELD
+    #ifdef CYD_28
+      uint16_t calData[5] = { 350, 3465, 188, 3431, 2 }; // tft.setRotation(0); // Portrait with TFT Shield
+      //Serial.println(F("Using CYD"));
+    #elif defined(CYD_24)
       uint16_t calData[5] = { 481, 3053, 433, 3296, 3 }; // tft.setRotation(0); // Portrait with TFT Shield
-    #else if defined(TFT_DIY)
+      //Serial.println(F("Using CYD 2.4in"));
+    #elif defined(TFT_DIY)
       uint16_t calData[5] = { 339, 3470, 237, 3438, 2 }; // tft.setRotation(0); // Portrait with DIY TFT
     #endif
 
@@ -1509,9 +1513,11 @@ void MenuFunctions::RunSetup()
   this->addNodes(&wifiMenu, text_table1[31], TFT_YELLOW, NULL, SNIFFERS, [this]() {
     this->changeMenu(&wifiSnifferMenu);
   });
+  #ifdef HAS_GPS
   this->addNodes(&wifiMenu, "Wardriving", TFT_GREEN, NULL, BEACON_SNIFF, [this]() {
     this->changeMenu(&wardrivingMenu);
   });
+  #endif
   this->addNodes(&wifiMenu, text_table1[32], TFT_RED, NULL, ATTACKS, [this]() {
     this->changeMenu(&wifiAttackMenu);
   });
@@ -1588,29 +1594,27 @@ void MenuFunctions::RunSetup()
     });
   #endif
   
-  
   // Build Wardriving menu
+  #ifdef HAS_GPS
   wardrivingMenu.parentMenu = &wifiMenu; // Main Menu is second menu parent
   this->addNodes(&wardrivingMenu, text09, TFT_LIGHTGREY, NULL, 0, [this]() {
     this->changeMenu(wardrivingMenu.parentMenu);
   });
-  #ifdef HAS_GPS
-    if (gps_obj.getGpsModuleStatus()) {
-      this->addNodes(&wardrivingMenu, "Wardrive", TFT_GREEN, NULL, BEACON_SNIFF, [this]() {
-        display_obj.clearScreen();
-        this->drawStatusBar();
-        wifi_scan_obj.StartScan(WIFI_SCAN_WAR_DRIVE, TFT_GREEN);
-      });
-    }
-  #endif
-  #ifdef HAS_GPS
-    if (gps_obj.getGpsModuleStatus()) {
-      this->addNodes(&wardrivingMenu, "Station Wardrive", TFT_ORANGE, NULL, PROBE_SNIFF, [this]() {
-        display_obj.clearScreen();
-        this->drawStatusBar();
-        wifi_scan_obj.StartScan(WIFI_SCAN_STATION_WAR_DRIVE, TFT_ORANGE);
-      });
-    }
+
+  if (gps_obj.getGpsModuleStatus()) {
+    this->addNodes(&wardrivingMenu, "Wardrive", TFT_GREEN, NULL, BEACON_SNIFF, [this]() {
+      display_obj.clearScreen();
+      this->drawStatusBar();
+      wifi_scan_obj.StartScan(WIFI_SCAN_WAR_DRIVE, TFT_GREEN);
+    });
+
+    this->addNodes(&wardrivingMenu, "Station Wardrive", TFT_ORANGE, NULL, PROBE_SNIFF, [this]() {
+      display_obj.clearScreen();
+      this->drawStatusBar();
+      wifi_scan_obj.StartScan(WIFI_SCAN_STATION_WAR_DRIVE, TFT_ORANGE);
+    });
+  }
+
   #endif
   
   // Build WiFi attack menu

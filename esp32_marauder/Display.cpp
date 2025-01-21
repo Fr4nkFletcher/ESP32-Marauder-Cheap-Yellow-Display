@@ -36,10 +36,13 @@ void Display::RunSetup()
 
   #ifdef HAS_ILI9341
 
-    #ifdef TFT_SHIELD
+    #ifdef CYD_28
+      uint16_t calData[5] = { 350, 3465, 188, 3431, 2 }; // tft.setRotation(0); // Portrait with TFT Shield
+      //Serial.println(F("Using CYD"));
+    #elif defined(CYD_24)
       uint16_t calData[5] = { 481, 3053, 433, 3296, 3 }; // tft.setRotation(0); // Portrait with TFT Shield
       //Serial.println(F("Using TFT Shield"));
-    #else if defined(TFT_DIY)
+    #elif defined(TFT_DIY)
       uint16_t calData[5] = { 339, 3470, 237, 3438, 2 }; // tft.setRotation(0); // Portrait with DIY TFT
       //Serial.println(F("Using TFT DIY"));
     #endif
