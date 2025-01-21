@@ -128,8 +128,10 @@
     #define HAS_FULL_SCREEN
     #define HAS_SD
     #define USE_SD
+    //#define HAS_GPS
+    #define CYD_28
+    //#define CYD_24
     //#define HAS_TEMP_SENSOR
-    #define HAS_GPS
   #endif
 
   #if defined(MARAUDER_V6) || defined(MARAUDER_V6_1)
@@ -449,8 +451,6 @@
       #ifndef TFT_HEIGHT
         #define TFT_HEIGHT 320
       #endif
-
-      #define TFT_SHIELD
     
       #define SCREEN_WIDTH TFT_WIDTH
       #define SCREEN_HEIGHT TFT_HEIGHT
@@ -489,7 +489,7 @@
       #define GREENBUTTON_W (FRAME_W/2)
       #define GREENBUTTON_H FRAME_H
     
-      #define STATUSBAR_COLOR 0x4A49
+      #define STATUSBAR_COLOR 0x18ED
     
       #define KIT_LED_BUILTIN 4
     #endif
