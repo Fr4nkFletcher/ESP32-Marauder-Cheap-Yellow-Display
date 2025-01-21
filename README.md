@@ -37,7 +37,7 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 1. A compatible CYD module (see [Compatibility](#compatibility))
 2. Chrome browser
 3. Data-capable USB cable
-4. *(Optional)* [GPS](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/edit/master/README.md#gps-functionality) module for enhanced functionality
+4. *(Optional)* [GPS](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display?tab=readme-ov-file#gps-functionality) module for enhanced functionality
 
 ---
 
