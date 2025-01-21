@@ -37,7 +37,7 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 1. A compatible CYD module (see [Compatibility](#compatibility))
 2. Chrome browser
 3. Data-capable USB cable
-4. *(Optional)* GPS module for enhanced functionality
+4. *(Optional)* [GPS](https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/edit/master/README.md#gps-functionality) module for enhanced functionality
 
 ---
 
@@ -46,13 +46,30 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 ### Web Flasher Method (Recommended)
 
 1. Go to the [CYM Web Flasher](https://fr4nkfletcher.github.io/Adafruit_WebSerial_ESPTool/)
-2. Click "Connect" and select your device
+2. Hold BOOT on your device, click "Connect" and select
 3. Choose the appropriate Model and Version
 4. Click "Program" to start flashing
 
 <p align="center">
   <img src="https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/blob/main/assets/sc00000.jpg?raw=true" alt="CYM Web Flasher Screenshot" width="100%" style="max-width:800px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 </p>
+
+### Manual Web Flasher Method (for installing old releases)
+
+1. Visit the [manual flasher](https://fr4nkfletcher.github.io/Adafruit_WebSerial_ESPTool/manual)
+2. Hold BOOT, click Connect
+3. Set memory offset and upload files
+4. Program
+
+<p align="center">
+  <img src="https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/blob/main/assets/scman1.png" alt="Manual Flashing">
+</p>
+
+| Offset | -> | Bin |
+|--------|:--:|------|
+| 0x1000  | -> | Bootloader |
+| 0x8000  | -> | Partitions |
+| 0x10000 | -> | Firmware   |
 
 #### Troubleshooting:
 
@@ -61,20 +78,28 @@ If issues arise, try the following steps:
 1. Unplug and restart your CYD module
 2. Hold `RST`, tap `BOOT`, release `RST` (the screen should go blank)
 3. Refresh the Web Flasher page and click "Connect"
-4. If problems persist, hold `BOOT` while clicking "Connect"
 
 For further details, check out the [Web Flasher repository](https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool).
 
+Alternatively, you can flash using [esptool.py](https://github.com/espressif/esptool) by:
+```
+cd ~
+git clone https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool
+esptool.py --port /dev/YOURSERIALPORT write_flash 0x1000 ~/Adafruit_WebSerial_ESPTool/resources/STATIC/M/CYD/esp32_marauder.ino.bootloader.bin \
+0x8000 ~/Adafruit_WebSerial_ESPTool/resources/STATIC/M/CYD/esp32_marauder.ino.partitions.bin \
+0x10000 ~/Adafruit_WebSerial_ESPTool/resources/CURRENT/esp32_marauder_ofyourchoice.bin
+```
 ---
 
 ### Manual Arduino IDE Method
 
-1. Set up your Arduino environment following the [ESP32 Marauder Arduino IDE Setup Guide](https://github.com/justcallmekoko/ESP32Marauder/wiki/arduino-ide-setup).
-2. Add the necessary libraries to your Arduino libraries folder.
-3. Set the upload speed to `115200` in the Arduino IDE (tested on version 1.8.19).
-4. Upload the firmware to your CYD module.
+1. Set up your Arduino environment following the [ESP32 Marauder Arduino IDE Setup Guide](https://github.com/justcallmekoko/ESP32Marauder/wiki/arduino-ide-setup)
+2. Update your platform.txt
+3. Add the necessary libraries to your Arduino libraries folder
+4. Set the upload speed to `115200` in the Arduino IDE (tested on version 1.8.19)
+5. Upload the firmware to your CYD module
 
-For a step-by-step guide, refer to [Smoochiee's tutorial](https://github.com/smoochiee/MARAUDER-FOR-CYD---CHEAP-YELLOW-DISPLAY).
+For a step-by-step guide, refer to [Smoochiee's tutorial](https://github.com/smoochiee/MARAUDER-FOR-CYD---CHEAP-YELLOW-DISPLAY)
 
 ---
 
@@ -87,13 +112,13 @@ The project has been successfully tested on:
 - [2.8" Resistive MicroUSB/Type-C 2USB](https://amazon.com/dp/B0CLR7MQ91)
 - [3.5" Resistive Touch](https://a.co/d/cxUc73a)
 
-No hardware modifications are required, thanks to **@ggaljoen's** fork of the [TFT_eSPI](https://github.com/ggaljoen/TFT_eSPI) library.
+No hardware modifications are required, thanks to **@ggaljoen's** fork of the [TFT_eSPI](https://github.com/ggaljoen/TFT_eSPI) library
 
 ---
 
 ## GPS Functionality
 
-GPS functionality is fully supported via the 4-pin connector near the MicroUSB port. For a list of compatible GPS hardware, refer to the [official wiki](https://github.com/justcallmekoko/ESP32Marauder/wiki/gps-modification).
+GPS functionality is fully supported via the 4-pin connector near the MicroUSB port. For a list of compatible GPS hardware, refer to the [official wiki](https://github.com/justcallmekoko/ESP32Marauder/wiki/gps-modification)
 
 | GPS | -> | CYD |
 |-----|:--:|-----|
@@ -102,13 +127,13 @@ GPS functionality is fully supported via the 4-pin connector near the MicroUSB p
 | TX  | -> | TX  |
 | RX  | -> | RX  |
 
-Note: On 2.4" models swap RX/TX
+Note: On 2.4" and 3.5" models swap RX/TX
 
 ---
 
 ## Example Usage
 
-After flashing, your CYD module will boot into the Marauder interface. Refer to the [ESP32 Marauder Wiki](https://github.com/justcallmekoko/ESP32Marauder/wiki) for detailed usage instructions.
+After flashing, you'll boot into the Marauder interface. Refer to the [ESP32 Marauder Wiki](https://github.com/justcallmekoko/ESP32Marauder/wiki) for detailed usage instructions
 
 <p align="center">
   <img src="https://github.com/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/blob/master/screenshots/2.gif" alt="Demo 1" width="45%">
