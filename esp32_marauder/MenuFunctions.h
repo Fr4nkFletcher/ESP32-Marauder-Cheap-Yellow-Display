@@ -73,6 +73,7 @@ extern Settings settings_obj;
 #define GPS_MENU 33
 #define DISABLE_TOUCH 34
 #define FLIPPER 35
+#define BLANK 36
 
 PROGMEM void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p);
 PROGMEM bool my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data);
@@ -156,7 +157,7 @@ class MenuFunctions
     #ifdef HAS_BT
       Menu airtagMenu;
     #endif
-    #ifndef HAS_ILI9341
+    #if !defined(HAS_ILI9341) && !defined(HAS_ST7796)
       Menu wifiStationMenu;
     #endif
 
@@ -187,7 +188,7 @@ class MenuFunctions
     void displaySetting(String key, Menu* menu, int index);
     void buttonSelected(uint8_t b, int8_t x = -1);
     void buttonNotSelected(uint8_t b, int8_t x = -1);
-    #if (!defined(HAS_ILI9341) && defined(HAS_BUTTONS))
+    #if (!defined(HAS_ILI9341) && !defined(HAS_ST7796) && defined(HAS_BUTTONS))
       void miniKeyboard(Menu * targetMenu);
     #endif
 

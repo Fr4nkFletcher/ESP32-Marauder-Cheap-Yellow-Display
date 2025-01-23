@@ -350,7 +350,7 @@ void loop()
     mini = true;
   #endif
 
-  #ifdef HAS_ILI9341
+  #if defined(HAS_ILI9341) || defined(HAS_ST7796)
     #ifdef HAS_BUTTONS
       if (c_btn.isHeld()) {
         if (menu_function_obj.disable_touch)

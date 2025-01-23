@@ -67,9 +67,9 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 
 | Offset | -> | Bin |
 |--------|:--:|------|
-| 0x1000  | -> | Bootloader |
-| 0x8000  | -> | Partitions |
-| 0x10000 | -> | Firmware   |
+| 0x1000  | -> | [Bootloader](https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/raw/refs/heads/main/resources/STATIC/M/CYD/esp32_marauder.ino.bootloader.bin) |
+| 0x8000  | -> | [Partitions](https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/raw/refs/heads/main/resources/STATIC/M/CYD/esp32_marauder.ino.partitions.bin) |
+| 0x10000 | -> | [Firmware](https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/tree/main/resources/CURRENT)   |
 
 #### Troubleshooting:
 
