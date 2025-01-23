@@ -34,13 +34,16 @@ void Display::RunSetup()
 
   tft.setCursor(0, 0);
 
-  #ifdef HAS_ILI9341
-
+  #ifdef HAS_SCREEN
+  
     #ifdef CYD_28
       uint16_t calData[5] = { 350, 3465, 188, 3431, 2 }; // tft.setRotation(0); // Portrait with TFT Shield
       //Serial.println(F("Using CYD"));
     #elif defined(CYD_24)
       uint16_t calData[5] = { 481, 3053, 433, 3296, 3 }; // tft.setRotation(0); // Portrait with TFT Shield
+      //Serial.println(F("Using TFT Shield"));
+    #elif defined(CYD_35)
+      uint16_t calData[5] = { 441, 3159, 406, 3330, 6 }; // tft.setRotation(0); // Portrait with TFT Shield
       //Serial.println(F("Using TFT Shield"));
     #elif defined(TFT_DIY)
       uint16_t calData[5] = { 339, 3470, 237, 3438, 2 }; // tft.setRotation(0); // Portrait with DIY TFT
@@ -265,7 +268,7 @@ void Display::touchToExit()
 {
   tft.setTextColor(TFT_BLACK, TFT_LIGHTGREY);
   tft.fillRect(0,32,HEIGHT_1,16, TFT_LIGHTGREY);
-  tft.drawCentreString(text11,120,32,2);
+  tft.drawCentreString(text11,TFT_WIDTH/2,32,2);
 }
 
 
@@ -286,13 +289,40 @@ void Display::scrollScreenBuffer(bool down) {
 }
 #endif
 
+void Display::processAndPrintString(TFT_eSPI& tft, const String& originalString) {
+  // Define colors
+  uint16_t text_color = TFT_GREEN; // Default text color
+  uint16_t background_color = TFT_BLACK; // Default background color
+  String new_string = originalString;
+  // Check for color macros at the start of the string
+  if (new_string.startsWith(RED_KEY)) {
+    text_color = TFT_RED;
+    new_string.remove(0, strlen(RED_KEY)); // Remove the macro
+  } else if (new_string.startsWith(GREEN_KEY)) {
+    text_color = TFT_GREEN;
+    new_string.remove(0, strlen(GREEN_KEY)); // Remove the macro
+  } else if (new_string.startsWith(CYAN_KEY)) {
+    text_color = TFT_CYAN;
+    new_string.remove(0, strlen(CYAN_KEY)); // Remove the macro
+  } else if (new_string.startsWith(WHITE_KEY)) {
+    text_color = TFT_WHITE;
+    new_string.remove(0, strlen(WHITE_KEY)); // Remove the macro
+  } else if (new_string.startsWith(MAGENTA_KEY)) {
+    text_color = TFT_MAGENTA;
+    new_string.remove(0, strlen(MAGENTA_KEY)); // Remove the macro
+  }
+  // Set text color and print the string
+  tft.setTextColor(text_color, background_color);
+  tft.print(new_string);
+}
+
 void Display::displayBuffer(bool do_clear)
 {
   if (this->display_buffer->size() > 0)
   {
-    delay(1);
-
-    while (display_buffer->size() > 0)
+    //delay(1);
+    int print_count = 10;
+    while ((display_buffer->size() > 0) && (print_count > 0))
     {
 
       #ifndef SCREEN_BUFFER
@@ -324,10 +354,14 @@ void Display::displayBuffer(bool do_clear)
           for (int x = 0; x < TFT_WIDTH / CHAR_WIDTH; x++)
             tft.print(" ");
           tft.setCursor(xPos, (i * 12) + (SCREEN_HEIGHT / 6));
-          tft.setTextColor(TFT_GREEN, TFT_BLACK);
-          tft.print(this->screen_buffer->get(i));
+          
+          this->processAndPrintString(tft, this->screen_buffer->get(i));
+          //tft.setTextColor(TFT_GREEN, TFT_BLACK);
+          //tft.print(this->screen_buffer->get(i));
         }
       #endif
+
+      print_count--;
     }
   }
 }
@@ -397,12 +431,15 @@ int Display::scroll_line(uint32_t color) {
 
 // Function to setup hardware scroll for TFT screen
 void Display::setupScrollArea(uint16_t tfa, uint16_t bfa) {
-  //Serial.println(F("setupScrollArea()"));
-  //Serial.println("   tfa: " + (String)tfa);
-  //Serial.println("   bfa: " + (String)bfa);
-  //Serial.println("yStart: " + (String)this->yStart);
   #ifdef HAS_ILI9341
-    tft.writecommand(ILI9341_VSCRDEF); // Vertical scroll definition
+    const uint8_t SCROLL_DEF_CMD = ILI9341_VSCRDEF;
+  #endif
+  #ifdef HAS_ST7796
+    const uint8_t SCROLL_DEF_CMD = ST7796_VSCRDEF;
+  #endif
+
+  #ifdef SCROLL_DEF_CMD
+    tft.writecommand(SCROLL_DEF_CMD); // Vertical scroll definition
     tft.writedata(tfa >> 8);           // Top Fixed Area line count
     tft.writedata(tfa);
     tft.writedata((YMAX-tfa-bfa)>>8);  // Vertical Scrolling Area line count
@@ -415,7 +452,14 @@ void Display::setupScrollArea(uint16_t tfa, uint16_t bfa) {
 
 void Display::scrollAddress(uint16_t vsp) {
   #ifdef HAS_ILI9341
-    tft.writecommand(ILI9341_VSCRSADD); // Vertical scrolling pointer
+    const uint8_t SCROLL_PTR_CMD = ILI9341_VSCRSADD;
+  #endif
+  #ifdef HAS_ST7796
+    const uint8_t SCROLL_PTR_CMD = ST7796_VSCRSADD;
+  #endif
+
+  #ifdef SCROLL_PTR_CMD
+    tft.writecommand(SCROLL_PTR_CMD); // Vertical scrolling pointer
     tft.writedata(vsp>>8);
     tft.writedata(vsp);
   #endif
