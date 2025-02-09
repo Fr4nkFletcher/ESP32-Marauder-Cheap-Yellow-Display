@@ -8,9 +8,15 @@
 
 #include <Arduino.h>
 
-#define B_PIN 17
-#define G_PIN 16
-#define R_PIN 4
+#ifdef CYD_28
+  #define B_PIN 17
+  #define G_PIN 16
+  #define R_PIN 4
+#elif defined(CYD_24) || defined(CYD_35)
+  #define B_PIN 16
+  #define G_PIN 17
+  #define R_PIN 4
+#endif
 
 extern Settings settings_obj;
 

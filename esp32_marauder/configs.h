@@ -34,7 +34,7 @@
   #elif defined(MARAUDER_REV_FEATHER)
     #define HARDWARE_NAME "Adafruit Feather ESP32-S2 Reverse TFT"
   #elif defined(MARAUDER_V4)
-    #define HARDWARE_NAME "Marauder v4"
+    #define HARDWARE_NAME "Marauder vCYD"
   #elif defined(MARAUDER_V6)
     #define HARDWARE_NAME "Marauder v6"
   #elif defined(MARAUDER_V6_1)
@@ -130,8 +130,8 @@
     #define USE_SD
     #define HAS_GPS
     //#define CYD_24
-    #define CYD_28
-    //#define CYD_35
+    //#define CYD_28
+    #define CYD_35
     //#define HAS_TEMP_SENSOR
   #endif
 

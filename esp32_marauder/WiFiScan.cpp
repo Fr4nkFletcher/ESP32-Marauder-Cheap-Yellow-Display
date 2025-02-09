@@ -916,31 +916,28 @@ bool WiFiScan::shutdownWiFi() {
 bool WiFiScan::shutdownBLE() {
   #ifdef HAS_BT
     if (this->ble_initialized) {
-      Serial.println("Shutting down BLE");
       pAdvertising->stop();
       pBLEScan->stop();
-      
+
       pBLEScan->clearResults();
       NimBLEDevice::deinit();
 
-      #ifdef MARAUDER_FLIPPER
-        flipper_led.offLED();
-      #elif defined(MARAUDER_V4)
-        flipper_led.offLED();
-      #elif defined(XIAO_ESP32_S3)
-        xiao_led.offLED();
-      #elif defined(MARAUDER_M5STICKC)
-        stickc_led.offLED();
-      #else
-        led_obj.setMode(MODE_OFF);
-      #endif
-    
       this->ble_initialized = false;
-      return true;
-    }
-    else {
+    } else {
       return false;
     }
+
+    #ifdef MARAUDER_FLIPPER
+      flipper_led.offLED();
+    #elif defined(MARAUDER_V4)
+      flipper_led.offLED();
+    #elif defined(XIAO_ESP32_S3)
+      xiao_led.offLED();
+    #elif defined(MARAUDER_M5STICKC)
+      stickc_led.offLED();
+    #else
+      led_obj.setMode(MODE_OFF);
+    #endif
   #endif
 
   return true;
@@ -950,53 +947,49 @@ bool WiFiScan::shutdownBLE() {
 void WiFiScan::StopScan(uint8_t scan_mode)
 {
   if ((currentScanMode == WIFI_SCAN_PROBE) ||
-  (currentScanMode == WIFI_SCAN_AP) ||
-  (currentScanMode == WIFI_SCAN_WAR_DRIVE) ||
-  (currentScanMode == WIFI_SCAN_STATION_WAR_DRIVE) ||
-  (currentScanMode == WIFI_SCAN_EVIL_PORTAL) ||
-  (currentScanMode == WIFI_SCAN_RAW_CAPTURE) ||
-  (currentScanMode == WIFI_SCAN_STATION) ||
-  (currentScanMode == WIFI_SCAN_SIG_STREN) ||
-  (currentScanMode == WIFI_SCAN_TARGET_AP) ||
-  (currentScanMode == WIFI_SCAN_TARGET_AP_FULL) ||
-  (currentScanMode == WIFI_SCAN_PWN) ||
-  (currentScanMode == WIFI_SCAN_EAPOL) ||
-  (currentScanMode == WIFI_SCAN_ACTIVE_EAPOL) ||
-  (currentScanMode == WIFI_SCAN_ACTIVE_LIST_EAPOL) ||
-  (currentScanMode == WIFI_SCAN_ALL) ||
-  (currentScanMode == WIFI_SCAN_DEAUTH) ||
-  (currentScanMode == WIFI_ATTACK_BEACON_LIST) ||
-  (currentScanMode == WIFI_ATTACK_BEACON_SPAM) ||
-  (currentScanMode == WIFI_ATTACK_AUTH) ||
-  (currentScanMode == WIFI_ATTACK_DEAUTH) ||
-  (currentScanMode == WIFI_ATTACK_DEAUTH_MANUAL) ||
-  (currentScanMode == WIFI_ATTACK_DEAUTH_TARGETED) ||
-  (currentScanMode == WIFI_ATTACK_MIMIC) ||
-  (currentScanMode == WIFI_ATTACK_RICK_ROLL) ||
-  (currentScanMode == WIFI_PACKET_MONITOR) ||
-  (currentScanMode == LV_JOIN_WIFI))
+      (currentScanMode == WIFI_SCAN_AP) ||
+      (currentScanMode == WIFI_SCAN_WAR_DRIVE) ||
+      (currentScanMode == WIFI_SCAN_STATION_WAR_DRIVE) ||
+      (currentScanMode == WIFI_SCAN_EVIL_PORTAL) ||
+      (currentScanMode == WIFI_SCAN_RAW_CAPTURE) ||
+      (currentScanMode == WIFI_SCAN_STATION) ||
+      (currentScanMode == WIFI_SCAN_SIG_STREN) ||
+      (currentScanMode == WIFI_SCAN_TARGET_AP) ||
+      (currentScanMode == WIFI_SCAN_TARGET_AP_FULL) ||
+      (currentScanMode == WIFI_SCAN_PWN) ||
+      (currentScanMode == WIFI_SCAN_EAPOL) ||
+      (currentScanMode == WIFI_SCAN_ACTIVE_EAPOL) ||
+      (currentScanMode == WIFI_SCAN_ACTIVE_LIST_EAPOL) ||
+      (currentScanMode == WIFI_SCAN_ALL) ||
+      (currentScanMode == WIFI_SCAN_DEAUTH) ||
+      (currentScanMode == WIFI_ATTACK_BEACON_LIST) ||
+      (currentScanMode == WIFI_ATTACK_BEACON_SPAM) ||
+      (currentScanMode == WIFI_ATTACK_AUTH) ||
+      (currentScanMode == WIFI_ATTACK_DEAUTH) ||
+      (currentScanMode == WIFI_ATTACK_DEAUTH_MANUAL) ||
+      (currentScanMode == WIFI_ATTACK_DEAUTH_TARGETED) ||
+      (currentScanMode == WIFI_ATTACK_MIMIC) ||
+      (currentScanMode == WIFI_ATTACK_RICK_ROLL) ||
+      (currentScanMode == WIFI_PACKET_MONITOR) ||
+      (currentScanMode == LV_JOIN_WIFI))
   {
     this->shutdownWiFi();
   }
-
-  
   else if ((currentScanMode == BT_SCAN_ALL) ||
-  (currentScanMode == BT_SCAN_AIRTAG) ||
-  (currentScanMode == BT_SCAN_FLIPPER) ||
-  (currentScanMode == BT_ATTACK_SOUR_APPLE) ||
-  (currentScanMode == BT_ATTACK_SWIFTPAIR_SPAM) ||
-  (currentScanMode == BT_ATTACK_SPAM_ALL) ||
-  (currentScanMode == BT_ATTACK_SAMSUNG_SPAM) ||
-  (currentScanMode == BT_ATTACK_GOOGLE_SPAM) ||
-  (currentScanMode == BT_ATTACK_FLIPPER_SPAM) ||
-  (currentScanMode == BT_SPOOF_AIRTAG) ||
-  (currentScanMode == BT_SCAN_WAR_DRIVE) ||
-  (currentScanMode == BT_SCAN_WAR_DRIVE_CONT) ||
-  (currentScanMode == BT_SCAN_SKIMMERS))
+           (currentScanMode == BT_SCAN_AIRTAG) ||
+           (currentScanMode == BT_SCAN_FLIPPER) ||
+           (currentScanMode == BT_ATTACK_SOUR_APPLE) ||
+           (currentScanMode == BT_ATTACK_SWIFTPAIR_SPAM) ||
+           (currentScanMode == BT_ATTACK_SPAM_ALL) ||
+           (currentScanMode == BT_ATTACK_SAMSUNG_SPAM) ||
+           (currentScanMode == BT_ATTACK_GOOGLE_SPAM) ||
+           (currentScanMode == BT_ATTACK_FLIPPER_SPAM) ||
+           (currentScanMode == BT_SPOOF_AIRTAG) ||
+           (currentScanMode == BT_SCAN_WAR_DRIVE) ||
+           (currentScanMode == BT_SCAN_WAR_DRIVE_CONT) ||
+           (currentScanMode == BT_SCAN_SKIMMERS))
   {
-    #ifdef HAS_BT
-      this->shutdownBLE();
-    #endif
+    this->shutdownBLE();
   }
 
   #ifdef HAS_SCREEN
@@ -1004,9 +997,6 @@ void WiFiScan::StopScan(uint8_t scan_mode)
     #ifdef SCREEN_BUFFER
       display_obj.screen_buffer->clear();
     #endif
-    //Serial.print("display_buffer->size(): ");
-    Serial.println(display_obj.display_buffer->size());
-  
     display_obj.tteBar = false;
   #endif
 
@@ -1014,6 +1004,7 @@ void WiFiScan::StopScan(uint8_t scan_mode)
     gps_obj.disable_queue();
   #endif
 }
+
 
 String WiFiScan::getStaMAC()
 {
@@ -2255,6 +2246,8 @@ void WiFiScan::executeSourApple() {
     pAdvertising->start();
     delay(20);
     pAdvertising->stop();
+    
+    
   #endif
 }
 
@@ -2365,6 +2358,8 @@ void WiFiScan::executeSwiftpairSpam(EBLEPayloadType type) {
     pAdvertising->stop();
     delay(5);
     NimBLEDevice::deinit();
+    
+
   #endif
 }
 
@@ -2753,6 +2748,19 @@ void WiFiScan::RunSourApple(uint8_t scan_mode, uint16_t color) {
     #endif
 
     this->ble_initialized;
+
+    #ifdef MARAUDER_FLIPPER
+      flipper_led.sniffLED();
+    #elif defined(MARAUDER_V4)
+      flipper_led.sniffLED();
+    #elif defined(XIAO_ESP32_S3)
+      xiao_led.sniffLED();
+    #elif defined(MARAUDER_M5STICKC)
+      stickc_led.sniffLED();
+    #else
+      led_obj.setMode(MODE_SNIFF);
+    #endif
+
   #endif
 }
 
@@ -2788,6 +2796,20 @@ void WiFiScan::RunSwiftpairSpam(uint8_t scan_mode, uint16_t color) {
     #endif
 
     this->ble_initialized;
+    
+    #ifdef MARAUDER_FLIPPER
+      flipper_led.attackLED();
+    #elif defined(MARAUDER_V4)
+      flipper_led.attackLED();
+    #elif defined(XIAO_ESP32_S3)
+      xiao_led.attackLED();
+    #elif defined(MARAUDER_M5STICKC)
+      stickc_led.attackLED();
+    #else
+      led_obj.setMode(MODE_ATTACK);
+    #endif
+
+    shutdownBLE();
   #endif
 }
 
@@ -2905,6 +2927,19 @@ void WiFiScan::RunBluetoothScan(uint8_t scan_mode, uint16_t color)
     pBLEScan->start(0, scanCompleteCB, false);
     Serial.println("Started BLE Scan");
     this->ble_initialized = true;
+
+    #ifdef MARAUDER_FLIPPER
+      flipper_led.sniffLED();
+    #elif defined(MARAUDER_V4)
+      flipper_led.sniffLED();
+    #elif defined(XIAO_ESP32_S3)
+      xiao_led.sniffLED();
+    #elif defined(MARAUDER_M5STICKC)
+      stickc_led.sniffLED();
+    #else
+      led_obj.setMode(MODE_SNIFF);
+    #endif
+
     initTime = millis();
   #endif
 }
@@ -2915,6 +2950,18 @@ void WiFiScan::RunBluetoothScan(uint8_t scan_mode, uint16_t color)
     printf("Scan complete!\n");
     printf("Found %d devices\n", scanResults.getCount());
     scanResults.dump();
+
+    #ifdef MARAUDER_FLIPPER
+      flipper_led.offLED();
+    #elif defined(MARAUDER_V4)
+      flipper_led.offLED();
+    #elif defined(XIAO_ESP32_S3)
+      xiao_led.offLED();
+    #elif defined(MARAUDER_M5STICKC)
+      stickc_led.offLED();
+    #else
+      led_obj.setMode(MODE_OFF);
+    #endif
   } // scanCompleteCB
 #endif
 

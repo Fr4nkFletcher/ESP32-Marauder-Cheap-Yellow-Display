@@ -14,8 +14,9 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 
 ---
 
-## 🏴‍☠️ Latest Update Highlights — Added ESP32-035 (01/18/24) 🏴‍☠️
+## 🏴‍☠️ Latest Update Highlights — v1.2.1 (02/08/25) 🏴‍☠️
 
+- Fix status LED for bluetooth stuff
 - Add support for ESP32-3248S035R 3.5" ST7796/XPT2046 Resistive Touch Display
 - Add support for Adafruit MAX17048 battery monitor
 - Update Save/Load Files menu to add for saving and loading AirTags

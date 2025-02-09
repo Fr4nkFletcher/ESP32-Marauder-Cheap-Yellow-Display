@@ -35,8 +35,7 @@ class LedInterface {
     void rainbow();
     void ledOff();
     void attackLed();
-    void sniffLed();
-  
+    void sniffLed();  
   public:
     LedInterface();
 
