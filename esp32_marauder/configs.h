@@ -130,8 +130,8 @@
     #define USE_SD
     #define HAS_GPS
     //#define CYD_24
-    //#define CYD_28
-    #define CYD_35
+    #define CYD_28
+    //#define CYD_35
     //#define HAS_TEMP_SENSOR
   #endif
 
@@ -1186,10 +1186,10 @@
   //// BATTERY STUFF
   #ifdef HAS_BATTERY
     #ifdef MARAUDER_V4
-      #ifdef CYD_35
-        #define I2C_SDA 22
-        #define I2C_SCL 21
-      #else
+      #if defined(CYD_35) || defined(CYD_24)
+        #define I2C_SDA 21
+        #define I2C_SCL 22
+      #elif defined(CYD_28)
         #define I2C_SDA 22
         #define I2C_SCL 27
       #endif

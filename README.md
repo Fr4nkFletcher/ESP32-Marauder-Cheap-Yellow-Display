@@ -14,8 +14,10 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 
 ---
 
-## 🏴‍☠️ Latest Update Highlights — v1.2.1 (02/08/25) 🏴‍☠️
+## 🏴‍☠️ Latest Update Highlights — v1.2.1 (02/14/25) 🏴‍☠️
 
+- Update amazon link for the 2.4"
+- Fix bluetooth attack LED not turning off
 - Fix status LED for bluetooth stuff
 - Add support for ESP32-3248S035R 3.5" ST7796/XPT2046 Resistive Touch Display
 - Add support for Adafruit MAX17048 battery monitor
@@ -108,7 +110,7 @@ For a step-by-step guide, refer to [Smoochiee's tutorial](https://github.com/smo
 
 The project has been successfully tested on:
 
-- [2.4" Resistive Touch](https://a.co/d/gWGoaP3)
+- [2.4" Resistive Touch](https://a.co/d/fhM7s0J)
 - [2.8" Resistive MicroUSB-only](https://amazon.com/dp/B0BVFXR313)
 - [2.8" Resistive MicroUSB/Type-C 2USB](https://amazon.com/dp/B0CLR7MQ91)
 - [3.5" Resistive Touch](https://a.co/d/cxUc73a)

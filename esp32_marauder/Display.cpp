@@ -1,5 +1,6 @@
 #include "Display.h"
 #include "lang_var.h"
+#include "flipperLED.h"
 
 #ifdef HAS_SCREEN
 

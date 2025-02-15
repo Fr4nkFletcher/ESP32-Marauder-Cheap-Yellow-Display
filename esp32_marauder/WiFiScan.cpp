@@ -913,9 +913,10 @@ bool WiFiScan::shutdownWiFi() {
   }
 }
 
-bool WiFiScan::shutdownBLE() {
+/*bool WiFiScan::shutdownBLE() {
   #ifdef HAS_BT
-    if (this->ble_initialized) {
+    if (this->ble_initialized = true) {
+      Serial.println("Shutting down BLE");
       pAdvertising->stop();
       pBLEScan->stop();
 
@@ -923,9 +924,45 @@ bool WiFiScan::shutdownBLE() {
       NimBLEDevice::deinit();
 
       this->ble_initialized = false;
-    } else {
+
+    } 
+    else {
       return false;
     }
+
+    #ifdef MARAUDER_FLIPPER
+        flipper_led.offLED();
+      #elif defined(MARAUDER_V4)
+        flipper_led.offLED();
+      #elif defined(XIAO_ESP32_S3)
+        xiao_led.offLED();
+      #elif defined(MARAUDER_M5STICKC)
+        stickc_led.offLED();
+      #else
+        led_obj.setMode(MODE_OFF);
+      #endif
+
+  #endif
+
+  return true;
+}
+*/
+
+bool WiFiScan::shutdownBLE() {
+  #ifdef HAS_BT
+    if (this->ble_initialized) {
+      Serial.println("Shutting down BLE");
+      pAdvertising->stop();
+      pBLEScan->stop();
+      
+      pBLEScan->clearResults();
+      NimBLEDevice::deinit();
+    
+      this->ble_initialized = false;
+    }
+    //else {
+    //  return false;
+    //}
 
     #ifdef MARAUDER_FLIPPER
       flipper_led.offLED();
@@ -938,6 +975,7 @@ bool WiFiScan::shutdownBLE() {
     #else
       led_obj.setMode(MODE_OFF);
     #endif
+
   #endif
 
   return true;
@@ -2747,7 +2785,7 @@ void WiFiScan::RunSourApple(uint8_t scan_mode, uint16_t color) {
       display_obj.tft.setTextColor(TFT_GREEN, TFT_BLACK);
     #endif
 
-    this->ble_initialized;
+    this->ble_initialized = true;
 
     #ifdef MARAUDER_FLIPPER
       flipper_led.sniffLED();
@@ -2809,7 +2847,7 @@ void WiFiScan::RunSwiftpairSpam(uint8_t scan_mode, uint16_t color) {
       led_obj.setMode(MODE_ATTACK);
     #endif
 
-    shutdownBLE();
+    //shutdownBLE();
   #endif
 }
 
