@@ -132,7 +132,8 @@
     //#define CYD_24
     //#define CYD_24G //Guition 2.4"
     //#define CYD_28
-    #define CYD_35
+    #define CYD_32
+    //#define CYD_35
     //#define HAS_TEMP_SENSOR
   #endif
 
@@ -483,6 +484,20 @@
           #define TFT_HEIGHT 320
         #endif
       #endif // CYD_28
+
+      #ifdef CYD_32
+        #define SCREEN_CHAR_WIDTH 40
+        #define HAS_ST7789
+        #define BANNER_TEXT_SIZE 2
+
+        #ifndef TFT_WIDTH
+          #define TFT_WIDTH 240
+        #endif
+
+        #ifndef TFT_HEIGHT
+          #define TFT_HEIGHT 320
+        #endif
+      #endif // CYD_32
 
       #ifdef CYD_35
         #define SCREEN_CHAR_WIDTH 40
@@ -1201,7 +1216,7 @@
   //// BATTERY STUFF
   #ifdef HAS_BATTERY
     #ifdef MARAUDER_V4
-      #if defined(CYD_35) || defined(CYD_24)
+      #if defined(CYD_35) || defined(CYD_24) || defined(CYD_32)
         #define I2C_SDA 21
         #define I2C_SCL 22
       #elif defined(CYD_28) || defined(CYD_24G)

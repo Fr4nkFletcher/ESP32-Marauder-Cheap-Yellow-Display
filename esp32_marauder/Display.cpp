@@ -46,6 +46,9 @@ void Display::RunSetup()
     #elif defined(CYD_24G)
       uint16_t calData[5] = { 405, 3209, 297, 3314, 2 }; // tft.setRotation(0); // Portrait with TFT Shield
       //Serial.println(F("Using TFT Shield"));
+    #elif defined(CYD_32)
+      uint16_t calData[5] = { 251, 3539, 331, 3534, 6 }; // tft.setRotation(0); // Portrait with TFT Shield
+      //Serial.println(F("Using TFT Shield"));
     #elif defined(CYD_35)
       uint16_t calData[5] = { 309, 3465, 297, 3552, 6 }; // tft.setRotation(0); // Portrait with TFT Shield
       //Serial.println(F("Using TFT Shield"));
@@ -443,6 +446,9 @@ void Display::setupScrollArea(uint16_t tfa, uint16_t bfa) {
   #ifdef HAS_ST7796
     const uint8_t SCROLL_DEF_CMD = ST7796_VSCRDEF;
   #endif
+  #ifdef HAS_ST7789
+    const uint8_t SCROLL_DEF_CMD = ST7789_VSCRDEF;
+  #endif
 
   #ifdef SCROLL_DEF_CMD
     tft.writecommand(SCROLL_DEF_CMD); // Vertical scroll definition
@@ -462,6 +468,9 @@ void Display::scrollAddress(uint16_t vsp) {
   #endif
   #ifdef HAS_ST7796
     const uint8_t SCROLL_PTR_CMD = ST7796_VSCRSADD;
+  #endif
+  #ifdef HAS_ST7789
+    const uint8_t SCROLL_PTR_CMD = ST7789_VSCRSADD;
   #endif
 
   #ifdef SCROLL_PTR_CMD

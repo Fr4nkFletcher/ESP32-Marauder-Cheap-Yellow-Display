@@ -15,8 +15,9 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 ---
 
 ## 🏴‍☠️ Latest Update Highlights — v1.2.1 (02/16/25) 🏴‍☠️
-
-- Add support for 2.4" Guition ESP32-2432S024R
+ 
+- Add support for ESP32-2432S032 3.2" ST7789/XPT2046 Resistive Touch Display
+- Add support for Guition ESP32-2432S024R 2.4" Resistive Touch Display
 - Recalibrate touch for 3.5" 
 - Fix bluetooth attack LED not turning off
 - Fix status LED for bluetooth stuff
@@ -115,6 +116,7 @@ The project has been successfully tested on:
 - [2.4" Resistive Touch Guition](https://www.aliexpress.us/item/3256806436471011.html)
 - [2.8" Resistive MicroUSB-only](https://amazon.com/dp/B0BVFXR313)
 - [2.8" Resistive MicroUSB/Type-C 2USB](https://amazon.com/dp/B0CLR7MQ91)
+- [3.2" Resistive Touch](https://www.aliexpress.us/item/3256806436888726.html)
 - [3.5" Resistive Touch](https://a.co/d/cxUc73a)
 
 No hardware modifications are required, thanks to **@ggaljoen's** fork of the [TFT_eSPI](https://github.com/ggaljoen/TFT_eSPI) library
