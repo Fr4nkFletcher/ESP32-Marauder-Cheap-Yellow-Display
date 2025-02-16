@@ -14,7 +14,7 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 
 ---
 
-## 🏴‍☠️ Latest Update Highlights — v1.2.1 (02/16/25) 🏴‍☠️
+## 🏴‍☠️ Latest Update Highlights — added ESP32-2432S032R 3.2" on v1.2.1 (02/16/25) 🏴‍☠️
  
 - Add support for ESP32-2432S032 3.2" ST7789/XPT2046 Resistive Touch Display
 - Add support for Guition ESP32-2432S024R 2.4" Resistive Touch Display
