@@ -43,8 +43,11 @@ void Display::RunSetup()
     #elif defined(CYD_24)
       uint16_t calData[5] = { 481, 3053, 433, 3296, 3 }; // tft.setRotation(0); // Portrait with TFT Shield
       //Serial.println(F("Using TFT Shield"));
+    #elif defined(CYD_24G)
+      uint16_t calData[5] = { 405, 3209, 297, 3314, 2 }; // tft.setRotation(0); // Portrait with TFT Shield
+      //Serial.println(F("Using TFT Shield"));
     #elif defined(CYD_35)
-      uint16_t calData[5] = { 441, 3159, 406, 3330, 6 }; // tft.setRotation(0); // Portrait with TFT Shield
+      uint16_t calData[5] = { 309, 3465, 297, 3552, 6 }; // tft.setRotation(0); // Portrait with TFT Shield
       //Serial.println(F("Using TFT Shield"));
     #elif defined(TFT_DIY)
       uint16_t calData[5] = { 339, 3470, 237, 3438, 2 }; // tft.setRotation(0); // Portrait with DIY TFT

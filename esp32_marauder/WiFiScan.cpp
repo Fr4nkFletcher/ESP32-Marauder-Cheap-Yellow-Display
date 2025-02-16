@@ -1615,8 +1615,11 @@ void WiFiScan::RunAPScan(uint8_t scan_mode, uint16_t color)
     #elif defined(CYD_24)
       uint16_t calData[5] = { 410, 3305, 499, 3045, 0 }; // Landscape CYD 2.4"
       //Serial.println(F("Using CYD 2.4in"));
+    #elif defined(CYD_24G)
+      uint16_t calData[5] = { 400, 3141, 617, 2888, 1 }; // Landscape CYD 2.4"
+      //Serial.println(F("Using Guition CYD 2.4in"));
     #elif defined(CYD_35)
-      uint16_t calData[5] = { 426, 3258, 498, 3118, 3 }; // Landscape CYD 3.5"
+      uint16_t calData[5] = { 292, 3570, 295, 3436, 3 }; // Landscape CYD 3.5"
     #elif defined(TFT_DIY)
       uint16_t calData[5] = { 213, 3469, 320, 3446, 1 }; // Landscape TFT DIY
       Serial.println("Using TFT DIY");
@@ -2016,8 +2019,11 @@ void WiFiScan::RunPacketMonitor(uint8_t scan_mode, uint16_t color)
       #elif defined(CYD_24)
         uint16_t calData[5] = { 410, 3305, 499, 3045, 0 }; // Landscape CYD 2.4"
       //Serial.println(F("Using CYD 2.4in"));
+      #elif defined(CYD_24G)
+      uint16_t calData[5] = { 400, 3141, 617, 2888, 1 }; // Landscape CYD 2.4"
+      //Serial.println(F("Using Guition CYD 2.4in"));
       #elif defined(CYD_35)
-      uint16_t calData[5] = { 426, 3258, 498, 3118, 3 }; // Landscape CYD 3.5"
+      uint16_t calData[5] = { 292, 3570, 295, 3436, 3 }; // Landscape CYD 3.5"
       #elif defined(TFT_DIY)
         uint16_t calData[5] = { 213, 3469, 320, 3446, 1 }; // Landscape TFT DIY
         Serial.println("Using TFT DIY");
@@ -2105,8 +2111,11 @@ void WiFiScan::RunEapolScan(uint8_t scan_mode, uint16_t color)
       #elif defined(CYD_24)
         uint16_t calData[5] = { 410, 3305, 499, 3045, 0 }; // Landscape CYD 2.4"
       //Serial.println(F("Using CYD 2.4in"));
+      #elif defined(CYD_24G)
+      uint16_t calData[5] = { 400, 3141, 617, 2888, 1 }; // Landscape CYD 2.4"
+      //Serial.println(F("Using Guition CYD 2.4in"));
       #elif defined(CYD_35)
-        uint16_t calData[5] = { 426, 3258, 498, 3118, 3 }; // Landscape CYD 3.5"
+        uint16_t calData[5] = { 292, 3570, 295, 3436, 3 }; // Landscape CYD 3.5"
       #elif defined(TFT_DIY)
         uint16_t calData[5] = { 213, 3469, 320, 3446, 1 }; // Landscape TFT DIY
         //Serial.println("Using TFT DIY");

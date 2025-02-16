@@ -130,8 +130,9 @@
     #define USE_SD
     #define HAS_GPS
     //#define CYD_24
-    #define CYD_28
-    //#define CYD_35
+    //#define CYD_24G //Guition 2.4"
+    //#define CYD_28
+    #define CYD_35
     //#define HAS_TEMP_SENSOR
   #endif
 
@@ -442,6 +443,20 @@
 
     #ifdef MARAUDER_V4
       #ifdef CYD_24
+        #define SCREEN_CHAR_WIDTH 40
+        #define HAS_ILI9341
+        #define BANNER_TEXT_SIZE 2
+
+        #ifndef TFT_WIDTH
+          #define TFT_WIDTH 240
+        #endif
+
+        #ifndef TFT_HEIGHT
+          #define TFT_HEIGHT 320
+        #endif
+      #endif // CYD_24
+
+      #ifdef CYD_24G
         #define SCREEN_CHAR_WIDTH 40
         #define HAS_ILI9341
         #define BANNER_TEXT_SIZE 2
@@ -1189,7 +1204,7 @@
       #if defined(CYD_35) || defined(CYD_24)
         #define I2C_SDA 21
         #define I2C_SCL 22
-      #elif defined(CYD_28)
+      #elif defined(CYD_28) || defined(CYD_24G)
         #define I2C_SDA 22
         #define I2C_SCL 27
       #endif
