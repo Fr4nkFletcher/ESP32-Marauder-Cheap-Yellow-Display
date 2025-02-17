@@ -6,6 +6,7 @@
 
 <p align="center">
   <img src="https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/actions/workflows/pages.yml/badge.svg" alt="GitHub Actions Badge" />
+  <img src="https://img.shields.io/badge/version-1.2.1-blue" alt="GitHub Release Version Badge" />
   <img src="https://komarev.com/ghpvc/?username=Fr4nkFletcher&label=Views&color=0e75b6&style=flat" alt="Profile Views" />
   <img src="https://img.shields.io/github/issues/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display?style=flat-square" alt="GitHub Issues" />
 </p>
