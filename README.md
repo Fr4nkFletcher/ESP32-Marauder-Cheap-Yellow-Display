@@ -7,12 +7,8 @@
 <p align="center">
   <img src="https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/actions/workflows/pages.yml/badge.svg" alt="GitHub Actions Badge" />
   <img src="https://img.shields.io/badge/version-1.2.1-blue" alt="GitHub Release Version Badge" />
-  <img src="https://komarev.com/ghpvc/?username=Fr4nkFletcher&label=Views&color=0e75b6&style=flat" alt="Profile Views" />
-  <img src="https://img.shields.io/github/commits-since/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/latest?style=flat&color=1F285E" />
   <img src="https://img.shields.io/github/issues/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display?style=flat-square" alt="GitHub Issues" />
-  <a href="https://twitter.com/Fr4nkFletcher">
-    <img src="https://img.shields.io/badge/Follow-%231DA1F2.svg?style=flat&logo=x&logoColor=white&color=1F285E" alt="Follow me on X">
-  </a>
+  <img src="https://komarev.com/ghpvc/?username=Fr4nkFletcher&label=Views&color=0e75b6&style=flat" alt="Profile Views" />
 </p>
 
 The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yellow Display (CYD), offering powerful WiFi and Bluetooth testing features on an affordable and accessible hardware platform.
