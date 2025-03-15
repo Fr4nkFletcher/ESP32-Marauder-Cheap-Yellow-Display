@@ -1,5 +1,8 @@
 #include "WiFiScan.h"
 #include "lang_var.h"
+#include "TouchDrvGT911.hpp"
+
+TouchDrvGT911 touch;
 
 int num_beacon = 0;
 int num_deauth = 0;
@@ -831,11 +834,9 @@ void WiFiScan::startWiFiAttacks(uint8_t scan_mode, uint16_t color, String title_
     display_obj.initScrollValues(true);
     display_obj.tft.setTextWrap(false);
     display_obj.tft.setTextColor(TFT_BLACK, color);
-    #ifdef HAS_FULL_SCREEN
+    #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789)
       display_obj.tft.fillRect(0,16,TFT_WIDTH,16, color);
       display_obj.tft.drawCentreString((String)title_string,TFT_WIDTH / 2,16,2);
-    #endif
-    #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789)
       display_obj.touchToExit();
     #endif
     display_obj.tft.setTextColor(TFT_GREEN, TFT_BLACK);
@@ -961,7 +962,7 @@ bool WiFiScan::shutdownBLE() {
       this->ble_initialized = false;
     }
     //else {
-    //  return false;
+      //return true;
     //}
 
     #ifdef MARAUDER_FLIPPER
@@ -1012,6 +1013,14 @@ void WiFiScan::StopScan(uint8_t scan_mode)
       (currentScanMode == LV_JOIN_WIFI))
   {
     this->shutdownWiFi();
+    //#ifdef CYD_32CAP
+    //    // Assuming GT911 has a method to clear events; adjust if not
+    //while (touch.isPressed()) {
+    //    int16_t tmp_x[5], tmp_y[5];
+    //    touch.getPoint(tmp_x, tmp_y, touch.getSupportTouchPoint());
+    //    delay(1); // Wait for release
+    //}
+    //#endif
   }
   else if ((currentScanMode == BT_SCAN_ALL) ||
            (currentScanMode == BT_SCAN_AIRTAG) ||
@@ -1604,34 +1613,34 @@ void WiFiScan::RunAPScan(uint8_t scan_mode, uint16_t color)
 }
 
 #ifdef HAS_SCREEN
-  void WiFiScan::RunLvJoinWiFi(uint8_t scan_mode, uint16_t color) {
-  
+void WiFiScan::RunLvJoinWiFi(uint8_t scan_mode, uint16_t color) {
     display_obj.tft.init();
     display_obj.tft.setRotation(1);
-    
-    #ifdef CYD_28
-      uint16_t calData[5] = { 188, 3408, 286, 3498, 1 }; // Landscape CYD 2.8"
+
+    #if defined(CYD_28)
+        uint16_t calData[5] = { 188, 3408, 286, 3498, 1 }; // Landscape CYD 2.8"
     #elif defined(CYD_24)
-      uint16_t calData[5] = { 410, 3305, 499, 3045, 0 }; // Landscape CYD 2.4"
+        uint16_t calData[5] = { 410, 3305, 499, 3045, 0 }; // Landscape CYD 2.4"
     #elif defined(CYD_24G)
-      uint16_t calData[5] = { 400, 3141, 617, 2888, 1 }; // Landscape CYD 2.4" Guition
+        uint16_t calData[5] = { 400, 3141, 617, 2888, 1 }; // Landscape CYD 2.4" Guition
     #elif defined(CYD_32)
-      uint16_t calData[5] = { 346, 3526, 253, 3542, 3 }; // Landscape CYD 3.2"
+        uint16_t calData[5] = { 346, 3526, 253, 3542, 3 }; // Landscape CYD 3.2"
     #elif defined(CYD_35)
-      uint16_t calData[5] = { 292, 3570, 295, 3436, 3 }; // Landscape CYD 3.5"
+        uint16_t calData[5] = { 292, 3570, 295, 3436, 3 }; // Landscape CYD 3.5"
     #elif defined(TFT_DIY)
-      uint16_t calData[5] = { 213, 3469, 320, 3446, 1 }; // Landscape TFT DIY
-      Serial.println("Using TFT DIY");
+        uint16_t calData[5] = { 213, 3469, 320, 3446, 1 }; // Landscape TFT DIY
+        Serial.println("Using TFT DIY");
     #endif
-    #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789)
+
+    #ifndef CYD_32CAP
       display_obj.tft.setTouch(calData);
     #endif
-    
-  
+
+    // Create LVGL screen
     lv_obj_t * scr = lv_cont_create(NULL, NULL);
     lv_disp_load_scr(scr);
-  
-  }
+
+}
 #endif
 
 void WiFiScan::RunClearStations() {
@@ -1968,18 +1977,20 @@ void WiFiScan::RunInfo()
   #endif
 
   #ifdef HAS_BATTERY
-    battery_obj.battery_level = battery_obj.getBatteryLevel();
-    if (battery_obj.i2c_supported) {
-      #ifdef HAS_SCREEN
-        display_obj.tft.println(text_table4[32]);
-        display_obj.tft.println(text_table4[33] + (String)battery_obj.battery_level + "%");
-      #endif
-    }
+    #if BATTERY_ANALOG_ON == 1
+      battery_obj.battery_level = battery_obj.getBatteryLevel();
+      if (battery_obj.i2c_supported) {
+        #ifdef HAS_SCREEN
+          display_obj.tft.println(text_table4[32]);
+          display_obj.tft.println(text_table4[33] + (String)battery_obj.battery_level + "%");
+        #endif
+      }
     else {
       #ifdef HAS_SCREEN
         display_obj.tft.println(text_table4[34]);
       #endif
-    }
+      }
+    #endif
   #endif
   
   //#ifdef HAS_SCREEN
@@ -1988,94 +1999,98 @@ void WiFiScan::RunInfo()
 }
 
 void WiFiScan::RunPacketMonitor(uint8_t scan_mode, uint16_t color)
-{
-  #ifdef MARAUDER_FLIPPER
-    flipper_led.sniffLED();
-  #elif defined(MARAUDER_V4)
-    flipper_led.sniffLED();
-  #elif defined(XIAO_ESP32_S3)
-    xiao_led.sniffLED();
-  #elif defined(MARAUDER_M5STICKC)
-    stickc_led.sniffLED();
-  #else
-    led_obj.setMode(MODE_SNIFF);
-  #endif
-
-  startPcap("packet_monitor");
-
-  #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789)
-    
-    #ifdef HAS_SCREEN
-      display_obj.tft.init();
-      display_obj.tft.setRotation(1);
-      display_obj.tft.fillScreen(TFT_BLACK);
+  {
+    #ifdef MARAUDER_FLIPPER
+      flipper_led.sniffLED();
+    #elif defined(MARAUDER_V4)
+      flipper_led.sniffLED();
+    #elif defined(XIAO_ESP32_S3)
+      xiao_led.sniffLED();
+    #elif defined(MARAUDER_M5STICKC)
+      stickc_led.sniffLED();
+    #else
+      led_obj.setMode(MODE_SNIFF);
     #endif
-  
-    #ifdef HAS_SCREEN
-      #ifdef CYD_28
-        uint16_t calData[5] = { 188, 3408, 286, 3498, 1 }; // Landscape CYD 2.8"
-      #elif defined(CYD_24)
-        uint16_t calData[5] = { 410, 3305, 499, 3045, 0 }; // Landscape CYD 2.4"
-      #elif defined(CYD_24G)
-      uint16_t calData[5] = { 400, 3141, 617, 2888, 1 }; // Landscape CYD 2.4" Guition
-      #elif defined(CYD_32)
-      uint16_t calData[5] = { 346, 3526, 253, 3542, 3 }; // Landscape CYD 3.2"
-      #elif defined(CYD_35)
-      uint16_t calData[5] = { 292, 3570, 295, 3436, 3 }; // Landscape CYD 3.5"
-      #elif defined(TFT_DIY)
-        uint16_t calData[5] = { 213, 3469, 320, 3446, 1 }; // Landscape TFT DIY
-        Serial.println("Using TFT DIY");
-      #endif
-      display_obj.tft.setTouch(calData);
-    
-      //display_obj.tft.setFreeFont(1);
-      display_obj.tft.setFreeFont(NULL);
-      display_obj.tft.setTextSize(1);
-      display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK); // Buttons
-      display_obj.tft.fillRect(12, 0, 90, 32, TFT_BLACK); // color key
-    
-      delay(10);
-    
-      display_obj.tftDrawGraphObjects(x_scale); //draw graph objects
-      display_obj.tftDrawColorKey();
-      display_obj.tftDrawXScaleButtons(x_scale);
-      display_obj.tftDrawYScaleButtons(y_scale);
-      display_obj.tftDrawChannelScaleButtons(set_channel);
-      display_obj.tftDrawExitScaleButtons();
-    #endif
-  #else
-    #ifdef HAS_SCREEN
-      display_obj.TOP_FIXED_AREA_2 = 48;
-      display_obj.tteBar = true;
-      display_obj.print_delay_1 = 15;
-      display_obj.print_delay_2 = 10;
-      display_obj.initScrollValues(true);
-      display_obj.tft.setTextWrap(false);
-      display_obj.tft.setTextColor(TFT_WHITE, color);
-      #ifdef HAS_FULL_SCREEN
-        display_obj.tft.fillRect(0,16,TFT_WIDTH,16, color);
-        display_obj.tft.drawCentreString(text_table1[45],TFT_WIDTH/2,16,2);
-      #endif
-      #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789)
-        display_obj.touchToExit();
-      #endif
-      display_obj.tft.setTextColor(TFT_GREEN, TFT_BLACK);
-      display_obj.setupScrollArea(display_obj.TOP_FIXED_AREA_2, BOT_FIXED_AREA);
-    #endif
-  #endif
 
-  Serial.println("Running packet scan...");
-  esp_wifi_init(&cfg);
-  esp_wifi_set_storage(WIFI_STORAGE_RAM);
-  esp_wifi_set_mode(WIFI_MODE_NULL);
-  esp_wifi_start();
-  esp_wifi_set_promiscuous(true);
-  esp_wifi_set_promiscuous_filter(&filt);
-  esp_wifi_set_promiscuous_rx_cb(&wifiSnifferCallback);
-  esp_wifi_set_channel(set_channel, WIFI_SECOND_CHAN_NONE);
-  this->wifi_initialized = true;
-  uint32_t initTime = millis();
-}
+    startPcap("packet_monitor");
+
+    #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789)
+      
+      #ifdef HAS_SCREEN
+        display_obj.tft.init();
+        display_obj.tft.setRotation(1);
+        display_obj.tft.fillScreen(TFT_BLACK);
+      #endif
+
+      #ifdef HAS_SCREEN
+        #ifdef CYD_28
+          uint16_t calData[5] = { 188, 3408, 286, 3498, 1 }; // Landscape CYD 2.8"
+        #elif defined(CYD_24)
+          uint16_t calData[5] = { 410, 3305, 499, 3045, 0 }; // Landscape CYD 2.4"
+        #elif defined(CYD_24G)
+        uint16_t calData[5] = { 400, 3141, 617, 2888, 1 }; // Landscape CYD 2.4" Guition
+        #elif defined(CYD_32)
+        uint16_t calData[5] = { 346, 3526, 253, 3542, 3 }; // Landscape CYD 3.2"
+        #elif defined(CYD_35)
+        uint16_t calData[5] = { 292, 3570, 295, 3436, 3 }; // Landscape CYD 3.5"
+        #elif defined(TFT_DIY)
+          uint16_t calData[5] = { 213, 3469, 320, 3446, 1 }; // Landscape TFT DIY
+          Serial.println("Using TFT DIY");
+        #endif
+
+        #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789) && !defined(CYD_32CAP)
+          display_obj.tft.setTouch(calData);
+        #endif
+
+        //display_obj.tft.setFreeFont(1);
+
+        display_obj.tft.setFreeFont(NULL);
+        display_obj.tft.setTextSize(1);
+        display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK); // Buttons
+        display_obj.tft.fillRect(12, 0, 90, 32, TFT_BLACK); // color key
+      
+        delay(10);
+      
+        display_obj.tftDrawGraphObjects(x_scale); //draw graph objects
+        display_obj.tftDrawColorKey();
+        display_obj.tftDrawXScaleButtons(x_scale);
+        display_obj.tftDrawYScaleButtons(y_scale);
+        display_obj.tftDrawChannelScaleButtons(set_channel);
+        display_obj.tftDrawExitScaleButtons();
+      #endif
+    #else
+      #ifdef HAS_SCREEN
+        display_obj.TOP_FIXED_AREA_2 = 48;
+        display_obj.tteBar = true;
+        display_obj.print_delay_1 = 15;
+        display_obj.print_delay_2 = 10;
+        display_obj.initScrollValues(true);
+        display_obj.tft.setTextWrap(false);
+        display_obj.tft.setTextColor(TFT_WHITE, color);
+        #ifdef HAS_FULL_SCREEN
+          display_obj.tft.fillRect(0,16,TFT_WIDTH,16, color);
+          display_obj.tft.drawCentreString(text_table1[45],TFT_WIDTH/2,16,2);
+        #endif
+        #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789)
+          display_obj.touchToExit();
+        #endif
+        display_obj.tft.setTextColor(TFT_GREEN, TFT_BLACK);
+        display_obj.setupScrollArea(display_obj.TOP_FIXED_AREA_2, BOT_FIXED_AREA);
+      #endif
+    #endif
+
+    Serial.println("Running packet scan...");
+    esp_wifi_init(&cfg);
+    esp_wifi_set_storage(WIFI_STORAGE_RAM);
+    esp_wifi_set_mode(WIFI_MODE_NULL);
+    esp_wifi_start();
+    esp_wifi_set_promiscuous(true);
+    esp_wifi_set_promiscuous_filter(&filt);
+    esp_wifi_set_promiscuous_rx_cb(&wifiSnifferCallback);
+    esp_wifi_set_channel(set_channel, WIFI_SECOND_CHAN_NONE);
+    this->wifi_initialized = true;
+    uint32_t initTime = millis();
+  }
 
 void WiFiScan::RunEapolScan(uint8_t scan_mode, uint16_t color)
 {
@@ -2116,8 +2131,11 @@ void WiFiScan::RunEapolScan(uint8_t scan_mode, uint16_t color)
       #elif defined(TFT_DIY)
         uint16_t calData[5] = { 213, 3469, 320, 3446, 1 }; // Landscape TFT DIY
       #endif
-      display_obj.tft.setTouch(calData);
-    
+
+      #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789) && !defined(CYD_32CAP)
+        display_obj.tft.setTouch(calData);
+      #endif
+
       display_obj.tft.setFreeFont(NULL);
       display_obj.tft.setTextSize(1);
       display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK); // Buttons
@@ -3005,7 +3023,7 @@ void WiFiScan::RunBluetoothScan(uint8_t scan_mode, uint16_t color)
     #else
       led_obj.setMode(MODE_OFF);
     #endif
-  } // scanCompleteCB
+  }  // scanCompleteCB
 #endif
 
 // Function to extract MAC addr from a packet at given offset
@@ -4924,397 +4942,477 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
 }
 
 #ifdef HAS_SCREEN
-  void WiFiScan::eapolMonitorMain(uint32_t currentTime)
-  {
-    //---------MAIN 'FOR' LOOP! THIS IS WHERE ALL THE ACTION HAPPENS! HAS TO BE FAST!!!!!---------\\
-    
-  
-  //  for (x_pos = (11 + x_scale); x_pos <= 320; x_pos += x_scale) //go along every point on the x axis and do something, start over when finished
-    for (x_pos = (11 + x_scale); x_pos <= 320; x_pos = x_pos)
-    {
-      currentTime = millis();
-      do_break = false;
-  
-      y_pos_x = 0;
-      y_pos_y = 0;
-      y_pos_z = 0;
-      boolean pressed = false;
-  
-      uint16_t t_x = 0, t_y = 0; // To store the touch coordinates
-  
-      // Do the touch stuff
-      #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789)
-        pressed = display_obj.tft.getTouch(&t_x, &t_y);
+  void WiFiScan::eapolMonitorMain(uint32_t currentTime) {
+      #ifdef CYD_32CAP
+        touch.setMaxCoordinates(SCREEN_HEIGHT, SCREEN_WIDTH);
+        touch.setSwapXY(true);
+        touch.setMirrorXY(false, true);
+        static bool was_pressed = false; // Track press state
       #endif
-  
-      if (pressed) {
-        Serial.print("Got touch | X: ");
-        Serial.print(t_x);
-        Serial.print(" Y: ");
-        Serial.println(t_y);
-      }
-  
-  
-      // Check buttons for presses
-      for (uint8_t b = 0; b < BUTTON_ARRAY_LEN; b++)
-      {
-        if (pressed && display_obj.key[b].contains(t_x, t_y))
-        {
-          display_obj.key[b].press(true);
-        } else {
-          display_obj.key[b].press(false);
-        }
-      }
-  
-      // Which buttons pressed
-      for (uint8_t b = 0; b < BUTTON_ARRAY_LEN; b++)
-      {
-        if (display_obj.key[b].justPressed())
-        {
-          Serial.println("Bro, key pressed");
-          //do_break = true;
-        }
-  
-        if (display_obj.key[b].justReleased())
-        {
-          do_break = true;
-  
-          // Channel - button pressed
-          if (b == 4) {
-            if (set_channel > 1) {
-              Serial.println("Shit channel down");
-              set_channel--;
-              delay(70);
-              display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
-              display_obj.tftDrawChannelScaleButtons(set_channel);
-              display_obj.tftDrawExitScaleButtons();
-              changeChannel();
-              break;
-            }
+      for (x_pos = (11 + x_scale); x_pos <= TFT_HEIGHT; x_pos = x_pos) {
+          currentTime = millis();
+          do_break = false;
+
+          y_pos_x = 0;
+          y_pos_y = 0;
+          y_pos_z = 0;
+          bool pressed = false;
+
+          #ifdef CYD_32CAP
+              int16_t t_x[5] = {0,0,0,0,0}, t_y[5] = {0,0,0,0,0};
+              int16_t points = 0;
+          #else
+              uint16_t t_x = 0, t_y = 0; // Single touch point for non-CYD_32CAP
+          #endif
+
+          #ifdef CYD_32CAP
+              if (!display_obj.headless_mode) {
+                  points = touch.getPoint(t_x, t_y, touch.getSupportTouchPoint());
+                  pressed = points > 0;
+
+                  if (pressed && !was_pressed) { // New press detected
+                      // Throw away touches for stabilization
+                      for (int i = 0; i < THROW_AWAY_TOUCH_COUNT; i++) {
+                          int16_t tmp_x[5] = {0,0,0,0,0}, tmp_y[5] = {0,0,0,0,0};
+                          touch.getPoint(tmp_x, tmp_y, touch.getSupportTouchPoint());
+                          delay(1);
+                      }
+                  }
+                  if (pressed) {
+                      Serial.print("Got touch | X: "); Serial.print(t_x[0]);
+                      Serial.print(" Y: "); Serial.println(t_y[0]);
+                      Serial.print("Points: "); Serial.println(points);
+                  }
+              } else {
+                  Serial.println("headless mode");
+              }
+          #elif defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789) && !defined(CYD_32CAP)
+              pressed = display_obj.tft.getTouch(&t_x, &t_y, 600);
+              if (pressed) {
+                  Serial.print("Got touch | X: "); Serial.print(t_x);
+                  Serial.print(" Y: "); Serial.println(t_y);
+              }
+          #endif
+
+          // Check buttons for presses
+          #ifdef CYD_32CAP
+              for (uint8_t b = 0; b < BUTTON_ARRAY_LEN; b++) {
+                  bool found = false;
+                  if (pressed) {
+                      for (int16_t i = 0; i < points; i++) {
+                          if (display_obj.key[b].contains(t_x[i], t_y[i])) {
+                              found = true;
+                              //Serial.print("Button "); Serial.print(b);
+                              //Serial.println(" pressed");
+                          }
+                      }
+                  }
+                  display_obj.key[b].press(found);
+              }
+          #else
+              for (uint8_t b = 0; b < BUTTON_ARRAY_LEN; b++) {
+                  if (pressed && display_obj.key[b].contains(t_x, t_y)) {
+                      display_obj.key[b].press(true);
+                      //Serial.print("Button "); Serial.print(b);
+                      //Serial.println(" pressed");
+                  } else {
+                      display_obj.key[b].press(false);
+                  }
+              }
+          #endif
+          #ifdef CYD_32CAP
+            was_pressed = pressed;
+          #endif
+          // Which buttons pressed
+          for (uint8_t b = 0; b < BUTTON_ARRAY_LEN; b++) {
+              if (display_obj.key[b].justPressed()) {
+                  Serial.println("Bro, key pressed");
+              }
+
+              if (display_obj.key[b].justReleased()) {
+                  do_break = true;
+
+                  if (b == 0) {
+                      if (x_scale > 1) {
+                          x_scale--;
+                          delay(70);
+                          display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
+                          display_obj.tftDrawXScaleButtons(x_scale);
+                          display_obj.tftDrawYScaleButtons(y_scale);
+                          display_obj.tftDrawChannelScaleButtons(set_channel);
+                          display_obj.tftDrawExitScaleButtons();
+                          break;
+                      }
+                  }
+                  else if (b == 1) {
+                      if (x_scale < 6) {
+                          x_scale++;
+                          delay(70);
+                          display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
+                          display_obj.tftDrawXScaleButtons(x_scale);
+                          display_obj.tftDrawYScaleButtons(y_scale);
+                          display_obj.tftDrawChannelScaleButtons(set_channel);
+                          display_obj.tftDrawExitScaleButtons();
+                          break;
+                      }
+                  }
+                  else if (b == 2) {
+                      if (y_scale > 1) {
+                          y_scale--;
+                          delay(70);
+                          display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
+                          display_obj.tftDrawXScaleButtons(x_scale);
+                          display_obj.tftDrawYScaleButtons(y_scale);
+                          display_obj.tftDrawChannelScaleButtons(set_channel);
+                          display_obj.tftDrawExitScaleButtons();
+                          break;
+                      }
+                  }
+                  else if (b == 3) {
+                      if (y_scale < 9) {
+                          y_scale++;
+                          delay(70);
+                          display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
+                          display_obj.tftDrawXScaleButtons(x_scale);
+                          display_obj.tftDrawYScaleButtons(y_scale);
+                          display_obj.tftDrawChannelScaleButtons(set_channel);
+                          display_obj.tftDrawExitScaleButtons();
+                          break;
+                      }
+                  }
+                  else if (b == 4) {
+                      if (set_channel > 1) {
+                          Serial.println("Shift channel down");
+                          set_channel--;
+                          delay(70);
+                          display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
+                          display_obj.tftDrawXScaleButtons(x_scale);
+                          display_obj.tftDrawYScaleButtons(y_scale);
+                          display_obj.tftDrawChannelScaleButtons(set_channel);
+                          display_obj.tftDrawExitScaleButtons();
+                          changeChannel();
+                          break;
+                      }
+                  }
+                  else if (b == 5) {
+                      if (set_channel < MAX_CHANNEL) {
+                          Serial.println("Shift channel up");
+                          set_channel++;
+                          delay(70);
+                          display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
+                          display_obj.tftDrawXScaleButtons(x_scale);
+                          display_obj.tftDrawYScaleButtons(y_scale);
+                          display_obj.tftDrawChannelScaleButtons(set_channel);
+                          display_obj.tftDrawExitScaleButtons();
+                          changeChannel();
+                          break;
+                      }
+                  }
+                  else if (b == 6) {
+                      Serial.println("Exiting eapol monitor...");
+                      this->StartScan(WIFI_SCAN_OFF);
+                      #ifdef CYD_32CAP
+                        touch.setMaxCoordinates(SCREEN_WIDTH, SCREEN_HEIGHT);
+                        touch.setSwapXY(false);
+                        touch.setMirrorXY(false, false);
+                      #endif
+                      this->orient_display = true;
+                      return;
+                  }
+              }
           }
-  
-          // Channel + button pressed
-          else if (b == 5) {
-            if (set_channel < MAX_CHANNEL) {
-              Serial.println("Shit channel up");
-              set_channel++;
-              delay(70);
-              display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
-              display_obj.tftDrawChannelScaleButtons(set_channel);
-              display_obj.tftDrawExitScaleButtons();
-              changeChannel();
-              break;
-            }
+
+          if (currentTime - initTime >= GRAPH_REFRESH) {
+              x_pos += x_scale;
+              initTime = millis();
+              y_pos_x = ((-num_beacon * (y_scale * 3)) + (HEIGHT_1 - 2));
+              y_pos_y = ((-num_deauth * (y_scale * 3)) + (HEIGHT_1 - 2));
+              y_pos_z = ((-num_probe * (y_scale * 3)) + (HEIGHT_1 - 2));
+
+              num_beacon = 0;
+              num_probe = 0;
+              num_deauth = 0;
+
+              display_obj.tft.drawLine(x_pos - x_scale, y_pos_x_old, x_pos, y_pos_x, TFT_GREEN);
+              display_obj.tft.drawLine(x_pos - x_scale, y_pos_z_old, x_pos, y_pos_z, TFT_BLUE);
+              display_obj.tft.drawLine(x_pos - x_scale, y_pos_y_old, x_pos, y_pos_y, TFT_RED);
+
+              if ((x_pos <= 90) || ((x_pos >= 117) && (x_pos <= 320))) {
+                  display_obj.tft.fillRect(x_pos + 1, 28, 10, 93, TFT_BLACK);
+              } else {
+                  display_obj.tft.fillRect(x_pos + 1, 0, 10, 121, TFT_BLACK);
+              }
+              if (x_pos < 0) {
+                  display_obj.tft.fillRect(x_pos + 1, 121, 10, 88, TFT_CYAN);
+              } else {
+                  display_obj.tft.fillRect(x_pos + 1, 121, 10, 118, TFT_BLACK);
+              }
+
+              if ((y_pos_x == 120) || (y_pos_y == 120) || (y_pos_z == 120)) {
+                  display_obj.tft.drawFastHLine(10, 120, 310, TFT_WHITE);
+              }
+
+              y_pos_x_old = y_pos_x;
+              y_pos_y_old = y_pos_y;
+              y_pos_z_old = y_pos_z;
           }
-          else if (b == 6) {
-            Serial.println("Exiting packet monitor...");
-            this->StartScan(WIFI_SCAN_OFF);
-            //display_obj.tft.init();
-            this->orient_display = true;
-            return;
-          }
-        }
+
+          #ifdef HAS_SD
+              sd_obj.main();
+          #endif
       }
-  
-      if (currentTime - initTime >= (GRAPH_REFRESH * 5)) {
-        x_pos += x_scale;
-        initTime = millis();
-        y_pos_x = ((-num_eapol * (y_scale * 3)) + (HEIGHT_1 - 2)); // GREEN
-        if (y_pos_x >= HEIGHT_1) {
-          Serial.println("Max EAPOL number reached. Adjusting...");
-          num_eapol = 0;
-        }
-  
-        //CODE FOR PLOTTING CONTINUOUS LINES!!!!!!!!!!!!
-        //Plot "X" value
-        display_obj.tft.drawLine(x_pos - x_scale, y_pos_x_old, x_pos, y_pos_x, TFT_CYAN);
-  
-        //Draw preceding black 'boxes' to erase old plot lines, !!!WEIRD CODE TO COMPENSATE FOR BUTTONS AND COLOR KEY SO 'ERASER' DOESN'T ERASE BUTTONS AND COLOR KEY!!!
-        if ((x_pos <= 90) || ((x_pos >= 117) && (x_pos <= 320))) //above x axis
-        {
-          display_obj.tft.fillRect(x_pos+1, 28, 10, 93, TFT_BLACK); //compensate for buttons!
-        }
-        else
-        {
-          display_obj.tft.fillRect(x_pos+1, 0, 10, 121, TFT_BLACK); //don't compensate for buttons!
-        }
-        if (x_pos < 0) // below x axis
-        {
-          //tft.fillRect(x_pos+1, 121, 10, 88, TFT_BLACK);
-          display_obj.tft.fillRect(x_pos+1, 121, 10, 88, TFT_CYAN);
-        }
-        else
-        {
-          //tft.fillRect(x_pos+1, 121, 10, 119, TFT_BLACK);
-          display_obj.tft.fillRect(x_pos+1, 121, 10, 118, TFT_BLACK);
-        }
-  
-        //tftDisplayTime();
-  
-        if ( (y_pos_x == 120) || (y_pos_y == 120) || (y_pos_z == 120) )
-        {
-          display_obj.tft.drawFastHLine(10, 120, 310, TFT_WHITE); // x axis
-        }
-  
-        y_pos_x_old = y_pos_x; //set old y pos values to current y pos values 
-        //y_pos_y_old = y_pos_y;
-        //y_pos_z_old = y_pos_z;
-  
-        //delay(50);
-      }
-  
-      #ifdef HAS_SD
-        sd_obj.main();
-      #endif
-  
-    }
-  
-    display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK); //erase XY buttons and any lines behind them
-    display_obj.tft.fillRect(12, 0, 90, 32, TFT_BLACK); // key
-    display_obj.tftDrawChannelScaleButtons(set_channel);
-    display_obj.tftDrawExitScaleButtons();
-    display_obj.tftDrawEapolColorKey();
-    display_obj.tftDrawGraphObjects(x_scale);
+
+      display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
+      display_obj.tft.fillRect(12, 0, 90, 32, TFT_BLACK);
+      display_obj.tftDrawXScaleButtons(x_scale);
+      display_obj.tftDrawYScaleButtons(y_scale);
+      display_obj.tftDrawChannelScaleButtons(set_channel);
+      display_obj.tftDrawExitScaleButtons();
+      display_obj.tftDrawColorKey();
+      display_obj.tftDrawGraphObjects(x_scale);
   }
 
   void WiFiScan::packetMonitorMain(uint32_t currentTime)
   {
-    //---------MAIN 'FOR' LOOP! THIS IS WHERE ALL THE ACTION HAPPENS! HAS TO BE FAST!!!!!---------\\
-    
-    
-  //  for (x_pos = (11 + x_scale); x_pos <= 320; x_pos += x_scale) //go along every point on the x axis and do something, start over when finished
-    for (x_pos = (11 + x_scale); x_pos <= 320; x_pos = x_pos)
-    {
-      currentTime = millis();
-      do_break = false;
-      
-      y_pos_x = 0;
-      y_pos_y = 0;
-      y_pos_z = 0;
-      boolean pressed = false;
-      
-      uint16_t t_x = 0, t_y = 0; // To store the touch coordinates
-  
-      // Do the touch stuff
-      #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789)
-        pressed = display_obj.tft.getTouch(&t_x, &t_y);
+      #ifdef CYD_32CAP
+        touch.setMaxCoordinates(SCREEN_HEIGHT, SCREEN_WIDTH);
+        touch.setSwapXY(true);
+        touch.setMirrorXY(false, true);
+        static bool was_pressed = false; // Track press state
       #endif
-  
-      if (pressed) {
-        Serial.print("Got touch | X: ");
-        Serial.print(t_x);
-        Serial.print(" Y: ");
-        Serial.println(t_y);
-      }
-  
-  
-      // Check buttons for presses
-      for (uint8_t b = 0; b < BUTTON_ARRAY_LEN; b++)
-      {
-        if (pressed && display_obj.key[b].contains(t_x, t_y))
-        {
-          display_obj.key[b].press(true);
-        } else {
-          display_obj.key[b].press(false);
-        }
-      }
-      
-      // Which buttons pressed
-      for (uint8_t b = 0; b < BUTTON_ARRAY_LEN; b++)
-      {
-        if (display_obj.key[b].justPressed())
-        {
-          Serial.println("Bro, key pressed");
-          //do_break = true;
-        }
-  
-        if (display_obj.key[b].justReleased())
-        {
-          do_break = true;
-          
-          // X - button pressed
-          if (b == 0) {
-            if (x_scale > 1) {
-              x_scale--;
-              delay(70);
-              display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
-              display_obj.tftDrawXScaleButtons(x_scale);
-              display_obj.tftDrawYScaleButtons(y_scale);
-              display_obj.tftDrawChannelScaleButtons(set_channel);
-              display_obj.tftDrawExitScaleButtons();
-              break;
-            }
-          }
-          // X + button pressed
-          else if (b == 1) {
-            if (x_scale < 6) {
-              x_scale++;
-              delay(70);
-              display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
-              display_obj.tftDrawXScaleButtons(x_scale);
-              display_obj.tftDrawYScaleButtons(y_scale);
-              display_obj.tftDrawChannelScaleButtons(set_channel);
-              display_obj.tftDrawExitScaleButtons();
-              break;
-            }
-          }
-  
-          // Y - button pressed
-          else if (b == 2) {
-            if (y_scale > 1) {
-              y_scale--;
-              delay(70);
-              display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
-              display_obj.tftDrawXScaleButtons(x_scale);
-              display_obj.tftDrawYScaleButtons(y_scale);
-              display_obj.tftDrawChannelScaleButtons(set_channel);
-              display_obj.tftDrawExitScaleButtons();
-              //updateMidway();
-              break;
-            }
-          }
-  
-          // Y + button pressed
-          else if (b == 3) {
-            if (y_scale < 9) {
-              y_scale++;
-              delay(70);
-              display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
-              display_obj.tftDrawXScaleButtons(x_scale);
-              display_obj.tftDrawYScaleButtons(y_scale);
-              display_obj.tftDrawChannelScaleButtons(set_channel);
-              display_obj.tftDrawExitScaleButtons();
-              //updateMidway();
-              break;
-            }
-          }
-  
-          // Channel - button pressed
-          else if (b == 4) {
-            if (set_channel > 1) {
-              Serial.println("Shit channel down");
-              set_channel--;
-              delay(70);
-              display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
-              display_obj.tftDrawXScaleButtons(x_scale);
-              display_obj.tftDrawYScaleButtons(y_scale);
-              display_obj.tftDrawChannelScaleButtons(set_channel);
-              display_obj.tftDrawExitScaleButtons();
-              changeChannel();
-              break;
-            }
-          }
-  
-          // Channel + button pressed
-          else if (b == 5) {
-            if (set_channel < MAX_CHANNEL) {
-              Serial.println("Shit channel up");
-              set_channel++;
-              delay(70);
-              display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
-              display_obj.tftDrawXScaleButtons(x_scale);
-              display_obj.tftDrawYScaleButtons(y_scale);
-              display_obj.tftDrawChannelScaleButtons(set_channel);
-              display_obj.tftDrawExitScaleButtons();
-              changeChannel();
-              break;
-            }
-          }
-          else if (b == 6) {
-            Serial.println("Exiting packet monitor...");
-            this->StartScan(WIFI_SCAN_OFF);
-            //display_obj.tft.init();
-            this->orient_display = true;
-            return;
-          }
-        }
-      }
-  
-      if (currentTime - initTime >= GRAPH_REFRESH) {
-        //Serial.println("-----------------------------------------");
-        //Serial.println("Time elapsed: " + (String)(currentTime - initTime) + "ms");
-        x_pos += x_scale;
-        initTime = millis();
-        y_pos_x = ((-num_beacon * (y_scale * 3)) + (HEIGHT_1 - 2)); // GREEN
-        y_pos_y = ((-num_deauth * (y_scale * 3)) + (HEIGHT_1 - 2)); // RED
-        y_pos_z = ((-num_probe * (y_scale * 3)) + (HEIGHT_1 - 2)); // BLUE
-  
-        //Serial.println("num_beacon: " + (String)num_beacon);
-        //Serial.println("num_deauth: " + (String)num_deauth);
-        //Serial.println(" num_probe: " + (String)num_probe);
-    
-        num_beacon = 0;
-        num_probe = 0;
-        num_deauth = 0;
-        
-        //CODE FOR PLOTTING CONTINUOUS LINES!!!!!!!!!!!!
-        //Plot "X" value
-        display_obj.tft.drawLine(x_pos - x_scale, y_pos_x_old, x_pos, y_pos_x, TFT_GREEN);
-        //Plot "Z" value
-        display_obj.tft.drawLine(x_pos - x_scale, y_pos_z_old, x_pos, y_pos_z, TFT_BLUE);
-        //Plot "Y" value
-        display_obj.tft.drawLine(x_pos - x_scale, y_pos_y_old, x_pos, y_pos_y, TFT_RED);
-        
-        //Draw preceding black 'boxes' to erase old plot lines, !!!WEIRD CODE TO COMPENSATE FOR BUTTONS AND COLOR KEY SO 'ERASER' DOESN'T ERASE BUTTONS AND COLOR KEY!!!
-        //if ((x_pos <= 90) || ((x_pos >= 198) && (x_pos <= 320))) //above x axis
-        if ((x_pos <= 90) || ((x_pos >= 117) && (x_pos <= 320))) //above x axis
-        {
-          display_obj.tft.fillRect(x_pos+1, 28, 10, 93, TFT_BLACK); //compensate for buttons!
-        }
-        else
-        {
-          display_obj.tft.fillRect(x_pos+1, 0, 10, 121, TFT_BLACK); //don't compensate for buttons!
-        }
-        //if ((x_pos >= 254) && (x_pos <= 320)) //below x axis
-        //if (x_pos <= 90)
-        if (x_pos < 0) // below x axis
-        {
-          //tft.fillRect(x_pos+1, 121, 10, 88, TFT_BLACK);
-          display_obj.tft.fillRect(x_pos+1, 121, 10, 88, TFT_CYAN);
-        }
-        else
-        {
-          //tft.fillRect(x_pos+1, 121, 10, 119, TFT_BLACK);
-          display_obj.tft.fillRect(x_pos+1, 121, 10, 118, TFT_BLACK);
-        }
-        
-        //tftDisplayTime();
-        
-        if ( (y_pos_x == 120) || (y_pos_y == 120) || (y_pos_z == 120) )
-        {
-          display_obj.tft.drawFastHLine(10, 120, 310, TFT_WHITE); // x axis
-        }
-         
-        y_pos_x_old = y_pos_x; //set old y pos values to current y pos values 
-        y_pos_y_old = y_pos_y;
-        y_pos_z_old = y_pos_z;
-    
-        //delay(50);
-      }
-  
-      #ifdef HAS_SD
-        sd_obj.main();
-      #endif
-     
-    }
-    
-    display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK); //erase XY buttons and any lines behind them
-    //tft.fillRect(56, 0, 66, 32, TFT_ORANGE); //erase time and color key and any stray lines behind them
-    display_obj.tft.fillRect(12, 0, 90, 32, TFT_BLACK); // key
-    
-    display_obj.tftDrawXScaleButtons(x_scale); //redraw stuff
-    display_obj.tftDrawYScaleButtons(y_scale);
-    display_obj.tftDrawChannelScaleButtons(set_channel);
-    display_obj.tftDrawExitScaleButtons();
-    display_obj.tftDrawColorKey();
-    display_obj.tftDrawGraphObjects(x_scale);
-  }
-#endif
 
-//void WiFiScan::sniffer_callback(void* buf, wifi_promiscuous_pkt_type_t type) {
-//  wifi_promiscuous_pkt_t *snifferPacket = (wifi_promiscuous_pkt_t*)buf;
-//  showMetadata(snifferPacket, type);
-//}
+      for (x_pos = (11 + x_scale); x_pos <= 320; x_pos = x_pos)
+      {
+          currentTime = millis();
+          do_break = false;
+
+          y_pos_x = 0;
+          y_pos_y = 0;
+          y_pos_z = 0;
+          bool pressed = false;
+
+          #ifdef CYD_32CAP
+            int16_t t_x[5] = {0,0,0,0,0}, t_y[5] = {0,0,0,0,0};
+            int16_t points = 0;
+          #else
+            uint16_t t_x = 0, t_y = 0; // To store the touch coordinates
+          #endif
+
+          #ifdef CYD_32CAP
+              if (!display_obj.headless_mode) {
+                  points = touch.getPoint(t_x, t_y, touch.getSupportTouchPoint());
+                  pressed = points > 0;
+
+                  if (pressed && !was_pressed) { // New press detected
+                      // Throw away touches for stabilization
+                      for (int i = 0; i < THROW_AWAY_TOUCH_COUNT; i++) {
+                          int16_t tmp_x[5] = {0,0,0,0,0}, tmp_y[5] = {0,0,0,0,0};
+                          touch.getPoint(tmp_x, tmp_y, touch.getSupportTouchPoint());
+                          delay(1);
+                      }
+                  }
+                  if (pressed) {
+                      Serial.print("Got touch | X: "); Serial.print(t_x[0]);
+                      Serial.print(" Y: "); Serial.println(t_y[0]);
+                      Serial.print("Points: "); Serial.println(points);
+                  }
+              } else {
+                  Serial.println("headless mode");
+              }
+          #else
+              pressed = display_obj.tft.getTouch(&t_x, &t_y);
+          #endif
+
+          // Check buttons for presses
+          #ifdef CYD_32CAP
+              for (uint8_t b = 0; b < BUTTON_ARRAY_LEN; b++) {
+                  bool found = false;
+                  if (pressed) {
+                      for (int16_t i = 0; i < points; i++) {
+                          if (display_obj.key[b].contains(t_x[i], t_y[i])) {
+                              found = true;
+                              //Serial.print("Button "); Serial.print(b);
+                              //Serial.println(" pressed");
+                          }
+                      }
+                  }
+                  display_obj.key[b].press(found);
+              }
+          #else
+              for (uint8_t b = 0; b < BUTTON_ARRAY_LEN; b++) {
+                  if (pressed && display_obj.key[b].contains(t_x, t_y)) {
+                      display_obj.key[b].press(true);
+                      //Serial.print("Button "); Serial.print(b);
+                      //Serial.println(" pressed");
+                  } else {
+                      display_obj.key[b].press(false);
+                  }
+              }
+          #endif
+          #ifdef CYD_32CAP
+            was_pressed = pressed;
+          #endif
+          // Which buttons pressed
+          for (uint8_t b = 0; b < BUTTON_ARRAY_LEN; b++) {
+              if (display_obj.key[b].justPressed()) {
+                  Serial.println("Bro, key pressed");
+              }
+
+              if (display_obj.key[b].justReleased()) {
+                  do_break = true;
+
+                  // X - button pressed
+                  if (b == 0) {
+                      if (x_scale > 1) {
+                          x_scale--;
+                          delay(70);
+                          display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
+                          display_obj.tftDrawXScaleButtons(x_scale);
+                          display_obj.tftDrawYScaleButtons(y_scale);
+                          display_obj.tftDrawChannelScaleButtons(set_channel);
+                          display_obj.tftDrawExitScaleButtons();
+                          break;
+                      }
+                  }
+                  // X + button pressed
+                  else if (b == 1) {
+                      if (x_scale < 6) {
+                          x_scale++;
+                          delay(70);
+                          display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
+                          display_obj.tftDrawXScaleButtons(x_scale);
+                          display_obj.tftDrawYScaleButtons(y_scale);
+                          display_obj.tftDrawChannelScaleButtons(set_channel);
+                          display_obj.tftDrawExitScaleButtons();
+                          break;
+                      }
+                  }
+                  // Y - button pressed
+                  else if (b == 2) {
+                      if (y_scale > 1) {
+                          y_scale--;
+                          delay(70);
+                          display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
+                          display_obj.tftDrawXScaleButtons(x_scale);
+                          display_obj.tftDrawYScaleButtons(y_scale);
+                          display_obj.tftDrawChannelScaleButtons(set_channel);
+                          display_obj.tftDrawExitScaleButtons();
+                          break;
+                      }
+                  }
+                  // Y + button pressed
+                  else if (b == 3) {
+                      if (y_scale < 9) {
+                          y_scale++;
+                          delay(70);
+                          display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
+                          display_obj.tftDrawXScaleButtons(x_scale);
+                          display_obj.tftDrawYScaleButtons(y_scale);
+                          display_obj.tftDrawChannelScaleButtons(set_channel);
+                          display_obj.tftDrawExitScaleButtons();
+                          break;
+                      }
+                  }
+                  // Channel - button pressed
+                  else if (b == 4) {
+                      if (set_channel > 1) {
+                          Serial.println("Shift channel down");
+                          set_channel--;
+                          delay(70);
+                          display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
+                          display_obj.tftDrawXScaleButtons(x_scale);
+                          display_obj.tftDrawYScaleButtons(y_scale);
+                          display_obj.tftDrawChannelScaleButtons(set_channel);
+                          display_obj.tftDrawExitScaleButtons();
+                          changeChannel();
+                          break;
+                      }
+                  }
+                  // Channel + button pressed
+                  else if (b == 5) {
+                      if (set_channel < MAX_CHANNEL) {
+                          Serial.println("Shift channel up");
+                          set_channel++;
+                          delay(70);
+                          display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
+                          display_obj.tftDrawXScaleButtons(x_scale);
+                          display_obj.tftDrawYScaleButtons(y_scale);
+                          display_obj.tftDrawChannelScaleButtons(set_channel);
+                          display_obj.tftDrawExitScaleButtons();
+                          changeChannel();
+                          break;
+                      }
+                  }
+                  // Exit button pressed
+                  else if (b == 6) {
+                      Serial.println("Exiting packet monitor...");
+                      this->StartScan(WIFI_SCAN_OFF);
+                      #ifdef CYD_32CAP
+                        touch.setMaxCoordinates(SCREEN_WIDTH, SCREEN_HEIGHT);
+                        touch.setSwapXY(false);
+                        touch.setMirrorXY(false, false);
+                        //while (touch.isPressed()) {
+                        //    int16_t tmpX[5], tmpY[5];
+                        //    touch.getPoint(tmpX, tmpY, touch.getSupportTouchPoint());
+                        //    delay(10);
+                        //}
+                      #endif
+                      this->orient_display = true;
+                      return;
+                  }
+              }
+          }
+
+          if (currentTime - initTime >= GRAPH_REFRESH) {
+              x_pos += x_scale;
+              initTime = millis();
+              y_pos_x = ((-num_beacon * (y_scale * 3)) + (HEIGHT_1 - 2));
+              y_pos_y = ((-num_deauth * (y_scale * 3)) + (HEIGHT_1 - 2));
+              y_pos_z = ((-num_probe * (y_scale * 3)) + (HEIGHT_1 - 2));
+
+              num_beacon = 0;
+              num_probe = 0;
+              num_deauth = 0;
+
+              display_obj.tft.drawLine(x_pos - x_scale, y_pos_x_old, x_pos, y_pos_x, TFT_GREEN);
+              display_obj.tft.drawLine(x_pos - x_scale, y_pos_z_old, x_pos, y_pos_z, TFT_BLUE);
+              display_obj.tft.drawLine(x_pos - x_scale, y_pos_y_old, x_pos, y_pos_y, TFT_RED);
+
+              if ((x_pos <= 90) || ((x_pos >= 117) && (x_pos <= 320))) {
+                  display_obj.tft.fillRect(x_pos + 1, 28, 10, 93, TFT_BLACK);
+              } else {
+                  display_obj.tft.fillRect(x_pos + 1, 0, 10, 121, TFT_BLACK);
+              }
+              if (x_pos < 0) {
+                  display_obj.tft.fillRect(x_pos + 1, 121, 10, 88, TFT_CYAN);
+              } else {
+                  display_obj.tft.fillRect(x_pos + 1, 121, 10, 118, TFT_BLACK);
+              }
+
+              if ((y_pos_x == 120) || (y_pos_y == 120) || (y_pos_z == 120)) {
+                  display_obj.tft.drawFastHLine(10, 120, 310, TFT_WHITE);
+              }
+
+              y_pos_x_old = y_pos_x;
+              y_pos_y_old = y_pos_y;
+              y_pos_z_old = y_pos_z;
+          }
+
+          #ifdef HAS_SD
+              sd_obj.main();
+          #endif
+      }
+
+      display_obj.tft.fillRect(127, 0, 193, 28, TFT_BLACK);
+      display_obj.tft.fillRect(12, 0, 90, 32, TFT_BLACK);
+      display_obj.tftDrawXScaleButtons(x_scale);
+      display_obj.tftDrawYScaleButtons(y_scale);
+      display_obj.tftDrawChannelScaleButtons(set_channel);
+      display_obj.tftDrawExitScaleButtons();
+      display_obj.tftDrawColorKey();
+      display_obj.tftDrawGraphObjects(x_scale);
+  }
+
 
 void WiFiScan::changeChannel(int chan) {
   this->set_channel = chan;
@@ -5697,3 +5795,5 @@ void WiFiScan::main(uint32_t currentTime)
         gps_obj.disable_queue();
   #endif
 }
+
+#endif

@@ -152,7 +152,6 @@ esp_err_t esp_wifi_80211_tx(wifi_interface_t ifx, const void *buffer, int len, b
   LinkedList<int>* stations;
 };*/
 
-
 /*struct mac_addr {
    unsigned char bytes[6];
 };
@@ -202,10 +201,6 @@ class WiFiScan
 
     bool wsl_bypass_enabled = false;
 
-    //int num_beacon = 0; // GREEN
-    //int num_probe = 0; // BLUE
-    //int num_deauth = 0; // RED
-
     uint32_t initTime = 0;
     bool run_setup = true;
     void initWiFi(uint8_t scan_mode);
@@ -215,9 +210,6 @@ class WiFiScan
     #ifdef HAS_BT
       NimBLEScan* pBLEScan;
     #endif
-
-    //String connected_network = "";
-    //const String alfa = "1234567890qwertyuiopasdfghjkklzxcvbnm QWERTYUIOPASDFGHJKLZXCVBNM_";
 
     const char* rick_roll[8] = {
       "01 Never gonna give you up",
@@ -289,8 +281,7 @@ class WiFiScan
       Airtag
     };
 
-      #ifdef HAS_BT
-
+    #ifdef HAS_BT
       struct BLEData
       {
         NimBLEAdvertisementData AdvData;
@@ -318,8 +309,6 @@ class WiFiScan
     void executeSpoofAirtag();
     void executeSwiftpairSpam(EBLEPayloadType type);
     void startWardriverWiFi();
-    //void generateRandomMac(uint8_t* mac);
-    //void generateRandomName(char *name, size_t length);
     String processPwnagotchiBeacon(const uint8_t* frame, int length);
 
     void startWiFiAttacks(uint8_t scan_mode, uint16_t color, String title_string);
@@ -360,18 +349,11 @@ class WiFiScan
     bool checkMem();
     void parseBSSID(const char* bssidStr, uint8_t* bssid);
 
-
   public:
     WiFiScan();
 
-    //AccessPoint ap_list;
-
-    //LinkedList<ssid>* ssids;
-
     uint8_t set_channel = 1;
-
     uint8_t old_channel = 0;
-
     bool orient_display = false;
     bool wifi_initialized = false;
     bool ble_initialized = false;
@@ -403,14 +385,12 @@ class WiFiScan
     bool shutdownWiFi();
     bool shutdownBLE();
     bool scanning();
-    //void joinWiFi(String ssid, String password);
     String getStaMAC();
     String getApMAC();
     String freeRAM();
     void changeChannel();
     void changeChannel(int chan);
     void RunInfo();
-    //void RunShutdownBLE();
     void RunGenerateSSIDs(int count = 20);
     void RunClearSSIDs();
     void RunClearAPs();
@@ -427,12 +407,10 @@ class WiFiScan
     void StartScan(uint8_t scan_mode, uint16_t color = 0);
     void StopScan(uint8_t scan_mode);
     void setBaseMacAddress(uint8_t macAddr[6]);
-    //const char* generateRandomName();
 
     bool save_serial = false;
     void startPcap(String file_name);
     void startLog(String file_name);
-    //String macToString(const Station& station);
 
     static void getMAC(char *addr, uint8_t* data, uint16_t offset);
     static void pwnSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t type);
@@ -447,58 +425,6 @@ class WiFiScan
     static void activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t type);
     static void eapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t type);
     static void wifiSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t type);
-
-    /*#ifdef HAS_BT
-      enum EBLEPayloadType
-      {
-        Microsoft,
-        Apple,
-        Samsung,
-        Google
-      };
-
-      struct BLEData
-      {
-        NimBLEAdvertisementData AdvData;
-        NimBLEAdvertisementData ScanData;
-      };
-
-      struct WatchModel
-      {
-          uint8_t value;
-          const char *name;
-      };
-
-      WatchModel* watch_models = nullptr;
-
-      const WatchModel watch_models[] = {
-        {0x1A, "Fallback Watch"},
-        {0x01, "White Watch4 Classic 44m"},
-        {0x02, "Black Watch4 Classic 40m"},
-        {0x03, "White Watch4 Classic 40m"},
-        {0x04, "Black Watch4 44mm"},
-        {0x05, "Silver Watch4 44mm"},
-        {0x06, "Green Watch4 44mm"},
-        {0x07, "Black Watch4 40mm"},
-        {0x08, "White Watch4 40mm"},
-        {0x09, "Gold Watch4 40mm"},
-        {0x0A, "French Watch4"},
-        {0x0B, "French Watch4 Classic"},
-        {0x0C, "Fox Watch5 44mm"},
-        {0x11, "Black Watch5 44mm"},
-        {0x12, "Sapphire Watch5 44mm"},
-        {0x13, "Purpleish Watch5 40mm"},
-        {0x14, "Gold Watch5 40mm"},
-        {0x15, "Black Watch5 Pro 45mm"},
-        {0x16, "Gray Watch5 Pro 45mm"},
-        {0x17, "White Watch5 44mm"},
-        {0x18, "White & Black Watch5"},
-        {0x1B, "Black Watch6 Pink 40mm"},
-        {0x1C, "Gold Watch6 Gold 40mm"},
-        {0x1D, "Silver Watch6 Cyan 44mm"},
-        {0x1E, "Black Watch6 Classic 43m"},
-        {0x20, "Green Watch6 Classic 43m"},
-      };
-    #endif*/
 };
+
 #endif

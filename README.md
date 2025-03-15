@@ -19,9 +19,10 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 
 ---
 
-## 🏴‍☠️ Latest Update Highlights — added ESP32-2432S032R 3.2" on v1.2.1 (02/16/25) 🏴‍☠️
+## 🏴‍☠️ Latest Update Highlights — added ESP32-2432S032C 3.2" Capacitive Touch (03/14/25) 🏴‍☠️
  
-- Add support for ESP32-2432S032 3.2" ST7789/XPT2046 Resistive Touch Display
+- Add support for ESP32-2432S032C 3.2" ST7789/GT911 Capacitive Touch Display
+- Add support for ESP32-2432S032R 3.2" ST7789/XPT2046 Resistive Touch Display
 - Add support for Guition ESP32-2432S024R 2.4" Resistive Touch Display
 - Recalibrate touch for 3.5" 
 - Fix bluetooth attack LED not turning off
@@ -122,6 +123,7 @@ The project has been successfully tested on:
 - [2.8" Resistive MicroUSB-only](https://amazon.com/dp/B0BVFXR313)
 - [2.8" Resistive MicroUSB/Type-C 2USB](https://amazon.com/dp/B0CLR7MQ91)
 - [3.2" Resistive Touch](https://www.aliexpress.us/item/3256806436888726.html)
+- [3.2" Capacitive Touch](https://a.co/d/faB7oVU)
 - [3.5" Resistive Touch](https://a.co/d/cxUc73a)
 
 No hardware modifications are required, thanks to **@ggaljoen's** fork of the [TFT_eSPI](https://github.com/ggaljoen/TFT_eSPI) library
@@ -156,7 +158,7 @@ After flashing, you'll boot into the Marauder interface. Refer to the [ESP32 Mar
 
 ## Acknowledgments
 
-A huge thanks to **@cod5fgzj**, [**smoochiee**](https://github.com/smoochiee), [**ggaljoen**](https://github.com/ggaljoen), and [**ATOMNFT**](https://github.com/ATOMNFT). And a special mention to [**JustCallMeKoko**](https://github.com/justcallmekoko) for their foundational work on the [ESP32Marauder](https://github.com/justcallmekoko/ESP32Marauder).
+A huge thanks to **@cod5fgzj**, [**smoochiee**](https://github.com/smoochiee), [**ggaljoen**](https://github.com/ggaljoen), [**ATOMNFT**](https://github.com/ATOMNFT), and [**jstockdale**](https://github.com/jstockdale). And a special mention to [**JustCallMeKoko**](https://github.com/justcallmekoko) for the foundational work on [ESP32Marauder](https://github.com/justcallmekoko/ESP32Marauder).
 
 ---
 

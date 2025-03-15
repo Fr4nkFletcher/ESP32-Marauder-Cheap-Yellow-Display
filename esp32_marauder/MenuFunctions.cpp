@@ -1,8 +1,12 @@
 #include "MenuFunctions.h"
 #include "lang_var.h"
 //#include "icons.h"
+#include "configs.h"
+#include "TouchDrvGT911.hpp"
 
-#ifdef HAS_SCREEN
+TouchDrvGT911 touch;
+
+
 
 extern const unsigned char menu_icons[][66];
 PROGMEM lv_obj_t * slider_label;
@@ -16,14 +20,49 @@ MenuFunctions::MenuFunctions()
 
 // LVGL Stuff
 /* Interrupt driven periodic handler */
+#if defined(HAS_ST7789) || defined(HAS_ILI9341) || defined(HAS_ST7796)
+    #ifdef CYD_32CAP
+      uint8_t MenuFunctions::updateTouch(int16_t *x, int16_t *y, uint16_t threshold) {
+        static bool was_pressed = false;
+        if (!display_obj.headless_mode) {
+          int16_t t_x[5] = {0,0,0,0,0}, t_y[5] = {0,0,0,0,0};
+          uint8_t result = touch.getPoint(t_x, t_y, touch.getSupportTouchPoint());
+          bool pressed = result > 0;
 
-#if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789)
-  uint8_t MenuFunctions::updateTouch(uint16_t *x, uint16_t *y, uint16_t threshold) {
-    if (!display_obj.headless_mode)
-      return display_obj.tft.getTouch(x, y, threshold);
-    else
-      return !display_obj.headless_mode;
-  }
+          if (pressed && !was_pressed) {
+            for (int i = 0; i < result; i++) {
+              x[i] = t_x[i];
+              y[i] = t_y[i];
+            }
+            
+            int16_t tmp_x[5] = {0,0,0,0,0}, tmp_y[5] = {0,0,0,0,0};
+            for (int i = 0; i < THROW_AWAY_TOUCH_COUNT; i++) {
+              touch.getPoint(tmp_x, tmp_y, touch.getSupportTouchPoint());
+              delay(1);
+            }
+            was_pressed = true;
+            return result;
+          } else if (!pressed) {
+            was_pressed = false;
+          }
+          return 0;
+        } else {
+          Serial.println("headless mode");
+          return !display_obj.headless_mode;
+        }
+      }
+    #else
+      // Resistive touch
+      uint8_t MenuFunctions::updateTouch(uint16_t *x, uint16_t *y, uint16_t threshold) {
+        if (!display_obj.headless_mode)
+          return display_obj.tft.getTouch(x, y, threshold);
+        else
+          return !display_obj.headless_mode;
+      }
+    #endif
+  
+
+
 
   void MenuFunctions::lv_tick_handler()
   {
@@ -49,44 +88,65 @@ MenuFunctions::MenuFunctions()
     lv_disp_flush_ready(disp);
   }
   
-  
-  bool my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data)
-  {
-    extern Display display_obj;
+  bool my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data) {
+      static bool was_pressed = false;
+      extern Display display_obj;
+      
+      #ifdef CYD_32CAP
+        int16_t touchX = 0, touchY = 0;
+      #else
+        uint16_t touchX, touchY;
+      #endif
+      // this is a mess
+
+      #ifdef CYD_32CAP
+          touch.setMaxCoordinates(SCREEN_HEIGHT, SCREEN_WIDTH);
+          touch.setSwapXY(true);
+          touch.setMirrorXY(true, true);
+          bool touched = false;
+          int16_t touchX_array[5] = {0,0,0,0,0}, touchY_array[5] = {0,0,0,0,0};
+          int16_t points = touch.getPoint(touchX_array, touchY_array, touch.getSupportTouchPoint());
+          touched = (points > 0);
+          if (touched) {
+              touchX = touchX_array[0];
+              touchY = touchY_array[0];
+              
+              if (!was_pressed) {
+                  for (int i = 0; i < THROW_AWAY_TOUCH_COUNT; i++) {
+                      int16_t tmp_x[5] = {0,0,0,0,0}, tmp_y[5] = {0,0,0,0,0};
+                      touch.getPoint(tmp_x, tmp_y, touch.getSupportTouchPoint());
+                      delay(1);
+                  }
+              }
+          }
+      #else
+        bool touched = display_obj.tft.getTouch(&touchX, &touchY, 600);
+      #endif
+          #ifdef CYD_32CAP
+            was_pressed = touched;
+          #endif
+          if (!touched) {
+              data->state = LV_INDEV_STATE_REL;
+              return false;
+          }
+          if (touchX >= WIDTH_1 || touchY >= HEIGHT_1) {
+              Serial.println("Touch outside expected parameters:");
+              Serial.print("x: ");
+              Serial.print(touchX);
+              Serial.print(" y: ");
+              Serial.print(touchY);
+              data->state = LV_INDEV_STATE_REL;
+              return false;
+          }
+          data->state = LV_INDEV_STATE_PR;
+          data->point.x = touchX;
+          data->point.y = touchY;
+          return false;
+        }
     
-    uint16_t touchX, touchY;
-  
-    bool touched = display_obj.tft.getTouch(&touchX, &touchY, 600);
-  
-    if(!touched)
-    {
-      return false;
-    }
-  
-    if(touchX>WIDTH_1 || touchY > HEIGHT_1)
-    {
-      Serial.println("Y or y outside of expected parameters..");
-      Serial.print("y:");
-      Serial.print(touchX);
-      Serial.print(" x:");
-      Serial.print(touchY);
-    }
-    else
-    {
-  
-      data->state = touched ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL; 
-       
-      data->point.x = touchX;
-      data->point.y = touchY;
-  
-    }
-  
-    return false;
-  }
-  
+
   void MenuFunctions::initLVGL() {
     tick.attach_ms(LVGL_TICK_PERIOD, lv_tick_handler);
-    
     lv_init();
   
     lv_disp_buf_init(&disp_buf, buf, NULL, LV_HOR_RES_MAX * 10);
@@ -108,8 +168,18 @@ MenuFunctions::MenuFunctions()
   
   
   void MenuFunctions::deinitLVGL() {
-    Serial.println(F("Deinit LVGL"));
-    //lv_deinit();
+      Serial.println(F("Deinit LVGL"));
+      #ifdef CYD_32CAP
+        touch.setMaxCoordinates(SCREEN_WIDTH, SCREEN_HEIGHT);
+        touch.setSwapXY(false);
+        touch.setMirrorXY(false, false);
+        //while (touch.isPressed()) {
+        //    int16_t tmpX[5], tmpY[5];
+        //    touch.getPoint(tmpX, tmpY, touch.getSupportTouchPoint());
+        //    delay(10);
+        //}
+      #endif
+      //display_obj.exit_draw = true;
   }
   
   
@@ -125,7 +195,7 @@ MenuFunctions::MenuFunctions()
     extern WiFiScan wifi_scan_obj;
   
     lv_obj_t * list1 = lv_list_create(lv_scr_act(), NULL);
-    lv_obj_set_size(list1, 160, 200);
+    lv_obj_set_size(list1, 320, 240);
     lv_obj_set_width(list1, LV_HOR_RES);
     lv_obj_align(list1, NULL, LV_ALIGN_CENTER, 0, 0);
   
@@ -502,6 +572,7 @@ MenuFunctions::MenuFunctions()
     lv_obj_align(ta2, NULL, LV_ALIGN_IN_TOP_MID, NULL, (LV_VER_RES / 2) - 35);
     lv_textarea_set_text(ta2, "");
     lv_textarea_set_placeholder_text(ta2, text_table1[1]);
+    
   
     // After generating text areas, add text to first text box
     for (int i = 0; i < ssids->size(); i++)
@@ -615,145 +686,80 @@ void MenuFunctions::buttonSelected(uint8_t b, int8_t x) {
 // Function to check menu input
 void MenuFunctions::main(uint32_t currentTime)
 {
-  // Some function exited and we need to go back to normal
-  if (display_obj.exit_draw) {
-    wifi_scan_obj.currentScanMode = WIFI_SCAN_OFF;
-    display_obj.exit_draw = false;
-    this->orientDisplay();
-  }
-  if ((wifi_scan_obj.currentScanMode == WIFI_SCAN_OFF) ||
-      (wifi_scan_obj.currentScanMode == OTA_UPDATE) ||
-      (wifi_scan_obj.currentScanMode == ESP_UPDATE) ||
-      (wifi_scan_obj.currentScanMode == SHOW_INFO) ||
-      (wifi_scan_obj.currentScanMode == WIFI_SCAN_GPS_DATA) ||
-      (wifi_scan_obj.currentScanMode == WIFI_SCAN_GPS_NMEA)) {
-    if (wifi_scan_obj.orient_display) {
-      this->orientDisplay();
-      wifi_scan_obj.orient_display = false;
+    if (display_obj.exit_draw) {
+        wifi_scan_obj.currentScanMode = WIFI_SCAN_OFF;
+        display_obj.exit_draw = false;
+        this->orientDisplay();
     }
-    /*#ifdef HAS_ILI9341
-      if ((wifi_scan_obj.currentScanMode != LV_JOIN_WIFI) &&
-          (wifi_scan_obj.currentScanMode != LV_ADD_SSID))
-        display_obj.updateBanner(current_menu->name);
-    #endif*/
-  }
-
-  if (currentTime != 0) {
-    if (currentTime - initTime >= BANNER_TIME) {
-      this->initTime = millis();
-      if ((wifi_scan_obj.currentScanMode != LV_JOIN_WIFI) &&
-          (wifi_scan_obj.currentScanMode != LV_ADD_SSID))
-        this->updateStatusBar();
+    if ((wifi_scan_obj.currentScanMode == WIFI_SCAN_OFF) ||
+        (wifi_scan_obj.currentScanMode == OTA_UPDATE) ||
+        (wifi_scan_obj.currentScanMode == ESP_UPDATE) ||
+        (wifi_scan_obj.currentScanMode == SHOW_INFO) ||
+        (wifi_scan_obj.currentScanMode == WIFI_SCAN_GPS_DATA) ||
+        (wifi_scan_obj.currentScanMode == WIFI_SCAN_GPS_NMEA)) {
+        if (wifi_scan_obj.orient_display) {
+            this->orientDisplay();
+            wifi_scan_obj.orient_display = false;
+        }
     }
-  }
 
+    if (currentTime != 0) {
+        if (currentTime - initTime >= BANNER_TIME) {
+            this->initTime = millis();
+            if ((wifi_scan_obj.currentScanMode != LV_JOIN_WIFI) &&
+                (wifi_scan_obj.currentScanMode != LV_ADD_SSID))
+                this->updateStatusBar();
+        }
+    }
 
-  boolean pressed = false;
-  // This is code from bodmer's keypad example
-  uint16_t t_x = 0, t_y = 0; // To store the touch coordinates
+    boolean pressed = false;
 
-  // Get the display buffer out of the way
-  if ((wifi_scan_obj.currentScanMode != WIFI_SCAN_OFF ) &&
-      (wifi_scan_obj.currentScanMode != WIFI_ATTACK_BEACON_SPAM) &&
-      (wifi_scan_obj.currentScanMode != WIFI_ATTACK_AP_SPAM) &&
-      (wifi_scan_obj.currentScanMode != WIFI_ATTACK_AUTH) &&
-      (wifi_scan_obj.currentScanMode != WIFI_ATTACK_DEAUTH) &&
-      (wifi_scan_obj.currentScanMode != WIFI_ATTACK_DEAUTH_MANUAL) &&
-      (wifi_scan_obj.currentScanMode != WIFI_ATTACK_DEAUTH_TARGETED) &&
-      (wifi_scan_obj.currentScanMode != WIFI_ATTACK_MIMIC) &&
-      (wifi_scan_obj.currentScanMode != WIFI_ATTACK_RICK_ROLL))
-    display_obj.displayBuffer();
+    #ifdef CYD_32CAP
+      int16_t t_x[5] = {0, 0, 0, 0, 0}, t_y[5] = {0, 0, 0, 0, 0}; // To store the touch coordinates
+      int16_t points = 0;
+    #else
+      uint16_t t_x = 0, t_y = 0;
+    #endif
+    
+    // Handle LVGL modes explicitly
+    if (wifi_scan_obj.currentScanMode == LV_JOIN_WIFI || wifi_scan_obj.currentScanMode == LV_ADD_SSID) {
+        display_obj.main(wifi_scan_obj.currentScanMode); // Calls lv_task_handler for LVGL
+        return;
+    }
 
+    if ((wifi_scan_obj.currentScanMode != WIFI_SCAN_OFF) &&
+        (wifi_scan_obj.currentScanMode != WIFI_ATTACK_BEACON_SPAM) &&
+        (wifi_scan_obj.currentScanMode != WIFI_ATTACK_AP_SPAM) &&
+        (wifi_scan_obj.currentScanMode != WIFI_ATTACK_AUTH) &&
+        (wifi_scan_obj.currentScanMode != WIFI_ATTACK_DEAUTH) &&
+        (wifi_scan_obj.currentScanMode != WIFI_ATTACK_DEAUTH_MANUAL) &&
+        (wifi_scan_obj.currentScanMode != WIFI_ATTACK_DEAUTH_TARGETED) &&
+        (wifi_scan_obj.currentScanMode != WIFI_ATTACK_MIMIC) &&
+        (wifi_scan_obj.currentScanMode != WIFI_ATTACK_RICK_ROLL))
+      display_obj.displayBuffer();
 
-  // Pressed will be set true is there is a valid touch on the screen
-  int pre_getTouch = millis();
+//int pre_getTouch = millis();
 
-  // getTouch causes a 10ms delay which makes beacon spam less effective
-  #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789)
-    if (!this->disable_touch)
+#if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789)
+    #ifdef CYD_32CAP
+      if (!this->disable_touch)
+        points = this->updateTouch(t_x, t_y);
+        pressed = points && points > 0;
+    #else
+      if (!this->disable_touch)
       pressed = this->updateTouch(&t_x, &t_y);
-  #endif
-
-
-  // This is if there are scans/attacks going on
-  #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789)
+    #endif
+      
+    #ifdef HAS_SCREEN
     if ((wifi_scan_obj.currentScanMode != WIFI_SCAN_OFF) &&
         (pressed) &&
         (wifi_scan_obj.currentScanMode != OTA_UPDATE) &&
         (wifi_scan_obj.currentScanMode != ESP_UPDATE) &&
         (wifi_scan_obj.currentScanMode != SHOW_INFO) &&
         (wifi_scan_obj.currentScanMode != WIFI_SCAN_GPS_DATA) &&
-        (wifi_scan_obj.currentScanMode != WIFI_SCAN_GPS_NMEA))
-    {
-      // Stop the current scan
-      if ((wifi_scan_obj.currentScanMode == WIFI_SCAN_PROBE) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_STATION_WAR_DRIVE) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_RAW_CAPTURE) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_STATION) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_AP) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_WAR_DRIVE) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_EVIL_PORTAL) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_SIG_STREN) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_TARGET_AP) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_TARGET_AP_FULL) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_PWN) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_ESPRESSIF) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_ALL) ||
-          (wifi_scan_obj.currentScanMode == WIFI_SCAN_DEAUTH) ||
-          (wifi_scan_obj.currentScanMode == WIFI_ATTACK_BEACON_SPAM) ||
-          (wifi_scan_obj.currentScanMode == WIFI_ATTACK_AP_SPAM) ||
-          (wifi_scan_obj.currentScanMode == WIFI_ATTACK_AUTH) ||
-          (wifi_scan_obj.currentScanMode == WIFI_ATTACK_DEAUTH) ||
-          (wifi_scan_obj.currentScanMode == WIFI_ATTACK_DEAUTH_MANUAL) ||
-          (wifi_scan_obj.currentScanMode == WIFI_ATTACK_DEAUTH_TARGETED) ||
-          (wifi_scan_obj.currentScanMode == WIFI_ATTACK_MIMIC) ||
-          (wifi_scan_obj.currentScanMode == WIFI_ATTACK_RICK_ROLL) ||
-          (wifi_scan_obj.currentScanMode == WIFI_ATTACK_BEACON_LIST) ||
-          (wifi_scan_obj.currentScanMode == BT_SCAN_ALL) ||
-          (wifi_scan_obj.currentScanMode == BT_SCAN_AIRTAG) ||
-          (wifi_scan_obj.currentScanMode == BT_SCAN_FLIPPER) ||
-          (wifi_scan_obj.currentScanMode == BT_ATTACK_SOUR_APPLE) ||
-          (wifi_scan_obj.currentScanMode == BT_ATTACK_SWIFTPAIR_SPAM) ||
-          (wifi_scan_obj.currentScanMode == BT_ATTACK_SPAM_ALL) ||
-          (wifi_scan_obj.currentScanMode == BT_ATTACK_SAMSUNG_SPAM) ||
-          (wifi_scan_obj.currentScanMode == BT_ATTACK_GOOGLE_SPAM) ||
-          (wifi_scan_obj.currentScanMode == BT_ATTACK_FLIPPER_SPAM) ||
-          (wifi_scan_obj.currentScanMode == BT_SPOOF_AIRTAG) ||
-          (wifi_scan_obj.currentScanMode == BT_SCAN_WAR_DRIVE) ||
-          (wifi_scan_obj.currentScanMode == BT_SCAN_WAR_DRIVE_CONT) ||
-          (wifi_scan_obj.currentScanMode == BT_SCAN_SKIMMERS))
+        (wifi_scan_obj.currentScanMode != WIFI_SCAN_GPS_NMEA)) 
       {
-        wifi_scan_obj.StartScan(WIFI_SCAN_OFF);
-  
-        // If we don't do this, the text and button coordinates will be off
-        display_obj.tft.init();
-  
-        // Take us back to the menu
-        changeMenu(current_menu);
-      }
-  
-      x = -1;
-      y = -1;
-  
-      return;
-    }
-  #endif
-
-  #ifdef HAS_BUTTONS
-
-    bool c_btn_press = c_btn.justPressed();
-
-    #if !defined(HAS_ILI9341) && !defined(HAS_ST7796) && !defined(HAS_ST7789)
-    
-      if ((c_btn_press) &&
-          (wifi_scan_obj.currentScanMode != WIFI_SCAN_OFF) &&
-          (wifi_scan_obj.currentScanMode != OTA_UPDATE) &&
-          (wifi_scan_obj.currentScanMode != ESP_UPDATE) &&
-          (wifi_scan_obj.currentScanMode != SHOW_INFO) &&
-          (wifi_scan_obj.currentScanMode != WIFI_SCAN_GPS_DATA) &&
-          (wifi_scan_obj.currentScanMode != WIFI_SCAN_GPS_NMEA))
-      {
-        // Stop the current scan
+        //Stop the current scan
         if ((wifi_scan_obj.currentScanMode == WIFI_SCAN_PROBE) ||
             (wifi_scan_obj.currentScanMode == WIFI_SCAN_STATION_WAR_DRIVE) ||
             (wifi_scan_obj.currentScanMode == WIFI_SCAN_RAW_CAPTURE) ||
@@ -789,34 +795,88 @@ void MenuFunctions::main(uint32_t currentTime)
             (wifi_scan_obj.currentScanMode == BT_SPOOF_AIRTAG) ||
             (wifi_scan_obj.currentScanMode == BT_SCAN_WAR_DRIVE) ||
             (wifi_scan_obj.currentScanMode == BT_SCAN_WAR_DRIVE_CONT) ||
-            (wifi_scan_obj.currentScanMode == BT_SCAN_SKIMMERS) ||
-            (wifi_scan_obj.currentScanMode == WIFI_SCAN_EAPOL) ||
-            (wifi_scan_obj.currentScanMode == WIFI_SCAN_ACTIVE_EAPOL) ||
-            (wifi_scan_obj.currentScanMode == WIFI_SCAN_ACTIVE_LIST_EAPOL) ||
-            (wifi_scan_obj.currentScanMode == WIFI_PACKET_MONITOR))
+            (wifi_scan_obj.currentScanMode == BT_SCAN_SKIMMERS)) 
         {
-          wifi_scan_obj.StartScan(WIFI_SCAN_OFF);
-    
-          // If we don't do this, the text and button coordinates will be off
-          display_obj.tft.init();
-    
-          // Take us back to the menu
-          changeMenu(current_menu);
+            wifi_scan_obj.StartScan(WIFI_SCAN_OFF);
+            
+            display_obj.tft.init();
+
+            changeMenu(current_menu);
         }
-    
+
         x = -1;
         y = -1;
-    
+
         return;
       }
     #endif
 
+  #ifdef HAS_BUTTONS
+    bool c_btn_press = c_btn.justPressed();
+
+    #if defined(HAS_SCREEN)
+      if ((c_btn_press) &&
+          (wifi_scan_obj.currentScanMode != WIFI_SCAN_OFF) &&
+          (wifi_scan_obj.currentScanMode != OTA_UPDATE) &&
+          (wifi_scan_obj.currentScanMode != ESP_UPDATE) &&
+          (wifi_scan_obj.currentScanMode != SHOW_INFO) &&
+          (wifi_scan_obj.currentScanMode != WIFI_SCAN_GPS_DATA) &&
+          (wifi_scan_obj.currentScanMode != WIFI_SCAN_GPS_NMEA))
+        {
+        if ((wifi_scan_obj.currentScanMode == WIFI_SCAN_PROBE) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_STATION_WAR_DRIVE) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_RAW_CAPTURE) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_STATION) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_AP) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_WAR_DRIVE) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_EVIL_PORTAL) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_SIG_STREN) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_TARGET_AP) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_TARGET_AP_FULL) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_PWN) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_ESPRESSIF) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_ALL) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_DEAUTH) ||
+            (wifi_scan_obj.currentScanMode == WIFI_ATTACK_BEACON_SPAM) ||
+            (wifi_scan_obj.currentScanMode == WIFI_ATTACK_AP_SPAM) ||
+            (wifi_scan_obj.currentScanMode == WIFI_ATTACK_AUTH) ||
+            (wifi_scan_obj.currentScanMode == WIFI_ATTACK_DEAUTH) ||
+            (wifi_scan_obj.currentScanMode == WIFI_ATTACK_DEAUTH_MANUAL) ||
+            (wifi_scan_obj.currentScanMode == WIFI_ATTACK_DEAUTH_TARGETED) ||
+            (wifi_scan_obj.currentScanMode == WIFI_ATTACK_MIMIC) ||
+            (wifi_scan_obj.currentScanMode == WIFI_ATTACK_RICK_ROLL) ||
+            (wifi_scan_obj.currentScanMode == WIFI_ATTACK_BEACON_LIST) ||
+            (wifi_scan_obj.currentScanMode == BT_SCAN_ALL) ||
+            (wifi_scan_obj.currentScanMode == BT_ATTACK_SOUR_APPLE) ||
+            (wifi_scan_obj.currentScanMode == BT_ATTACK_SWIFTPAIR_SPAM) ||
+            (wifi_scan_obj.currentScanMode == BT_ATTACK_SPAM_ALL) ||
+            (wifi_scan_obj.currentScanMode == BT_ATTACK_SAMSUNG_SPAM) ||
+            (wifi_scan_obj.currentScanMode == BT_ATTACK_GOOGLE_SPAM) ||
+            (wifi_scan_obj.currentScanMode == BT_SCAN_WAR_DRIVE) ||
+            (wifi_scan_obj.currentScanMode == BT_SCAN_WAR_DRIVE_CONT) ||
+            (wifi_scan_obj.currentScanMode == BT_SCAN_SKIMMERS) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_EAPOL) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_ACTIVE_EAPOL) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_ACTIVE_LIST_EAPOL) ||
+            (wifi_scan_obj.currentScanMode == WIFI_PACKET_MONITOR)) 
+          {
+            wifi_scan_obj.StartScan(WIFI_SCAN_OFF);
+            
+            display_obj.tft.init();
+            
+            changeMenu(current_menu);
+        }
+
+        x = -1;
+        y = -1;
+
+        return;
+    }
+    #endif
+
   #endif
 
-
-  // Check if any key coordinate boxes contain the touch coordinates
-  // This is for when on a menu
-  #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789)
+#if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789)
     if ((wifi_scan_obj.currentScanMode != WIFI_ATTACK_BEACON_SPAM) &&
         (wifi_scan_obj.currentScanMode != WIFI_ATTACK_AP_SPAM) &&
         (wifi_scan_obj.currentScanMode != WIFI_ATTACK_AUTH) &&
@@ -824,136 +884,127 @@ void MenuFunctions::main(uint32_t currentTime)
         (wifi_scan_obj.currentScanMode != WIFI_ATTACK_DEAUTH_MANUAL) &&
         (wifi_scan_obj.currentScanMode != WIFI_ATTACK_DEAUTH_TARGETED) &&
         (wifi_scan_obj.currentScanMode != WIFI_ATTACK_MIMIC) &&
-        (wifi_scan_obj.currentScanMode != WIFI_ATTACK_RICK_ROLL))
-    {
-      // Need this to set all keys to false
-      for (uint8_t b = 0; b < BUTTON_ARRAY_LEN; b++) {
-        if (pressed && display_obj.key[b].contains(t_x, t_y)) {
-          display_obj.key[b].press(true);  // tell the button it is pressed
-        } else {
-          display_obj.key[b].press(false);  // tell the button it is NOT pressed
-        }
-      }
-  
-      // Check if any key has changed state
-      for (uint8_t b = 0; b < current_menu->list->size(); b++) {
-        display_obj.tft.setFreeFont(MENU_FONT);
-        if (display_obj.key[b].justPressed()) {
-          display_obj.key[b].drawButton(true, current_menu->list->get(b).name);
-          if (current_menu->list->get(b).name != text09)
-            display_obj.tft.drawXBitmap(0,
-                                        KEY_Y + b * (KEY_H + KEY_SPACING_Y) - (ICON_H / 2),
-                                        menu_icons[current_menu->list->get(b).icon],
-                                        ICON_W,
-                                        ICON_H,
-                                        current_menu->list->get(b).color,
-                                        TFT_BLACK);
-        }
-  
-        // If button was just release, execute the button's function
-        if ((display_obj.key[b].justReleased()) && (!pressed))
+        (wifi_scan_obj.currentScanMode != WIFI_ATTACK_RICK_ROLL)) 
         {
-          display_obj.key[b].drawButton(false, current_menu->list->get(b).name);
-          current_menu->list->get(b).callable();
+          #ifdef CYD_32CAP
+          for (uint8_t b = 0; b < BUTTON_ARRAY_LEN; b++) {
+            bool found = false;
+            if (pressed) {
+                //Serial.print("Checking button "); Serial.print(b); Serial.print(" with "); Serial.print(points); Serial.println(" points");
+                for (int16_t i = 0; i < points && i < 5; i++) {
+                    if (display_obj.key[b].contains(t_x[i], t_y[i])) {
+                        found = true;
+                        //Serial.print("Button "); Serial.print(b); Serial.println(" pressed");
+                        break;
+                    }
+                }
+                display_obj.key[b].press(found);
+                if (found) {
+                    //Serial.print("Button "); Serial.print(b); Serial.println(" activated");
+                }
+            } else {
+                display_obj.key[b].press(false);
+            }
         }
-        // This
-        else if ((display_obj.key[b].justReleased()) && (pressed)) {
-          display_obj.key[b].drawButton(false, current_menu->list->get(b).name);
-          if (current_menu->list->get(b).name != text09)
-            display_obj.tft.drawXBitmap(0,
-                                        KEY_Y + b * (KEY_H + KEY_SPACING_Y) - (ICON_H / 2),
-                                        menu_icons[current_menu->list->get(b).icon],
-                                        ICON_W,
-                                        ICON_H,
-                                        TFT_BLACK,
-                                        current_menu->list->get(b).color);
+        #else
+        for (uint8_t b = 0; b < BUTTON_ARRAY_LEN; b++) {
+            if (pressed && display_obj.key[b].contains(t_x, t_y)) {
+                display_obj.key[b].press(true);
+                //Serial.print("Button "); Serial.print(b); Serial.println(" pressed");
+            } else {
+                display_obj.key[b].press(false);
+            }
         }
-  
-        display_obj.tft.setFreeFont(NULL);
-      }
-    }
-    x = -1;
-    y = -1;
-  #endif
+        #endif
 
-  #ifdef HAS_BUTTONS
+        for (uint8_t b = 0; b < current_menu->list->size(); b++) {
+            display_obj.tft.setFreeFont(MENU_FONT);
+            if (display_obj.key[b].justPressed()) {
+                display_obj.key[b].drawButton(true, current_menu->list->get(b).name);
+                if (current_menu->list->get(b).name != text09) {
+                    display_obj.tft.drawXBitmap(0, KEY_Y + b * (KEY_H + KEY_SPACING_Y) - (ICON_H / 2),
+                                                menu_icons[current_menu->list->get(b).icon],
+                                                ICON_W, ICON_H, current_menu->list->get(b).color, TFT_BLACK);
+                }
+            }
+            if (display_obj.key[b].justReleased()) {
+                display_obj.key[b].drawButton(false, current_menu->list->get(b).name);
+                if (!pressed) {
+                    current_menu->list->get(b).callable();
+                }
+                if (current_menu->list->get(b).name != text09) {
+                    display_obj.tft.drawXBitmap(0, KEY_Y + b * (KEY_H + KEY_SPACING_Y) - (ICON_H / 2),
+                                                menu_icons[current_menu->list->get(b).icon],
+                                                ICON_W, ICON_H, TFT_BLACK, current_menu->list->get(b).color);
+                }
+            }
+            display_obj.tft.setFreeFont(NULL);
+        }
+    }
+#endif
+
+#ifdef HAS_BUTTONS
     #if !(defined(MARAUDER_V6) || defined(MARAUDER_V6_1))
-      #ifndef MARAUDER_M5STICKC
-        if (u_btn.justPressed()){
-          if ((wifi_scan_obj.currentScanMode == WIFI_SCAN_OFF) ||
-              (wifi_scan_obj.currentScanMode == OTA_UPDATE)) {
+    #ifndef MARAUDER_M5STICKC
+    if (u_btn.justPressed()) {
+        if (wifi_scan_obj.currentScanMode == WIFI_SCAN_OFF || wifi_scan_obj.currentScanMode == OTA_UPDATE) {
             if (current_menu->selected > 0) {
-              current_menu->selected--;
-              // Page up
-              if (current_menu->selected < this->menu_start_index) {
-                this->buildButtons(current_menu, current_menu->selected);
-                this->displayCurrentMenu(current_menu->selected);
-              }
-              this->buttonSelected(current_menu->selected - this->menu_start_index, current_menu->selected);
-              if (!current_menu->list->get(current_menu->selected + 1).selected)
-                this->buttonNotSelected(current_menu->selected + 1 - this->menu_start_index, current_menu->selected + 1);
+                current_menu->selected--;
+                if (current_menu->selected < this->menu_start_index) {
+                    this->buildButtons(current_menu, current_menu->selected);
+                    this->displayCurrentMenu(current_menu->selected);
+                }
+                this->buttonSelected(current_menu->selected - this->menu_start_index, current_menu->selected);
+                if (!current_menu->list->get(current_menu->selected + 1).selected)
+                    this->buttonNotSelected(current_menu->selected + 1 - this->menu_start_index, current_menu->selected + 1);
+            } else {
+                current_menu->selected = current_menu->list->size() - 1;
+                if (current_menu->selected >= BUTTON_SCREEN_LIMIT) {
+                    this->buildButtons(current_menu, current_menu->selected + 1 - BUTTON_SCREEN_LIMIT);
+                    this->displayCurrentMenu(current_menu->selected + 1 - BUTTON_SCREEN_LIMIT);
+                }
+                this->buttonSelected(current_menu->selected, current_menu->selected);
+                if (!current_menu->list->get(0).selected)
+                    this->buttonNotSelected(0, this->menu_start_index);
             }
-            // Loop to end
-            else {
-              current_menu->selected = current_menu->list->size() - 1;
-              if (current_menu->selected >= BUTTON_SCREEN_LIMIT) {
-                this->buildButtons(current_menu, current_menu->selected + 1 - BUTTON_SCREEN_LIMIT);
-                this->displayCurrentMenu(current_menu->selected + 1 - BUTTON_SCREEN_LIMIT);
-              }
-              this->buttonSelected(current_menu->selected, current_menu->selected);
-              if (!current_menu->list->get(0).selected)
-                this->buttonNotSelected(0, this->menu_start_index);
-            }
-          }
-          else if ((wifi_scan_obj.currentScanMode == WIFI_PACKET_MONITOR) ||
-                  (wifi_scan_obj.currentScanMode == WIFI_SCAN_EAPOL)) {
-            if (wifi_scan_obj.set_channel < 14)
-              wifi_scan_obj.changeChannel(wifi_scan_obj.set_channel + 1);
-            else
-              wifi_scan_obj.changeChannel(1);
-          }
+        } else if (wifi_scan_obj.currentScanMode == WIFI_PACKET_MONITOR || wifi_scan_obj.currentScanMode == WIFI_SCAN_EAPOL) {
+            wifi_scan_obj.changeChannel(wifi_scan_obj.set_channel < 14 ? wifi_scan_obj.set_channel + 1 : 1);
         }
-      #endif
-      if (d_btn.justPressed()){
-        if ((wifi_scan_obj.currentScanMode == WIFI_SCAN_OFF) ||
-            (wifi_scan_obj.currentScanMode == OTA_UPDATE)) {
-          if (current_menu->selected < current_menu->list->size() - 1) {
-            current_menu->selected++;
-            this->buttonSelected(current_menu->selected - this->menu_start_index, current_menu->selected);
-            if (!current_menu->list->get(current_menu->selected - 1).selected)
-              this->buttonNotSelected(current_menu->selected - 1 - this->menu_start_index, current_menu->selected - 1);
-            // Page down
-            if (current_menu->selected - this->menu_start_index >= BUTTON_SCREEN_LIMIT) {
-              this->buildButtons(current_menu, current_menu->selected + 1 - BUTTON_SCREEN_LIMIT);
-              this->displayCurrentMenu(current_menu->selected + 1 - BUTTON_SCREEN_LIMIT);
+    }
+    if (d_btn.justPressed()) {
+        if (wifi_scan_obj.currentScanMode == WIFI_SCAN_OFF || wifi_scan_obj.currentScanMode == OTA_UPDATE) {
+            if (current_menu->selected < current_menu->list->size() - 1) {
+                current_menu->selected++;
+                this->buttonSelected(current_menu->selected - this->menu_start_index, current_menu->selected);
+                if (!current_menu->list->get(current_menu->selected - 1).selected)
+                    this->buttonNotSelected(current_menu->selected - 1 - this->menu_start_index, current_menu->selected - 1);
+                if (current_menu->selected - this->menu_start_index >= BUTTON_SCREEN_LIMIT) {
+                    this->buildButtons(current_menu, current_menu->selected + 1 - BUTTON_SCREEN_LIMIT);
+                    this->displayCurrentMenu(current_menu->selected + 1 - BUTTON_SCREEN_LIMIT);
+                }
+            } else {
+                if (current_menu->selected >= BUTTON_SCREEN_LIMIT) {
+                    this->buildButtons(current_menu);
+                    this->displayCurrentMenu();
+                }
+                current_menu->selected = 0;
+                this->buttonSelected(current_menu->selected);
+                if (!current_menu->list->get(current_menu->list->size() - 1).selected)
+                    this->buttonNotSelected(current_menu->list->size() - 1);
             }
-          }
-          // Loop to beginning
-          else {
-            if (current_menu->selected >= BUTTON_SCREEN_LIMIT) {
-              this->buildButtons(current_menu);
-              this->displayCurrentMenu();
-            }
-            current_menu->selected = 0;
-            this->buttonSelected(current_menu->selected);
-            if (!current_menu->list->get(current_menu->list->size() - 1).selected)
-              this->buttonNotSelected(current_menu->list->size() - 1);
-          }
+        } else if (wifi_scan_obj.currentScanMode == WIFI_PACKET_MONITOR || wifi_scan_obj.currentScanMode == WIFI_SCAN_EAPOL) {
+            wifi_scan_obj.changeChannel(wifi_scan_obj.set_channel > 1 ? wifi_scan_obj.set_channel - 1 : 14);
         }
-        else if ((wifi_scan_obj.currentScanMode == WIFI_PACKET_MONITOR) ||
-                (wifi_scan_obj.currentScanMode == WIFI_SCAN_EAPOL)) {
-          if (wifi_scan_obj.set_channel > 1)
-            wifi_scan_obj.changeChannel(wifi_scan_obj.set_channel - 1);
-          else
-            wifi_scan_obj.changeChannel(14);
-        }
-      }
-      if(c_btn_press){
+    }
+    if (c_btn_press) {
         current_menu->list->get(current_menu->selected).callable();
-      }
+    }
     #endif
-  #endif
+    #endif
+#endif
+
 }
+
 
 #if BATTERY_ANALOG_ON == 1
 byte battery_analog_array[10];
@@ -1006,6 +1057,7 @@ void MenuFunctions::battery(bool initial)
 void MenuFunctions::battery2(bool initial)
 {
   uint16_t the_color;
+  Serial.println("battery2 called");
   if ( digitalRead(CHARGING_PIN) == 1) the_color = TFT_BLUE;
   else if (battery_analog < 20) the_color = TFT_RED;
   else if (battery_analog < 40)  the_color = TFT_YELLOW;
@@ -1039,6 +1091,7 @@ void MenuFunctions::battery(bool initial)
     uint16_t the_color;
     if (battery_obj.i2c_supported)
     {
+      
       // Could use int compare maybe idk
       if (((String)battery_obj.battery_level != "25") && ((String)battery_obj.battery_level != "0"))
         the_color = TFT_GREEN;
@@ -1405,7 +1458,9 @@ void MenuFunctions::orientDisplay()
       uint16_t calData[5] = { 339, 3470, 237, 3438, 2 }; // tft.setRotation(0); // Portrait with DIY TFT
     #endif
 
-    display_obj.tft.setTouch(calData);
+    #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789) && !defined(CYD_32CAP)  
+      display_obj.tft.setTouch(calData);
+    #endif
   #endif
 
   changeMenu(current_menu);
@@ -1767,7 +1822,7 @@ void MenuFunctions::RunSetup()
     this->changeMenu(&generateSSIDsMenu);
     wifi_scan_obj.RunGenerateSSIDs();
   });
-  #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789)
+  #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789) && !defined(CYD_32CAP)
     this->addNodes(&wifiGeneralMenu, text_table1[1], TFT_NAVY, NULL, KEYBOARD_ICO, [this](){
       display_obj.clearScreen(); 
       wifi_scan_obj.StartScan(LV_ADD_SSID, TFT_YELLOW); 
@@ -2650,7 +2705,6 @@ void MenuFunctions::changeMenu(Menu * menu)
   display_obj.setupScrollArea(TOP_FIXED_AREA, BOT_FIXED_AREA);
   display_obj.tft.init();
   current_menu = menu;
-
   buildButtons(menu);
 
   displayCurrentMenu();
@@ -2764,3 +2818,6 @@ void MenuFunctions::displayCurrentMenu(uint8_t start_index)
 }
 
 #endif
+
+
+

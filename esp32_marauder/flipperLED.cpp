@@ -14,13 +14,21 @@ void flipperLED::RunSetup() {
     
   delay(50);
 
+  digitalWrite(R_PIN, HIGH);
+  digitalWrite(G_PIN, HIGH);
   digitalWrite(B_PIN, LOW);
   delay(500);
-  digitalWrite(B_PIN, HIGH);
+
+  // Turn on the green color
+  digitalWrite(R_PIN, HIGH);
   digitalWrite(G_PIN, LOW);
+  digitalWrite(B_PIN, HIGH);
   delay(500);
-  digitalWrite(G_PIN, HIGH);
+
+  // Turn on the red color
   digitalWrite(R_PIN, LOW);
+  digitalWrite(G_PIN, HIGH);
+  digitalWrite(B_PIN, HIGH);
   delay(500);
   digitalWrite(R_PIN, HIGH);
 }

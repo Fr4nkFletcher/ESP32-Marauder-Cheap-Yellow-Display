@@ -16,10 +16,14 @@
 #include <Ticker.h>
 #include "SPIFFS.h"
 #include "Assets.h"
-
+#include <Wire.h>  // Added for I2C support (needed for capacitive touch)
 #include <TFT_eSPI.h>
 
-// WiFi stuff
+//#if defined(CYD_32CAP)
+//  #include <TAMC_GT911.h>
+//#endif
+
+// WiFi stuff (unchanged)
 #define OTA_UPDATE 100
 #define SHOW_INFO 101
 #define WIFI_SCAN_OFF 0
@@ -49,13 +53,8 @@ class Display
 {
   private:
     bool SwitchOn = false;
-    
     bool run_setup = true;
-    
-    // For the byte we read from the serial port
     byte data = 0;
-    
-    // A few test variables used during debugging
     boolean change_colour = 1;
     boolean selected = 1;
 
@@ -70,6 +69,12 @@ class Display
     Display();
     TFT_eSPI tft = TFT_eSPI();
     TFT_eSPI_Button key[BUTTON_ARRAY_LEN];
+
+    // Capacitive touch object for CYD_32CAP
+    //#if defined(CYD_32CAP)
+    //  TAMC_GT911 tp = TAMC_GT911(TOUCH_SDA, TOUCH_SCL, TOUCH_INT, TOUCH_RST, TOUCH_WIDTH, TOUCH_HEIGHT);
+    //#endif
+
     const String PROGMEM version_number = MARAUDER_VERSION;
 
     bool printing = false;
@@ -89,21 +94,20 @@ class Display
       LinkedList<String>* screen_buffer;
     #endif
 
-    // The initial y coordinate of the top of the bottom text line
     uint16_t yDraw = YMAX - BOT_FIXED_AREA - TEXT_HEIGHT;
-
-    // Keep track of the drawing x coordinate
     uint16_t xPos = 0;
-
-    // The initial y coordinate of the top of the scrolling area
     uint16_t yStart = TOP_FIXED_AREA_2;
-    // yArea must be a integral multiple of TEXT_HEIGHT
     uint16_t yArea = YMAX - TOP_FIXED_AREA_2 - BOT_FIXED_AREA;
 
-    // We have to blank the top line each time the display is scrolled, but this takes up to 13 milliseconds
-    // for a full width line, meanwhile the serial buffer may be filling... and overflowing
-    // We can speed up scrolling of short text lines by just blanking the character we drew
-    int blank[19]; // We keep all the strings pixel lengths to optimise the speed of the top line blanking
+    int blank[19];
+
+    // Capacitive touch variables for CYD_32CAP
+    //#if defined(CYD_32CAP)
+    //  uint32_t touchTime;
+    //  boolean isTouched = false;
+    //  int touchX = 0;
+    //  int touchY = 0;
+    //#endif
 
     void tftDrawRedOnOffButton();
     void tftDrawGreenOnOffButton();
@@ -117,7 +121,7 @@ class Display
     void buildBanner(String msg, int xpos);
     void clearScreen();
     void displayBuffer(bool do_clear = false);
-    //void drawJpeg(const char *filename, int xpos, int ypos);
+    // void drawJpeg(const char *filename, int xpos, int ypos); // Commented out in current code
     void getTouchWhileFunction(bool pressed);
     void initScrollValues(bool tte = false);
     void jpegInfo();
@@ -134,5 +138,6 @@ class Display
     void twoPartDisplay(String center_text);
     void updateBanner(String msg);
 };
+
 #endif
 #endif

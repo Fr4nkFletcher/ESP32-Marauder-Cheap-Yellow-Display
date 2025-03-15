@@ -4,10 +4,8 @@
 #define BatteryInterface_h
 
 #include <Arduino.h>
-
 #include "configs.h"
 #include "Adafruit_MAX1704X.h"
-
 #include <Wire.h>
 
 #define IP5306_ADDR 0x75
@@ -19,8 +17,8 @@ class BatteryInterface {
     Adafruit_MAX17048 maxlipo;
 
   public:
-    int8_t battery_level = 0;
-    int8_t old_level = 0;
+    int8_t battery_level = -1; // Default to "unknown"
+    int8_t old_level = -1;
     bool i2c_supported = false;
     bool has_max17048 = false;
     bool has_ip5306 = false;

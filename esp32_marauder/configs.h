@@ -1,4 +1,4 @@
-#pragma once
+    #pragma once
 
 #ifndef configs_h
 
@@ -119,7 +119,7 @@
 
   #ifdef MARAUDER_V4
     //#define FLIPPER_ZERO_HAT
-    #define HAS_BATTERY
+    //#define HAS_BATTERY
     #define HAS_BT
     //#define HAS_BUTTONS
     #define HAS_NEOPIXEL_LED
@@ -132,7 +132,8 @@
     //#define CYD_24
     //#define CYD_24G //Guition 2.4"
     //#define CYD_28
-    #define CYD_32
+    //#define CYD_32
+    #define CYD_32CAP
     //#define CYD_35
     //#define HAS_TEMP_SENSOR
   #endif
@@ -499,6 +500,110 @@
         #endif
       #endif // CYD_32
 
+      #ifdef CYD_32CAP
+        #define SCREEN_CHAR_WIDTH 40
+        #define HAS_ST7789
+        #define BANNER_TEXT_SIZE 2
+
+        #ifndef TFT_WIDTH
+          #define TFT_WIDTH 240
+        #endif
+
+        #ifndef TFT_HEIGHT
+          #define TFT_HEIGHT 320
+        #endif
+
+        #define THROW_AWAY_TOUCH_COUNT 31
+        // Touchscreen pins (already in your config, kept as-is)
+        #define TOUCH_SDA  33
+        #define TOUCH_SCL  32
+        #define TOUCH_INT 21
+        #define TOUCH_RST 25
+
+        // Additional capacitive touch definitions
+        #define TFT_MISO 12 // or SDO
+        #define TFT_MOSI 13 // In some display driver board, it might be written as "SDA" or SDI
+        #define TFT_SCLK 14
+        #define TFT_CS   15  // Chip select control pin
+        #define TFT_DC   2   // Data Command control pin (OR RS)
+        #define TFT_RST  -1  // Reset pin (could connect to Arduino RESET pin)
+        #define TFT_BL   27  // LED back-light
+        #define TFT_BACKLIGHT_ON HIGH  // Level to turn ON back-light (HIGH or LOW)
+
+        #define TOUCH_WIDTH  240
+        #define TOUCH_HEIGHT 320
+
+        #define SPI_FREQUENCY  65000000
+        #define SPI_READ_FREQUENCY  20000000
+        #define SPI_TOUCH_FREQUENCY  2500000
+
+        // Generic commands used by TFT_eSPI.cpp
+        #define TFT_NOP     0x00
+        #define TFT_SWRST   0x01
+        #define TFT_INVOFF  0x20
+        #define TFT_INVON   0x21
+        #define TFT_DISPOFF 0x28
+        #define TFT_DISPON  0x29
+        #define TFT_CASET   0x2A
+        #define TFT_PASET   0x2B
+        #define TFT_RAMWR   0x2C
+        #define TFT_RAMRD   0x2E
+        #define TFT_MADCTL  0x36
+        #define TFT_MAD_MY  0x80
+        #define TFT_MAD_MX  0x40
+        #define TFT_MAD_MV  0x20
+        #define TFT_MAD_ML  0x10
+        #define TFT_MAD_BGR 0x08
+        #define TFT_MAD_MH  0x10
+        #define TFT_MAD_RGB 0x00
+
+        #ifdef TFT_RGB_ORDER
+          #if (TFT_RGB_ORDER == 1)
+            #define TFT_MAD_COLOR_ORDER TFT_MAD_RGB
+          #else
+            #define TFT_MAD_COLOR_ORDER TFT_MAD_BGR
+          #endif
+        #else
+          #define TFT_MAD_COLOR_ORDER TFT_MAD_BGR
+        #endif
+
+        
+        #define ST7789_NOP     0x00
+        #define ST7789_SWRESET 0x01
+        #define ST7789_RDDID   0x04
+        #define ST7789_RDDST   0x09
+        #define ST7789_SLPIN   0x10
+        #define ST7789_SLPOUT  0x11
+        #define ST7789_PTLON   0x12
+        #define ST7789_NORON   0x13
+        #define ST7789_INVOFF  0x20
+        #define ST7789_INVON   0x21
+        #define ST7789_DISPOFF 0x28
+        #define ST7789_DISPON  0x29
+        #define ST7789_CASET   0x2A
+        #define ST7789_PASET   0x2B
+        #define ST7789_RAMWR   0x2C
+        #define ST7789_RAMRD   0x2E
+        #define ST7789_PTLAR   0x30
+        #define ST7789_MADCTL  0x36
+        #define ST7789_COLMOD  0x3A
+        #define ST7789_FRMCTR1 0xB1
+        #define ST7789_FRMCTR2 0xB2
+        #define ST7789_FRMCTR3 0xB3
+        #define ST7789_INVCTR  0xB4
+        #define ST7789_DISSET5 0xB6
+        #define ST7789_PWCTR1  0xC0
+        #define ST7789_PWCTR2  0xC1
+        #define ST7789_PWCTR3  0xC2
+        #define ST7789_VMCTR1  0xC5
+        #define ST7789_RDID1   0xDA
+        #define ST7789_RDID2   0xDB
+        #define ST7789_RDID3   0xDC
+        #define ST7789_RDID4   0xDD
+        #define ST7789_GMCTRP1 0xE0
+        #define ST7789_GMCTRN1 0xE1
+      #endif
+
       #ifdef CYD_35
         #define SCREEN_CHAR_WIDTH 40
         #define HAS_ST7796
@@ -523,11 +628,11 @@
       #define TOP_FIXED_AREA 48 // Number of lines in top fixed area (lines counted from top of screen)
       #define YMAX TFT_HEIGHT // Dynamically set based on the display height
       #define minimum(a,b)     (((a) < (b)) ? (a) : (b))
-        //#define MENU_FONT NULL
+      //#define MENU_FONT NULL
       #define MENU_FONT &FreeMono9pt7b // Winner
-        //#define MENU_FONT &FreeMonoBold9pt7b
-        //#define MENU_FONT &FreeSans9pt7b
-        //#define MENU_FONT &FreeSansBold9pt7b
+      //#define MENU_FONT &FreeMonoBold9pt7b
+      //#define MENU_FONT &FreeSans9pt7b
+      //#define MENU_FONT &FreeSansBold9pt7b
       #define BUTTON_SCREEN_LIMIT 12
       #define BUTTON_ARRAY_LEN 12
       #define STATUS_BAR_WIDTH 16
@@ -538,13 +643,13 @@
       #define FRAME_W 120
       #define FRAME_H 50
 
-        // Red zone size
+      // Red zone size
       #define REDBUTTON_X FRAME_X
       #define REDBUTTON_Y FRAME_Y
       #define REDBUTTON_W (FRAME_W / 2)
       #define REDBUTTON_H FRAME_H
 
-        // Green zone size
+      // Green zone size
       #define GREENBUTTON_X (REDBUTTON_X + REDBUTTON_W)
       #define GREENBUTTON_Y FRAME_Y
       #define GREENBUTTON_W (FRAME_W / 2)
@@ -1216,7 +1321,7 @@
   //// BATTERY STUFF
   #ifdef HAS_BATTERY
     #ifdef MARAUDER_V4
-      #if defined(CYD_35) || defined(CYD_24) || defined(CYD_32)
+      #if defined(CYD_35) || defined(CYD_24) || defined(CYD_32) || defined(CYD_32CAP)
         #define I2C_SDA 21
         #define I2C_SCL 22
       #elif defined(CYD_28) || defined(CYD_24G)

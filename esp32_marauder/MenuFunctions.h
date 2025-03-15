@@ -31,12 +31,14 @@ extern Settings settings_obj;
 #define FLASH_BUTTON 0
 
 #if BATTERY_ANALOG_ON == 1
-#define BATTERY_PIN 13
-#define ANALOG_PIN 34
-#define CHARGING_PIN 27
+  #ifndef CYD_32CAP
+    #define BATTERY_PIN 13
+    #define ANALOG_PIN 34 
+    #define CHARGING_PIN 27
+  #endif
 #endif
 
-// Icon definitions
+// Icon definitions (merged from both versions)
 #define ATTACKS 0
 #define BEACON_SNIFF 1
 #define BLUETOOTH 2
@@ -72,8 +74,8 @@ extern Settings settings_obj;
 #define STATUS_GPS 32
 #define GPS_MENU 33
 #define DISABLE_TOUCH 34
-#define FLIPPER 35
-#define BLANK 36
+#define FLIPPER 35  // From current code
+#define BLANK 36    // From current code
 
 PROGMEM void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p);
 PROGMEM bool my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data);
@@ -96,7 +98,6 @@ PROGMEM static lv_obj_t * save_as_kb;
 struct Menu;
 
 // Individual Nodes of a menu
-
 struct MenuNode {
   String name;
   bool command;
@@ -115,13 +116,10 @@ struct Menu {
   uint8_t               selected = 0;
 };
 
-
 class MenuFunctions
 {
   private:
-
     String u_result = "";
-
     uint32_t initTime = 0;
     uint8_t menu_start_index = 0;
     uint8_t mini_kb_index = 0;
@@ -129,7 +127,6 @@ class MenuFunctions
 
     // Main menu stuff
     Menu mainMenu;
-
     Menu wifiMenu;
     Menu bluetoothMenu;
     Menu badusbMenu;
@@ -157,7 +154,7 @@ class MenuFunctions
     #ifdef HAS_BT
       Menu airtagMenu;
     #endif
-    #if !defined(HAS_ILI9341) && !defined(HAS_ST7796)  && !defined(HAS_ST7789) && !defined(HAS_ST7789)
+    #if !defined(HAS_ILI9341) && !defined(HAS_ST7796) && !defined(HAS_ST7789)
       Menu wifiStationMenu;
     #endif
 
@@ -175,10 +172,6 @@ class MenuFunctions
 
     static void lv_tick_handler();
 
-    // Menu icons
-
-
-
     void addNodes(Menu* menu, String name, uint16_t color, Menu* child, int place, std::function<void()> callable, bool selected = false, String command = "");
     void battery(bool initial = false);
     void battery2(bool initial = false);
@@ -188,11 +181,16 @@ class MenuFunctions
     void displaySetting(String key, Menu* menu, int index);
     void buttonSelected(uint8_t b, int8_t x = -1);
     void buttonNotSelected(uint8_t b, int8_t x = -1);
-    #if (!defined(HAS_ILI9341) && !defined(HAS_ST7796)  && !defined(HAS_ST7789) && defined(HAS_BUTTONS))
+    #if !defined(HAS_ILI9341) && !defined(HAS_ST7796) && !defined(HAS_ST7789) && defined(HAS_BUTTONS)
       void miniKeyboard(Menu * targetMenu);
     #endif
 
-    uint8_t updateTouch(uint16_t *x, uint16_t *y, uint16_t threshold = 600);
+    // Unified updateTouch function with conditional signatures
+    #if defined(CYD_32CAP)
+      uint8_t updateTouch(int16_t *x, int16_t *y, uint16_t threshold = 600);  // Capacitive version
+    #else
+      uint8_t updateTouch(uint16_t *x, uint16_t *y, uint16_t threshold = 600);  // Resistive version
+    #endif
 
   public:
     MenuFunctions();
@@ -201,13 +199,13 @@ class MenuFunctions
     Menu clearSSIDsMenu;
     Menu clearAPsMenu;
     
-    // Save Files Menu
+    // Save Files Menu (merged from both)
     Menu saveSSIDsMenu;
     Menu loadSSIDsMenu;
     Menu saveAPsMenu;
     Menu loadAPsMenu;
-    Menu saveATsMenu;
-    Menu loadATsMenu;
+    Menu saveATsMenu;  // From current code
+    Menu loadATsMenu;  // From current code
 
     #ifdef HAS_GPS
       // GPS Menu
@@ -215,7 +213,6 @@ class MenuFunctions
     #endif
 
     Ticker tick;
-
     uint16_t x = -1, y = -1;
     boolean pressed = false;
 
@@ -228,7 +225,7 @@ class MenuFunctions
     void selectEPHTMLGFX();
     void updateStatusBar();
     void addSSIDGFX();
-    void addAPGFX(String type = "AP");
+    void addAPGFX(String type = "AP");  // From current code
     void addStationGFX();
     void buildButtons(Menu* menu, int starting_index = 0, String button_name = "");
     void changeMenu(Menu* menu);
@@ -238,7 +235,6 @@ class MenuFunctions
     void RunSetup();
     void orientDisplay();
 };
-
 
 #endif
 #endif

@@ -5,12 +5,11 @@ BatteryInterface::BatteryInterface() {
 }
 
 void BatteryInterface::main(uint32_t currentTime) {
-  if (currentTime != 0) {
+  if (currentTime != 0 && this->i2c_supported) { // Only poll if I2C is confirmed
     if (currentTime - initTime >= 3000) {
-      //Serial.println("Checking Battery Level");
+      Serial.println("Checking Battery Level");
       this->initTime = millis();
       int8_t new_level = this->getBatteryLevel();
-      //this->battery_level = this->getBatteryLevel();
       if (this->battery_level != new_level) {
         Serial.println(text00 + (String)new_level);
         this->battery_level = new_level;
@@ -21,82 +20,57 @@ void BatteryInterface::main(uint32_t currentTime) {
 }
 
 void BatteryInterface::RunSetup() {
-  byte error;
-  byte addr;
-
   #ifdef HAS_BATTERY
-
     Wire.begin(I2C_SDA, I2C_SCL);
-
     Serial.println("Checking for battery monitors...");
 
+    // Check IP5306
     Wire.beginTransmission(IP5306_ADDR);
-    error = Wire.endTransmission();
-
+    byte error = Wire.endTransmission();
     if (error == 0) {
       Serial.println("Detected IP5306");
       this->has_ip5306 = true;
       this->i2c_supported = true;
+    } else {
+      Serial.println("No IP5306 found");
+      this->has_ip5306 = false;
     }
 
+    // Check MAX17048
     Wire.beginTransmission(MAX17048_ADDR);
     error = Wire.endTransmission();
-
-    if (error == 0) {
-      if (maxlipo.begin()) {
-        Serial.println("Detected MAX17048");
-        this->has_max17048 = true;
-        this->i2c_supported = true;
-      }
-    }
-
-    /*for(addr = 1; addr < 127; addr++ ) {
-      Wire.beginTransmission(addr);
-      error = Wire.endTransmission();
-
-      if (error == 0)
-      {
-        Serial.print("I2C device found at address 0x");
-        
-        if (addr<16)
-          Serial.print("0");
-
-        Serial.println(addr,HEX);
-        
-        if (addr == IP5306_ADDR) {
-          this->has_ip5306 = true;
-          this->i2c_supported = true;
-        }
-
-        if (addr == MAX17048_ADDR) {
-          if (maxlipo.begin()) {
-            Serial.println("Detected MAX17048");
-            this->has_max17048 = true;
-            this->i2c_supported = true;
-          }
-        }
-      }
-    }*/
-
-    /*if (this->maxlipo.begin()) {
+    if (error == 0 && maxlipo.begin()) {
       Serial.println("Detected MAX17048");
       this->has_max17048 = true;
       this->i2c_supported = true;
-    }*/
-    
+    } else {
+      Serial.println("No MAX17048 found");
+      this->has_max17048 = false;
+    }
+
+    // Only enable i2c_supported if a device is actually present
+    this->i2c_supported = (this->has_ip5306 || this->has_max17048);
+    if (!this->i2c_supported) {
+      Serial.println("No battery monitors detected; disabling I2C polling");
+    }
+
     this->initTime = millis();
+  #else
+    this->i2c_supported = false; // Ensure disabled if no HAS_BATTERY
   #endif
 }
 
 int8_t BatteryInterface::getBatteryLevel() {
+  if (!this->i2c_supported) {
+    return -1; // No monitor present
+  }
 
   if (this->has_ip5306) {
     Wire.beginTransmission(IP5306_ADDR);
     Wire.write(0x78);
-    if (Wire.endTransmission(false) == 0 &&
-        Wire.requestFrom(IP5306_ADDR, 1)) {
-      this->i2c_supported = true;
-      switch (Wire.read() & 0xF0) {
+    if (Wire.endTransmission(false) == 0 && Wire.requestFrom(IP5306_ADDR, 1)) {
+      uint8_t val = Wire.read();
+      switch (val & 0xF0) {
         case 0xE0: return 25;
         case 0xC0: return 50;
         case 0x80: return 75;
@@ -104,19 +78,17 @@ int8_t BatteryInterface::getBatteryLevel() {
         default: return 0;
       }
     }
-    this->i2c_supported = false;
+    Serial.println("IP5306 read failed");
+    this->i2c_supported = false; // Disable on failure
     return -1;
   }
 
-
   if (this->has_max17048) {
     float percent = this->maxlipo.cellPercent();
-    // Sometimes we dumb
-    if (percent >= 100)
-      return 100;
-    else if (percent <= 0)
-      return 0;
-    else
-      return percent;
+    if (percent >= 100) return 100;
+    if (percent <= 0) return 0;
+    return (int8_t)percent;
   }
+
+  return -1; // Fallback if no device is active
 }
