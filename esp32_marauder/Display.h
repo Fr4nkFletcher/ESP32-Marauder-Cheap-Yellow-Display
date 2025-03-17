@@ -19,11 +19,8 @@
 #include <Wire.h>  // Added for I2C support (needed for capacitive touch)
 #include <TFT_eSPI.h>
 
-//#if defined(CYD_32CAP)
-//  #include <TAMC_GT911.h>
-//#endif
 
-// WiFi stuff (unchanged)
+
 #define OTA_UPDATE 100
 #define SHOW_INFO 101
 #define WIFI_SCAN_OFF 0
@@ -70,11 +67,6 @@ class Display
     TFT_eSPI tft = TFT_eSPI();
     TFT_eSPI_Button key[BUTTON_ARRAY_LEN];
 
-    // Capacitive touch object for CYD_32CAP
-    //#if defined(CYD_32CAP)
-    //  TAMC_GT911 tp = TAMC_GT911(TOUCH_SDA, TOUCH_SCL, TOUCH_INT, TOUCH_RST, TOUCH_WIDTH, TOUCH_HEIGHT);
-    //#endif
-
     const String PROGMEM version_number = MARAUDER_VERSION;
 
     bool printing = false;
@@ -100,14 +92,6 @@ class Display
     uint16_t yArea = YMAX - TOP_FIXED_AREA_2 - BOT_FIXED_AREA;
 
     int blank[19];
-
-    // Capacitive touch variables for CYD_32CAP
-    //#if defined(CYD_32CAP)
-    //  uint32_t touchTime;
-    //  boolean isTouched = false;
-    //  int touchX = 0;
-    //  int touchY = 0;
-    //#endif
 
     void tftDrawRedOnOffButton();
     void tftDrawGreenOnOffButton();

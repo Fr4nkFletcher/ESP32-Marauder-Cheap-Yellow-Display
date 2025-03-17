@@ -21,7 +21,7 @@ MenuFunctions::MenuFunctions()
 // LVGL Stuff
 /* Interrupt driven periodic handler */
 #if defined(HAS_ST7789) || defined(HAS_ILI9341) || defined(HAS_ST7796)
-    #ifdef CYD_32CAP
+    #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
       uint8_t MenuFunctions::updateTouch(int16_t *x, int16_t *y, uint16_t threshold) {
         static bool was_pressed = false;
         if (!display_obj.headless_mode) {
@@ -92,14 +92,14 @@ MenuFunctions::MenuFunctions()
       static bool was_pressed = false;
       extern Display display_obj;
       
-      #ifdef CYD_32CAP
+      #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
         int16_t touchX = 0, touchY = 0;
       #else
         uint16_t touchX, touchY;
       #endif
       // this is a mess
 
-      #ifdef CYD_32CAP
+      #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
           touch.setMaxCoordinates(SCREEN_HEIGHT, SCREEN_WIDTH);
           touch.setSwapXY(true);
           touch.setMirrorXY(true, true);
@@ -122,7 +122,7 @@ MenuFunctions::MenuFunctions()
       #else
         bool touched = display_obj.tft.getTouch(&touchX, &touchY, 600);
       #endif
-          #ifdef CYD_32CAP
+          #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
             was_pressed = touched;
           #endif
           if (!touched) {
@@ -169,15 +169,10 @@ MenuFunctions::MenuFunctions()
   
   void MenuFunctions::deinitLVGL() {
       Serial.println(F("Deinit LVGL"));
-      #ifdef CYD_32CAP
+      #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
         touch.setMaxCoordinates(SCREEN_WIDTH, SCREEN_HEIGHT);
         touch.setSwapXY(false);
         touch.setMirrorXY(false, false);
-        //while (touch.isPressed()) {
-        //    int16_t tmpX[5], tmpY[5];
-        //    touch.getPoint(tmpX, tmpY, touch.getSupportTouchPoint());
-        //    delay(10);
-        //}
       #endif
       //display_obj.exit_draw = true;
   }
@@ -714,7 +709,7 @@ void MenuFunctions::main(uint32_t currentTime)
 
     boolean pressed = false;
 
-    #ifdef CYD_32CAP
+    #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
       int16_t t_x[5] = {0, 0, 0, 0, 0}, t_y[5] = {0, 0, 0, 0, 0}; // To store the touch coordinates
       int16_t points = 0;
     #else
@@ -741,7 +736,7 @@ void MenuFunctions::main(uint32_t currentTime)
 //int pre_getTouch = millis();
 
 #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789)
-    #ifdef CYD_32CAP
+    #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
       if (!this->disable_touch)
         points = this->updateTouch(t_x, t_y);
         pressed = points && points > 0;
@@ -886,7 +881,7 @@ void MenuFunctions::main(uint32_t currentTime)
         (wifi_scan_obj.currentScanMode != WIFI_ATTACK_MIMIC) &&
         (wifi_scan_obj.currentScanMode != WIFI_ATTACK_RICK_ROLL)) 
         {
-          #ifdef CYD_32CAP
+          #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
           for (uint8_t b = 0; b < BUTTON_ARRAY_LEN; b++) {
             bool found = false;
             if (pressed) {
@@ -1458,7 +1453,7 @@ void MenuFunctions::orientDisplay()
       uint16_t calData[5] = { 339, 3470, 237, 3438, 2 }; // tft.setRotation(0); // Portrait with DIY TFT
     #endif
 
-    #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789) && !defined(CYD_32CAP)  
+    #if !defined(CYD_32CAP) && !defined(CYD_35CAP) && !defined(CYD_24CAP)
       display_obj.tft.setTouch(calData);
     #endif
   #endif
@@ -1822,7 +1817,7 @@ void MenuFunctions::RunSetup()
     this->changeMenu(&generateSSIDsMenu);
     wifi_scan_obj.RunGenerateSSIDs();
   });
-  #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789) && !defined(CYD_32CAP)
+  #if defined(HAS_ILI9341) && !defined(CYD_24CAP) || defined(HAS_ST7796) && !defined(CYD_35CAP) || defined(HAS_ST7789) && !defined(CYD_32CAP)
     this->addNodes(&wifiGeneralMenu, text_table1[1], TFT_NAVY, NULL, KEYBOARD_ICO, [this](){
       display_obj.clearScreen(); 
       wifi_scan_obj.StartScan(LV_ADD_SSID, TFT_YELLOW); 

@@ -31,7 +31,7 @@ extern Settings settings_obj;
 #define FLASH_BUTTON 0
 
 #if BATTERY_ANALOG_ON == 1
-  #ifndef CYD_32CAP
+  #if !defined(CYD_32CAP) || !defined(CYD_35CAP)  || !defined(CYD_24CAP)
     #define BATTERY_PIN 13
     #define ANALOG_PIN 34 
     #define CHARGING_PIN 27
@@ -186,7 +186,7 @@ class MenuFunctions
     #endif
 
     // Unified updateTouch function with conditional signatures
-    #if defined(CYD_32CAP)
+    #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
       uint8_t updateTouch(int16_t *x, int16_t *y, uint16_t threshold = 600);  // Capacitive version
     #else
       uint8_t updateTouch(uint16_t *x, uint16_t *y, uint16_t threshold = 600);  // Resistive version

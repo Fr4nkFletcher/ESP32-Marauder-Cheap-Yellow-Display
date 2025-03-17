@@ -194,7 +194,6 @@ void setup()
 
   backlightOff();
 
-  // Draw the title screen (text only, no boot image)
   #ifdef HAS_SCREEN
     display_obj.tft.drawCentreString("ESP32 Marauder", TFT_WIDTH / 2, TFT_HEIGHT * 0.33, 1);
     display_obj.tft.drawCentreString("JustCallMeKoko", TFT_WIDTH / 2, TFT_HEIGHT * 0.5, 1);
@@ -203,31 +202,33 @@ void setup()
 
   backlightOn();
 
-  #ifdef CYD_32CAP
-    #define GT911_SLAVE_ADDRESS_H 0x5D
-    pinMode(TOUCH_INT, INPUT);
+  #if defined(CYD_32CAP) || defined(CYD_35CAP)
+      #define GT911_SLAVE_ADDRESS_H 0x5D
+      #define GT911_SLAVE_ADDRESS_L 0x14
+      pinMode(TOUCH_INT, INPUT);
+      Wire.begin(TOUCH_SDA, TOUCH_SCL);
 
-    pinMode(ST7789_PWCTR1, OUTPUT);
-    digitalWrite(ST7789_PWCTR1, HIGH);
+      touch.setPins(-1, TOUCH_INT);
+      bool touchInitialized = false;
+      if (touch.begin(Wire, GT911_SLAVE_ADDRESS_H)) {
+          touchInitialized = true;
+      } 
+      else if (touch.begin(Wire, GT911_SLAVE_ADDRESS_L)) {
+          touchInitialized = true;
+      }
 
-    Wire.begin(TOUCH_SDA, TOUCH_SCL);
-
-
-    touch.setPins(-1, TOUCH_INT);
-    if (!touch.begin(Wire, GT911_SLAVE_ADDRESS_H)) {
-        while (1) {
-            Serial.println("Failed to find GT911 - check your wiring!");
-            delay(1000);
-        }
-    }
-
-    Serial.println("Init GT911 Sensor success!");
-    // Set touch max xy
-    touch.setMaxCoordinates(SCREEN_WIDTH, SCREEN_HEIGHT);
-    // Set swap xy
-    touch.setSwapXY(false);
-    // Set mirror xy
-    touch.setMirrorXY(false, false);
+      if (touchInitialized) {
+          Serial.println("Init GT911 Sensor success!");
+          // Set touch max xy
+          touch.setMaxCoordinates(SCREEN_WIDTH, SCREEN_HEIGHT);
+          // Set swap xy
+          touch.setSwapXY(false);
+          // Set mirror xy
+          touch.setMirrorXY(false, false);
+      } else {
+          Serial.println("Failed to find GT911 at both addresses =[");
+          // Could add retry logic here instead of looping forever
+      }
   #endif
 
   #ifdef HAS_SCREEN

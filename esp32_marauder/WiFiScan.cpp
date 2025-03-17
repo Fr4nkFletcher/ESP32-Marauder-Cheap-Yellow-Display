@@ -1632,7 +1632,7 @@ void WiFiScan::RunLvJoinWiFi(uint8_t scan_mode, uint16_t color) {
         Serial.println("Using TFT DIY");
     #endif
 
-    #ifndef CYD_32CAP
+    #if !defined(CYD_32CAP) && !defined(CYD_35CAP) && !defined(CYD_24CAP)
       display_obj.tft.setTouch(calData);
     #endif
 
@@ -2038,7 +2038,7 @@ void WiFiScan::RunPacketMonitor(uint8_t scan_mode, uint16_t color)
           Serial.println("Using TFT DIY");
         #endif
 
-        #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789) && !defined(CYD_32CAP)
+        #if !defined(CYD_32CAP) && !defined(CYD_35CAP) && !defined(CYD_24CAP)
           display_obj.tft.setTouch(calData);
         #endif
 
@@ -2132,7 +2132,7 @@ void WiFiScan::RunEapolScan(uint8_t scan_mode, uint16_t color)
         uint16_t calData[5] = { 213, 3469, 320, 3446, 1 }; // Landscape TFT DIY
       #endif
 
-      #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789) && !defined(CYD_32CAP)
+      #if !defined(CYD_32CAP) && !defined(CYD_35CAP) && !defined(CYD_24CAP)
         display_obj.tft.setTouch(calData);
       #endif
 
@@ -4943,7 +4943,7 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
 
 #ifdef HAS_SCREEN
   void WiFiScan::eapolMonitorMain(uint32_t currentTime) {
-      #ifdef CYD_32CAP
+      #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
         touch.setMaxCoordinates(SCREEN_HEIGHT, SCREEN_WIDTH);
         touch.setSwapXY(true);
         touch.setMirrorXY(false, true);
@@ -4958,20 +4958,20 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
           y_pos_z = 0;
           bool pressed = false;
 
-          #ifdef CYD_32CAP
+          #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
               int16_t t_x[5] = {0,0,0,0,0}, t_y[5] = {0,0,0,0,0};
               int16_t points = 0;
           #else
-              uint16_t t_x = 0, t_y = 0; // Single touch point for non-CYD_32CAP
+              uint16_t t_x = 0, t_y = 0;
           #endif
 
-          #ifdef CYD_32CAP
+          #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
               if (!display_obj.headless_mode) {
                   points = touch.getPoint(t_x, t_y, touch.getSupportTouchPoint());
                   pressed = points > 0;
 
-                  if (pressed && !was_pressed) { // New press detected
-                      // Throw away touches for stabilization
+                  if (pressed && !was_pressed) {
+                      
                       for (int i = 0; i < THROW_AWAY_TOUCH_COUNT; i++) {
                           int16_t tmp_x[5] = {0,0,0,0,0}, tmp_y[5] = {0,0,0,0,0};
                           touch.getPoint(tmp_x, tmp_y, touch.getSupportTouchPoint());
@@ -4986,7 +4986,7 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
               } else {
                   Serial.println("headless mode");
               }
-          #elif defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789) && !defined(CYD_32CAP)
+          #elif !defined(CYD_32CAP) && !defined(CYD_35CAP) && !defined(CYD_24CAP)
               pressed = display_obj.tft.getTouch(&t_x, &t_y, 600);
               if (pressed) {
                   Serial.print("Got touch | X: "); Serial.print(t_x);
@@ -4995,7 +4995,7 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
           #endif
 
           // Check buttons for presses
-          #ifdef CYD_32CAP
+          #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
               for (uint8_t b = 0; b < BUTTON_ARRAY_LEN; b++) {
                   bool found = false;
                   if (pressed) {
@@ -5020,7 +5020,7 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
                   }
               }
           #endif
-          #ifdef CYD_32CAP
+          #if defined(CYD_32CAP) || defined(CYD_35CAP)
             was_pressed = pressed;
           #endif
           // Which buttons pressed
@@ -5111,7 +5111,7 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
                   else if (b == 6) {
                       Serial.println("Exiting eapol monitor...");
                       this->StartScan(WIFI_SCAN_OFF);
-                      #ifdef CYD_32CAP
+                      #if defined(CYD_32CAP) || defined(CYD_35CAP)
                         touch.setMaxCoordinates(SCREEN_WIDTH, SCREEN_HEIGHT);
                         touch.setSwapXY(false);
                         touch.setMirrorXY(false, false);
@@ -5174,7 +5174,7 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
 
   void WiFiScan::packetMonitorMain(uint32_t currentTime)
   {
-      #ifdef CYD_32CAP
+      #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
         touch.setMaxCoordinates(SCREEN_HEIGHT, SCREEN_WIDTH);
         touch.setSwapXY(true);
         touch.setMirrorXY(false, true);
@@ -5191,14 +5191,14 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
           y_pos_z = 0;
           bool pressed = false;
 
-          #ifdef CYD_32CAP
+          #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
             int16_t t_x[5] = {0,0,0,0,0}, t_y[5] = {0,0,0,0,0};
             int16_t points = 0;
           #else
             uint16_t t_x = 0, t_y = 0; // To store the touch coordinates
           #endif
 
-          #ifdef CYD_32CAP
+          #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
               if (!display_obj.headless_mode) {
                   points = touch.getPoint(t_x, t_y, touch.getSupportTouchPoint());
                   pressed = points > 0;
@@ -5224,7 +5224,7 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
           #endif
 
           // Check buttons for presses
-          #ifdef CYD_32CAP
+          #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
               for (uint8_t b = 0; b < BUTTON_ARRAY_LEN; b++) {
                   bool found = false;
                   if (pressed) {
@@ -5249,7 +5249,7 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
                   }
               }
           #endif
-          #ifdef CYD_32CAP
+          #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
             was_pressed = pressed;
           #endif
           // Which buttons pressed
@@ -5347,15 +5347,10 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
                   else if (b == 6) {
                       Serial.println("Exiting packet monitor...");
                       this->StartScan(WIFI_SCAN_OFF);
-                      #ifdef CYD_32CAP
+                      #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
                         touch.setMaxCoordinates(SCREEN_WIDTH, SCREEN_HEIGHT);
                         touch.setSwapXY(false);
                         touch.setMirrorXY(false, false);
-                        //while (touch.isPressed()) {
-                        //    int16_t tmpX[5], tmpY[5];
-                        //    touch.getPoint(tmpX, tmpY, touch.getSupportTouchPoint());
-                        //    delay(10);
-                        //}
                       #endif
                       this->orient_display = true;
                       return;

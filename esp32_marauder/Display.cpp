@@ -47,7 +47,7 @@ void Display::RunSetup()
     #elif defined(TFT_DIY)
       uint16_t calData[5] = { 339, 3470, 237, 3438, 2 };
     #endif
-    #ifndef CYD_32CAP
+    #if !defined(CYD_24CAP) && !defined(CYD_32CAP) && !defined(CYD_35CAP)
       tft.setTouch(calData);
     #endif
   #endif
