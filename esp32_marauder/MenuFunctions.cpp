@@ -1140,12 +1140,6 @@ void MenuFunctions::updateStatusBar()
   
   uint16_t the_color; 
 
-  //if (this->old_gps_sat_count != gps_obj.getNumSats()) {
-    //this->old_gps_sat_count = gps_obj.getNumSats();
-    //display_obj.tft.fillRect(0, 0, 240, STATUS_BAR_WIDTH, STATUSBAR_COLOR);
-    //status_changed = true;
-  //}
-
   // GPS Stuff
   #ifdef HAS_GPS
     if (gps_obj.getGpsModuleStatus()) {
@@ -1155,15 +1149,16 @@ void MenuFunctions::updateStatusBar()
         the_color = TFT_RED;
         
       #ifdef HAS_FULL_SCREEN
-        display_obj.tft.drawXBitmap(4,
-                                    0,
-                                    menu_icons[STATUS_GPS],
-                                    16,
-                                    16,
-                                    STATUSBAR_COLOR,
-                                    the_color);
+        uint8_t current_sat_count = gps_obj.getNumSats();
+        
+        if (current_sat_count != this->old_gps_sat_count) {
+          
+          display_obj.tft.fillRect(22, 0, 28, STATUS_BAR_WIDTH, STATUSBAR_COLOR);
+          this->old_gps_sat_count = current_sat_count;
+        }
+        
+        display_obj.tft.drawXBitmap(4, 0, menu_icons[STATUS_GPS], 16, 16, STATUSBAR_COLOR, the_color);
         display_obj.tft.setTextColor(TFT_WHITE, STATUSBAR_COLOR);
-
         display_obj.tft.drawString(gps_obj.getNumSatsString(), 22, 0, 2);
       #elif defined(HAS_SCREEN)
         display_obj.tft.setTextColor(the_color, STATUSBAR_COLOR);
@@ -1191,7 +1186,7 @@ void MenuFunctions::updateStatusBar()
     #endif
 
     #ifdef HAS_ST7789
-      display_obj.tft.drawString("CH: " + (String)wifi_scan_obj.set_channel, 68, 0, 2);
+      display_obj.tft.drawString("CH: " + (String)wifi_scan_obj.set_channel, 50, 0, 2);
     #endif
 
     #ifdef HAS_MINI_SCREEN
@@ -1213,7 +1208,7 @@ void MenuFunctions::updateStatusBar()
     #endif
 
     #ifdef HAS_ST7789
-      display_obj.tft.drawString((String)wifi_scan_obj.free_ram + "B", 130, 0, 2);
+      display_obj.tft.drawString((String)wifi_scan_obj.free_ram + "B", 100, 0, 2);
     #endif
 
 
@@ -1235,7 +1230,7 @@ void MenuFunctions::updateStatusBar()
 
   #ifdef HAS_ST7789
     MenuFunctions::battery(false);
-    display_obj.tft.fillRect(210, 0, 16, STATUS_BAR_WIDTH, STATUSBAR_COLOR);
+    display_obj.tft.fillRect(186, 0, 16, STATUS_BAR_WIDTH, STATUSBAR_COLOR);
   #endif
 
   
@@ -1283,7 +1278,7 @@ void MenuFunctions::updateStatusBar()
     #endif
 
     #ifdef HAS_ST7789
-      display_obj.tft.drawXBitmap(200,
+      display_obj.tft.drawXBitmap(170,
                                   0,
                                   menu_icons[STATUS_SD],
                                   16,
@@ -1412,7 +1407,7 @@ void MenuFunctions::drawStatusBar()
     #endif
 
     #ifdef HAS_ST7789
-      display_obj.tft.drawXBitmap(200,
+      display_obj.tft.drawXBitmap(170,
                                   0,
                                   menu_icons[STATUS_SD],
                                   16,

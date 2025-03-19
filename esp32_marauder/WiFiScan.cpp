@@ -725,6 +725,7 @@ bool WiFiScan::scanning() {
 // Function to prepare to run a specific scan
 void WiFiScan::StartScan(uint8_t scan_mode, uint16_t color)
 {  
+  this->set_channel = 1;
   this->initWiFi(scan_mode);
   if (scan_mode == WIFI_SCAN_OFF)
     StopScan(scan_mode);
@@ -5417,7 +5418,8 @@ void WiFiScan::changeChannel(int chan) {
 
 void WiFiScan::changeChannel()
 {
-  esp_wifi_set_channel(this->set_channel, WIFI_SECOND_CHAN_NONE);
+  if (set_channel < 1 || set_channel > 13) set_channel = 1;
+  esp_wifi_set_channel(set_channel, WIFI_SECOND_CHAN_NONE);
   delay(1);
 }
 

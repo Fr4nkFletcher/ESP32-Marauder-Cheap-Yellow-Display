@@ -134,9 +134,9 @@
     //#define CYD_24CAP
     //#define CYD_28
     //#define CYD_32
-    //#define CYD_32CAP
+    #define CYD_32CAP
     //#define CYD_35
-    #define CYD_35CAP
+    //#define CYD_35CAP
     //#define HAS_TEMP_SENSOR
   #endif
 
