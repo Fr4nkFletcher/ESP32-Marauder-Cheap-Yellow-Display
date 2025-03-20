@@ -1,3 +1,5 @@
+#include <bb_captouch.h>
+
 /* FLASH SETTINGS
 Board: LOLIN D32
 Flash Frequency: 80MHz
@@ -9,6 +11,11 @@ https://www.online-utility.org/image/convert/to/XBM
 #include "TouchDrvGT911.hpp"
 
 TouchDrvGT911 touch;
+
+#ifdef CYD_24CAP
+BBCapTouch bbct;
+const char *szNames[] = {"Unknown", "FT6x36", "GT911", "CST820"};
+#endif
 
 #ifndef HAS_SCREEN
   #define MenuFunctions_h
@@ -229,6 +236,10 @@ void setup()
           Serial.println("Failed to find GT911 at both addresses =[");
           // Could add retry logic here instead of looping forever
       }
+  #elif defined(CYD_24CAP)
+    bbct.init(TOUCH_SDA, TOUCH_SCL, TOUCH_RST, TOUCH_INT);
+    int iType = bbct.sensorType();
+    Serial.printf("Sensor type = %s\n", szNames[iType]);
   #endif
 
   #ifdef HAS_SCREEN

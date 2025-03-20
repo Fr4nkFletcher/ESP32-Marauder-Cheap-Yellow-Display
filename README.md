@@ -19,8 +19,9 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 
 ---
 
-## 🏴‍☠️ Latest Update Highlights — added support for 3.2" and 3.5" Capacitive Touch (03/16/25) 🏴‍☠️
+## 🏴‍☠️ Latest Update Highlights — added support for 2.4", 3.2" and 3.5" Capacitive Touch (03/20/25) 🏴‍☠️
  
+- Add support for ESP32-2432S024C 2.4" ILI9341/CST820 Capacitive Touch
 - Add support for ESP32-3248S035C 3.5" ST7796/GT911 Capacitive Touch
 - Add support for ESP32-2432S032C 3.2" ST7789/GT911 Capacitive Touch
 - Add support for ESP32-2432S032R 3.2" ST7789/XPT2046 Resistive Touch 
@@ -119,6 +120,7 @@ For a step-by-step guide, refer to [Smoochiee's tutorial](https://github.com/smo
 
 The project has been successfully tested on:
 
+- [2.4" Capacitive Touch](https://a.co/d/bTSoo9Z)
 - [2.4" Resistive Touch](https://a.co/d/fhM7s0J)
 - [2.4" Resistive Touch Guition](https://www.aliexpress.us/item/3256806436471011.html)
 - [2.8" Resistive MicroUSB-only](https://amazon.com/dp/B0BVFXR313)

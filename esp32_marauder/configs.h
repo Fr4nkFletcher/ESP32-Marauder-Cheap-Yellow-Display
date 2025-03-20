@@ -119,7 +119,7 @@
 
   #ifdef MARAUDER_V4
     //#define FLIPPER_ZERO_HAT
-    //#define HAS_BATTERY
+    #define HAS_BATTERY
     #define HAS_BT
     //#define HAS_BUTTONS
     #define HAS_NEOPIXEL_LED
@@ -129,12 +129,13 @@
     #define HAS_SD
     #define USE_SD
     #define HAS_GPS
+    //#define CYD_22CAP
     //#define CYD_24
     //#define CYD_24G
-    //#define CYD_24CAP
+    #define CYD_24CAP
     //#define CYD_28
     //#define CYD_32
-    #define CYD_32CAP
+    //#define CYD_32CAP
     //#define CYD_35
     //#define CYD_35CAP
     //#define HAS_TEMP_SENSOR

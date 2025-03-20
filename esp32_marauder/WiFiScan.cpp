@@ -1,8 +1,13 @@
 #include "WiFiScan.h"
 #include "lang_var.h"
 #include "TouchDrvGT911.hpp"
+#include "MenuFunctions.h"
 
 TouchDrvGT911 touch;
+
+#ifdef CYD_24CAP
+#include <bb_captouch.h>
+#endif
 
 int num_beacon = 0;
 int num_deauth = 0;
@@ -1619,21 +1624,23 @@ void WiFiScan::RunLvJoinWiFi(uint8_t scan_mode, uint16_t color) {
     display_obj.tft.setRotation(1);
 
     #if defined(CYD_28)
-        uint16_t calData[5] = { 188, 3408, 286, 3498, 1 }; // Landscape CYD 2.8"
+      uint16_t calData[5] = { 188, 3408, 286, 3498, 1 }; // Landscape CYD 2.8"
     #elif defined(CYD_24)
-        uint16_t calData[5] = { 410, 3305, 499, 3045, 0 }; // Landscape CYD 2.4"
+      uint16_t calData[5] = { 410, 3305, 499, 3045, 0 }; // Landscape CYD 2.4"
+    #elif defined(CYD_24CAP)
+      uint16_t calData[5] = { 188, 3408, 286, 3498, 5 };
     #elif defined(CYD_24G)
-        uint16_t calData[5] = { 400, 3141, 617, 2888, 1 }; // Landscape CYD 2.4" Guition
+      uint16_t calData[5] = { 400, 3141, 617, 2888, 1 }; // Landscape CYD 2.4" Guition
     #elif defined(CYD_32)
-        uint16_t calData[5] = { 346, 3526, 253, 3542, 3 }; // Landscape CYD 3.2"
+      uint16_t calData[5] = { 346, 3526, 253, 3542, 3 }; // Landscape CYD 3.2"
     #elif defined(CYD_35)
-        uint16_t calData[5] = { 292, 3570, 295, 3436, 3 }; // Landscape CYD 3.5"
+      uint16_t calData[5] = { 292, 3570, 295, 3436, 3 }; // Landscape CYD 3.5"
     #elif defined(TFT_DIY)
-        uint16_t calData[5] = { 213, 3469, 320, 3446, 1 }; // Landscape TFT DIY
-        Serial.println("Using TFT DIY");
+      uint16_t calData[5] = { 213, 3469, 320, 3446, 1 }; // Landscape TFT DIY
+      Serial.println("Using TFT DIY");
     #endif
 
-    #if !defined(CYD_32CAP) && !defined(CYD_35CAP) && !defined(CYD_24CAP)
+    #if !defined(CYD_32CAP) && !defined(CYD_35CAP)
       display_obj.tft.setTouch(calData);
     #endif
 
@@ -2028,18 +2035,20 @@ void WiFiScan::RunPacketMonitor(uint8_t scan_mode, uint16_t color)
           uint16_t calData[5] = { 188, 3408, 286, 3498, 1 }; // Landscape CYD 2.8"
         #elif defined(CYD_24)
           uint16_t calData[5] = { 410, 3305, 499, 3045, 0 }; // Landscape CYD 2.4"
+        #elif defined(CYD_24CAP)
+          uint16_t calData[5] = { 188, 3408, 286, 3498, 5 };
         #elif defined(CYD_24G)
-        uint16_t calData[5] = { 400, 3141, 617, 2888, 1 }; // Landscape CYD 2.4" Guition
+          uint16_t calData[5] = { 400, 3141, 617, 2888, 1 }; // Landscape CYD 2.4" Guition
         #elif defined(CYD_32)
-        uint16_t calData[5] = { 346, 3526, 253, 3542, 3 }; // Landscape CYD 3.2"
+          uint16_t calData[5] = { 346, 3526, 253, 3542, 3 }; // Landscape CYD 3.2"
         #elif defined(CYD_35)
-        uint16_t calData[5] = { 292, 3570, 295, 3436, 3 }; // Landscape CYD 3.5"
+          uint16_t calData[5] = { 292, 3570, 295, 3436, 3 }; // Landscape CYD 3.5"
         #elif defined(TFT_DIY)
           uint16_t calData[5] = { 213, 3469, 320, 3446, 1 }; // Landscape TFT DIY
           Serial.println("Using TFT DIY");
         #endif
 
-        #if !defined(CYD_32CAP) && !defined(CYD_35CAP) && !defined(CYD_24CAP)
+        #if !defined(CYD_32CAP) && !defined(CYD_35CAP)
           display_obj.tft.setTouch(calData);
         #endif
 
@@ -2125,6 +2134,8 @@ void WiFiScan::RunEapolScan(uint8_t scan_mode, uint16_t color)
         uint16_t calData[5] = { 410, 3305, 499, 3045, 0 }; // Landscape CYD 2.4"
       #elif defined(CYD_24G)
         uint16_t calData[5] = { 400, 3141, 617, 2888, 1 }; // Landscape CYD 2.4" Guition
+      #elif defined(CYD_24CAP)
+        uint16_t calData[5] = { 188, 3408, 286, 3498, 5 };
       #elif defined(CYD_32)
         uint16_t calData[5] = { 346, 3526, 253, 3542, 3 }; // Landscape CYD 3.2"
       #elif defined(CYD_35)
@@ -2133,7 +2144,7 @@ void WiFiScan::RunEapolScan(uint8_t scan_mode, uint16_t color)
         uint16_t calData[5] = { 213, 3469, 320, 3446, 1 }; // Landscape TFT DIY
       #endif
 
-      #if !defined(CYD_32CAP) && !defined(CYD_35CAP) && !defined(CYD_24CAP)
+      #if !defined(CYD_32CAP) && !defined(CYD_35CAP)
         display_obj.tft.setTouch(calData);
       #endif
 
@@ -4944,12 +4955,13 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
 
 #ifdef HAS_SCREEN
   void WiFiScan::eapolMonitorMain(uint32_t currentTime) {
-      #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
+      #if defined(CYD_32CAP) || defined(CYD_35CAP)
         touch.setMaxCoordinates(SCREEN_HEIGHT, SCREEN_WIDTH);
         touch.setSwapXY(true);
         touch.setMirrorXY(false, true);
         static bool was_pressed = false; // Track press state
       #endif
+
       for (x_pos = (11 + x_scale); x_pos <= TFT_HEIGHT; x_pos = x_pos) {
           currentTime = millis();
           do_break = false;
@@ -4957,16 +4969,18 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
           y_pos_x = 0;
           y_pos_y = 0;
           y_pos_z = 0;
-          bool pressed = false;
+          boolean pressed = false;
 
-          #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
+          #if defined(CYD_32CAP) || defined(CYD_35CAP)
               int16_t t_x[5] = {0,0,0,0,0}, t_y[5] = {0,0,0,0,0};
               int16_t points = 0;
+          #elif defined(CYD_24CAP)
+              uint16_t t_x = 0, t_y = 0;
           #else
               uint16_t t_x = 0, t_y = 0;
           #endif
 
-          #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
+          #if defined(CYD_32CAP) || defined(CYD_35CAP)
               if (!display_obj.headless_mode) {
                   points = touch.getPoint(t_x, t_y, touch.getSupportTouchPoint());
                   pressed = points > 0;
@@ -4987,16 +5001,19 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
               } else {
                   Serial.println("headless mode");
               }
+
           #elif !defined(CYD_32CAP) && !defined(CYD_35CAP) && !defined(CYD_24CAP)
               pressed = display_obj.tft.getTouch(&t_x, &t_y, 600);
               if (pressed) {
                   Serial.print("Got touch | X: "); Serial.print(t_x);
                   Serial.print(" Y: "); Serial.println(t_y);
               }
+          #elif defined(CYD_24CAP)
+            pressed = display_obj.tft.getTouchBBC(&t_x, &t_y);
           #endif
 
           // Check buttons for presses
-          #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
+          #if defined(CYD_32CAP) || defined(CYD_35CAP)
               for (uint8_t b = 0; b < BUTTON_ARRAY_LEN; b++) {
                   bool found = false;
                   if (pressed) {
@@ -5175,7 +5192,7 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
 
   void WiFiScan::packetMonitorMain(uint32_t currentTime)
   {
-      #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
+      #if defined(CYD_32CAP) || defined(CYD_35CAP)
         touch.setMaxCoordinates(SCREEN_HEIGHT, SCREEN_WIDTH);
         touch.setSwapXY(true);
         touch.setMirrorXY(false, true);
@@ -5190,16 +5207,18 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
           y_pos_x = 0;
           y_pos_y = 0;
           y_pos_z = 0;
-          bool pressed = false;
+          boolean pressed = false;
 
-          #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
+          #if defined(CYD_32CAP) || defined(CYD_35CAP)
             int16_t t_x[5] = {0,0,0,0,0}, t_y[5] = {0,0,0,0,0};
             int16_t points = 0;
+          #elif defined(CYD_24CAP)
+            uint16_t t_x = 0, t_y = 0;
           #else
             uint16_t t_x = 0, t_y = 0; // To store the touch coordinates
           #endif
 
-          #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
+          #if defined(CYD_32CAP) || defined(CYD_35CAP)
               if (!display_obj.headless_mode) {
                   points = touch.getPoint(t_x, t_y, touch.getSupportTouchPoint());
                   pressed = points > 0;
@@ -5220,12 +5239,14 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
               } else {
                   Serial.println("headless mode");
               }
+          #elif defined(CYD_24CAP)
+            pressed = display_obj.tft.getTouchBBC(&t_x, &t_y);
           #else
-              pressed = display_obj.tft.getTouch(&t_x, &t_y);
+            pressed = display_obj.tft.getTouch(&t_x, &t_y);
           #endif
 
           // Check buttons for presses
-          #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
+          #if defined(CYD_32CAP) || defined(CYD_35CAP)
               for (uint8_t b = 0; b < BUTTON_ARRAY_LEN; b++) {
                   bool found = false;
                   if (pressed) {
@@ -5243,14 +5264,12 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
               for (uint8_t b = 0; b < BUTTON_ARRAY_LEN; b++) {
                   if (pressed && display_obj.key[b].contains(t_x, t_y)) {
                       display_obj.key[b].press(true);
-                      //Serial.print("Button "); Serial.print(b);
-                      //Serial.println(" pressed");
                   } else {
                       display_obj.key[b].press(false);
                   }
               }
           #endif
-          #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
+          #if defined(CYD_32CAP) || defined(CYD_35CAP)
             was_pressed = pressed;
           #endif
           // Which buttons pressed
@@ -5348,7 +5367,7 @@ void WiFiScan::activeEapolSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t
                   else if (b == 6) {
                       Serial.println("Exiting packet monitor...");
                       this->StartScan(WIFI_SCAN_OFF);
-                      #if defined(CYD_32CAP) || defined(CYD_35CAP) || defined(CYD_24CAP)
+                      #if defined(CYD_32CAP) || defined(CYD_35CAP)
                         touch.setMaxCoordinates(SCREEN_WIDTH, SCREEN_HEIGHT);
                         touch.setSwapXY(false);
                         touch.setMirrorXY(false, false);
@@ -5794,3 +5813,4 @@ void WiFiScan::main(uint32_t currentTime)
 }
 
 #endif
+
