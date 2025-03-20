@@ -162,7 +162,7 @@ After flashing, you'll boot into the Marauder interface. Refer to the [ESP32 Mar
 
 ## Acknowledgments
 
-A huge thanks to **@cod5fgzj**, [**smoochiee**](https://github.com/smoochiee), [**ggaljoen**](https://github.com/ggaljoen), [**ATOMNFT**](https://github.com/ATOMNFT), [**jstockdale**](https://github.com/jstockdale), and [**sorinbotirla**](https://github.com/sorinbotirla). And a special mention to [**JustCallMeKoko**](https://github.com/justcallmekoko) for the foundational work on [ESP32Marauder](https://github.com/justcallmekoko/ESP32Marauder).
+A huge thanks to **@cod5fgzj**, [**smoochiee**](https://github.com/smoochiee), [**ggaljoen**](https://github.com/ggaljoen), [**ATOMNFT**](https://github.com/ATOMNFT), [**jstockdale**](https://github.com/jstockdale), [**sorinbotirla**](https://github.com/sorinbotirla), and [**lsdlsd88**](https://github.com/lsdlsd88). And a special mention to [**JustCallMeKoko**](https://github.com/justcallmekoko) for the foundational work on [ESP32Marauder](https://github.com/justcallmekoko/ESP32Marauder).
 
 ---
 
