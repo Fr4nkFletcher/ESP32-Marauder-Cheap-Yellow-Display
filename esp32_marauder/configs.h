@@ -1,4 +1,4 @@
-    #pragma once
+#pragma once
 
 #ifndef configs_h
 
@@ -22,7 +22,9 @@
   //#define MARAUDER_REV_FEATHER
   //// END BOARD TARGETS
 
-  #define MARAUDER_VERSION "v1.2.1"
+  #define MARAUDER_VERSION "v1.3.1"
+
+  #define GRAPH_REFRESH 100
 
   //// HARDWARE NAMES
   #ifdef MARAUDER_M5STICKC
@@ -118,27 +120,24 @@
   #endif
 
   #ifdef MARAUDER_V4
-    //#define FLIPPER_ZERO_HAT
     #define HAS_BATTERY
     #define HAS_BT
-    //#define HAS_BUTTONS
     #define HAS_NEOPIXEL_LED
     //#define HAS_PWR_MGMT
     #define HAS_SCREEN
     #define HAS_FULL_SCREEN
     #define HAS_SD
     #define USE_SD
-    #define HAS_GPS
+    //#define HAS_GPS
     //#define CYD_22CAP
     //#define CYD_24
-    //#define CYD_24G
-    #define CYD_24CAP
+    #define CYD_24G
+    //#define CYD_24CAP
     //#define CYD_28
     //#define CYD_32
     //#define CYD_32CAP
     //#define CYD_35
     //#define CYD_35CAP
-    //#define HAS_TEMP_SENSOR
   #endif
 
   #if defined(MARAUDER_V6) || defined(MARAUDER_V6_1)
@@ -447,6 +446,105 @@
     #endif
 
     #ifdef MARAUDER_V4
+      // 2.2 capacitive
+      #ifdef CYD_22CAP
+        #define SCREEN_CHAR_WIDTH 40
+        #define HAS_ST7789
+        #define BANNER_TEXT_SIZE 2
+
+        #ifndef TFT_WIDTH
+          #define TFT_WIDTH 240
+        #endif
+
+        #ifndef TFT_HEIGHT
+          #define TFT_HEIGHT 320
+        #endif
+
+        #define TOUCH_SDA  21
+        #define TOUCH_SCL  22
+        #define TOUCH_INT -1
+        #define TOUCH_RST -1
+        //#define TOUCH_CS -1
+
+        //#define TFT_MISO 12 // or SDO
+        //#define TFT_MOSI 13 // In some display driver board, it might be written as "SDA" or SDI
+        //#define TFT_SCLK 14
+        //#define TFT_CS   15  // Chip select control pin
+        //#define TFT_DC   2   // Data Command control pin (OR RS)
+        //#define TFT_RST  -1  // Reset pin (could connect to Arduino RESET pin)
+        #define TFT_BL   27  // LED back-light
+        #define TFT_BACKLIGHT_ON HIGH  // Level to turn ON back-light (HIGH or LOW)
+
+        #define TOUCH_WIDTH  240
+        #define TOUCH_HEIGHT 320
+
+        // Generic commands used by TFT_eSPI.cpp
+        #define TFT_NOP     0x00
+        #define TFT_SWRST   0x01
+        #define TFT_INVOFF  0x20
+        #define TFT_INVON   0x21
+        #define TFT_DISPOFF 0x28
+        #define TFT_DISPON  0x29
+        #define TFT_CASET   0x2A
+        #define TFT_PASET   0x2B
+        #define TFT_RAMWR   0x2C
+        #define TFT_RAMRD   0x2E
+        #define TFT_MADCTL  0x36
+        #define TFT_MAD_MY  0x80
+        #define TFT_MAD_MX  0x40
+        #define TFT_MAD_MV  0x20
+        #define TFT_MAD_ML  0x10
+        #define TFT_MAD_BGR 0x08
+        #define TFT_MAD_MH  0x10
+        #define TFT_MAD_RGB 0x00
+
+        #ifdef TFT_RGB_ORDER
+          #if (TFT_RGB_ORDER == 1)
+            #define TFT_MAD_COLOR_ORDER TFT_MAD_RGB
+          #else
+            #define TFT_MAD_COLOR_ORDER TFT_MAD_BGR
+          #endif
+        #else
+          #define TFT_MAD_COLOR_ORDER TFT_MAD_BGR
+        #endif
+
+        
+        #define ST7789_NOP     0x00
+        #define ST7789_SWRESET 0x01
+        #define ST7789_RDDID   0x04
+        #define ST7789_RDDST   0x09
+        #define ST7789_SLPIN   0x10
+        #define ST7789_SLPOUT  0x11
+        #define ST7789_PTLON   0x12
+        #define ST7789_NORON   0x13
+        #define ST7789_INVOFF  0x20
+        #define ST7789_INVON   0x21
+        #define ST7789_DISPOFF 0x28
+        #define ST7789_DISPON  0x29
+        #define ST7789_CASET   0x2A
+        #define ST7789_PASET   0x2B
+        #define ST7789_RAMWR   0x2C
+        #define ST7789_RAMRD   0x2E
+        #define ST7789_PTLAR   0x30
+        #define ST7789_MADCTL  0x36
+        #define ST7789_COLMOD  0x3A
+        #define ST7789_FRMCTR1 0xB1
+        #define ST7789_FRMCTR2 0xB2
+        #define ST7789_FRMCTR3 0xB3
+        #define ST7789_INVCTR  0xB4
+        #define ST7789_DISSET5 0xB6
+        #define ST7789_PWCTR1  0xC0
+        #define ST7789_PWCTR2  0xC1
+        #define ST7789_PWCTR3  0xC2
+        #define ST7789_VMCTR1  0xC5
+        #define ST7789_RDID1   0xDA
+        #define ST7789_RDID2   0xDB
+        #define ST7789_RDID3   0xDC
+        #define ST7789_RDID4   0xDD
+        #define ST7789_GMCTRP1 0xE0
+        #define ST7789_GMCTRN1 0xE1
+      #endif
+      
       #ifdef CYD_24
         #define SCREEN_CHAR_WIDTH 40
         #define HAS_ILI9341
@@ -860,6 +958,17 @@
         #define ST7796_MADCTL_MH  0x04
       #endif // CYD_35CAP
 
+      #define SCREEN_BUFFER
+
+      #if defined(CYD_35CAP) || defined(CYD_35)
+        #define MAX_SCREEN_BUFFER 33
+      #else
+        #define MAX_SCREEN_BUFFER 22
+      #endif
+
+      #define GRAPH_VERT_LIM TFT_HEIGHT/2
+      
+      #define CHAR_WIDTH 12
       #define SCREEN_WIDTH TFT_WIDTH
       #define SCREEN_HEIGHT TFT_HEIGHT
       #define HEIGHT_1 TFT_WIDTH
@@ -919,6 +1028,9 @@
 
       #define TFT_DIY
     
+      #define GRAPH_VERT_LIM TFT_HEIGHT/2
+
+      #define CHAR_WIDTH 12
       #define SCREEN_WIDTH TFT_WIDTH
       #define SCREEN_HEIGHT TFT_HEIGHT
       #define HEIGHT_1 TFT_WIDTH
@@ -1040,7 +1152,9 @@
 
       #define TFT_DIY
       #define KIT
-    
+
+
+      #define CHAR_WIDTH 12
       #define SCREEN_WIDTH TFT_WIDTH
       #define SCREEN_HEIGHT TFT_HEIGHT
       #define HEIGHT_1 TFT_WIDTH
@@ -1406,6 +1520,26 @@
   #endif
   //// END SD DEFINITIONS
 
+  //// SPACE SAVING COLORS
+  #define TFTWHITE     1
+  #define TFTCYAN      2
+  #define TFTBLUE      3
+  #define TFTRED       4
+  #define TFTGREEN     5
+  #define TFTGREY      6
+  #define TFTGRAY      7
+  #define TFTMAGENTA   8
+  #define TFTVIOLET    9
+  #define TFTORANGE    10
+  #define TFTYELLOW    11
+  #define TFTLIGHTGREY 12
+  #define TFTPURPLE    13
+  #define TFTNAVY      14
+  #define TFTSILVER    15
+  #define TFTDARKGREY  16
+  #define TFTSKYBLUE   17
+  //// END SPACE SAVING COLORS
+  
   //// SCREEN STUFF
   #ifndef HAS_SCREEN
 
@@ -1435,29 +1569,29 @@
   //// MEMORY LOWER LIMIT STUFF
   // These values are in bytes
   #ifdef MARAUDER_M5STICKC
-    #define MEM_LOWER_LIM 20000
+    #define MEM_LOWER_LIM 10000
   #elif defined(MARAUDER_MINI)
-    #define MEM_LOWER_LIM 20000
+    #define MEM_LOWER_LIM 10000
   #elif defined(MARAUDER_V7)
-    #define MEM_LOWER_LIM 20000
+    #define MEM_LOWER_LIM 10000
   #elif defined(MARAUDER_REV_FEATHER)
-    #define MEM_LOWER_LIM 20000
+    #define MEM_LOWER_LIM 10000
   #elif defined(MARAUDER_V4)
-    #define MEM_LOWER_LIM 20000
+    #define MEM_LOWER_LIM 10000
   #elif defined(MARAUDER_V6) || defined(MARAUDER_V6_1)
-    #define MEM_LOWER_LIM 20000
+    #define MEM_LOWER_LIM 10000
   #elif defined(MARAUDER_KIT)
-    #define MEM_LOWER_LIM 20000
+    #define MEM_LOWER_LIM 10000
   #elif defined(GENERIC_ESP32)
-    #define MEM_LOWER_LIM 20000
+    #define MEM_LOWER_LIM 10000
   #elif defined(MARAUDER_FLIPPER)
-    #define MEM_LOWER_LIM 20000
+    #define MEM_LOWER_LIM 10000
   #elif defined(ESP32_LDDB)
-    #define MEM_LOWER_LIM 20000
+    #define MEM_LOWER_LIM 10000
   #elif defined(MARAUDER_DEV_BOARD_PRO)
-    #define MEM_LOWER_LIM 20000
+    #define MEM_LOWER_LIM 10000
   #elif defined(XIAO_ESP32_S3)
-    #define MEM_LOWER_LIM 20000
+    #define MEM_LOWER_LIM 10000
   #endif
   //// END MEMORY LOWER LIMIT STUFF
 
@@ -1513,50 +1647,50 @@
       #define GPS_SERIAL_INDEX 2
       #define GPS_TX 4
       #define GPS_RX 13
-      #define mac_history_len 512
+      #define mac_history_len 100
     #elif defined(MARAUDER_V4)
       #define GPS_SERIAL_INDEX 2
       #define GPS_TX 1
       #define GPS_RX 3
-      #define mac_history_len 512
+      #define mac_history_len 100
     #elif defined(MARAUDER_KIT)
       #define GPS_SERIAL_INDEX 2
       #define GPS_TX 4
       #define GPS_RX 13
-      #define mac_history_len 512
+      #define mac_history_len 100
     #elif defined(MARAUDER_DEV_BOARD_PRO)
       #define GPS_SERIAL_INDEX 2
       #define GPS_TX 21
       #define GPS_RX 17
-      #define mac_history_len 512
+      #define mac_history_len 100
     #elif defined(MARAUDER_MINI)
       #define GPS_SERIAL_INDEX 2
       #define GPS_TX 21
       #define GPS_RX 22
-      #define mac_history_len 512
+      #define mac_history_len 100
     #elif defined(MARAUDER_V7)
       #define GPS_SERIAL_INDEX 2
       #define GPS_TX 21
       #define GPS_RX 22
-      #define mac_history_len 512
+      #define mac_history_len 100
     #elif defined(MARAUDER_FLIPPER)
       #define GPS_SERIAL_INDEX 1
       #define GPS_TX 9
       #define GPS_RX 21
-      #define mac_history_len 512
+      #define mac_history_len 100
     #elif defined(MARAUDER_M5STICKC)
       #define GPS_SERIAL_INDEX 1
       #define GPS_TX 33
       #define GPS_RX 32
-      #define mac_history_len 512
+      #define mac_history_len 100
     #elif defined(MARAUDER_REV_FEATHER)
       #define GPS_SERIAL_INDEX 1
       #define GPS_TX 6
       #define GPS_RX 9
-      #define mac_history_len 512
+      #define mac_history_len 100
     #endif
   #else
-    #define mac_history_len 512
+    #define mac_history_len 100
   #endif
   //// END GPS STUFF
 
@@ -1622,4 +1756,19 @@
   #endif
   //// END MARAUDER TITLE STUFF
 
+  //// PCAP BUFFER STUFF
+  #ifdef MARAUDER_V7
+    #define BUF_SIZE 8 * 1024 // Had to reduce buffer size to save RAM. GG @spacehuhn
+    #define SNAP_LEN 4096 // max len of each recieved packet
+  #elif defined(MARAUDER_MINI)
+    #define BUF_SIZE 8 * 1024 // Had to reduce buffer size to save RAM. GG @spacehuhn
+    #define SNAP_LEN 4096 // max len of each recieved packet
+  #elif defined(MARAUDER_REV_FEATHER)
+    #define BUF_SIZE 8 * 1024 // Had to reduce buffer size to save RAM. GG @spacehuhn
+    #define SNAP_LEN 4096 // max len of each recieved packet
+  #else
+    #define BUF_SIZE 3 * 1024 // Had to reduce buffer size to save RAM. GG @spacehuhn
+    #define SNAP_LEN 2324 // max len of each recieved packet
+  #endif
+  //// PCAP BUFFER STUFF
 #endif

@@ -6,10 +6,11 @@
 
 <p align="center">
   <img src="https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/actions/workflows/pages.yml/badge.svg" alt="GitHub Actions Badge" />
-  <img src="https://img.shields.io/badge/version-1.2.1-blue" alt="GitHub Release Version Badge" />
-  <img src="https://komarev.com/ghpvc/?username=Fr4nkFletcher&label=Views&color=0e75b6&style=flat" alt="Profile Views" />
+  <img src="https://img.shields.io/badge/version-1.2.1-000000?style=flat" alt="GitHub Release Version Badge" />
+  <img src="https://img.shields.io/github/issues/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display?style=flat&color=2EA44F" alt="GitHub Issues" />
+  <br>
   <img src="https://img.shields.io/github/commits-since/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/latest?style=flat&color=1F285E" />
-  <img src="https://img.shields.io/github/issues/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display?style=flat-square" alt="GitHub Issues" />
+  <img src="https://komarev.com/ghpvc/?username=Fr4nkFletcher&label=Views&color=333333&style=flat" alt="Profile Views" />
   <a href="https://twitter.com/Fr4nkFletcher">
     <img src="https://img.shields.io/badge/Follow-%231DA1F2.svg?style=flat&logo=x&logoColor=white&color=1F285E" alt="Follow me on X">
   </a>
@@ -19,8 +20,12 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 
 ---
 
-## 🏴‍☠️ Latest Update Highlights — added support for 2.4", 3.2" and 3.5" Capacitive Touch (03/20/25) 🏴‍☠️
- 
+## 🏴‍☠️ Latest Update Highlights — v1.3.1 with other significant improvements (03/29/25) 🏴‍☠️
+
+- Fixed sniffer output overlapping 
+- Reduced memory usage
+- Add index number to AP scan display
+- Add BLE analyzer 
 - Add support for ESP32-2432S024C 2.4" ILI9341/CST820 Capacitive Touch
 - Add support for ESP32-3248S035C 3.5" ST7796/GT911 Capacitive Touch
 - Add support for ESP32-2432S032C 3.2" ST7789/GT911 Capacitive Touch

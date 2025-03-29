@@ -16,7 +16,7 @@
 #include <Ticker.h>
 #include "SPIFFS.h"
 #include "Assets.h"
-#include <Wire.h>  // Added for I2C support (needed for capacitive touch)
+#include <Wire.h>
 #include <TFT_eSPI.h>
 
 

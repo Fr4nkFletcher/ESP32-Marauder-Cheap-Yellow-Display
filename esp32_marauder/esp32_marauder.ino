@@ -1,5 +1,3 @@
-#include <bb_captouch.h>
-
 /* FLASH SETTINGS
 Board: LOLIN D32
 Flash Frequency: 80MHz
@@ -7,12 +5,13 @@ Partition Scheme: Minimal SPIFFS
 https://www.online-utility.org/image/convert/to/XBM
 */
 
+#include <bb_captouch.h>
 #include "configs.h"
 #include "TouchDrvGT911.hpp"
 
 TouchDrvGT911 touch;
 
-#ifdef CYD_24CAP
+#if defined(CYD_24CAP) || defined(CYD_22CAP)
 BBCapTouch bbct;
 const char *szNames[] = {"Unknown", "FT6x36", "GT911", "CST820"};
 #endif
@@ -240,6 +239,32 @@ void setup()
     bbct.init(TOUCH_SDA, TOUCH_SCL, TOUCH_RST, TOUCH_INT);
     int iType = bbct.sensorType();
     Serial.printf("Sensor type = %s\n", szNames[iType]);
+  #elif defined(CYD_22CAP)
+    // Attempt CST820 initialization with retry logic
+    const int maxRetries = 3;
+    int retryCount = 0;
+    int iType = -1;
+    
+    while (retryCount < maxRetries && iType == -1) {
+          bbct.init(TOUCH_SDA, TOUCH_SCL, -1, -1);
+          iType = bbct.sensorType();
+          
+          if (iType != -1) {
+              Serial.printf("Sensor type = %s (Initialized after %d attempts)\n", 
+                          szNames[iType], retryCount + 1);
+          } else {
+              retryCount++;
+              if (retryCount < maxRetries) {
+                  Serial.printf("CST820 init failed, attempt %d of %d\n", 
+                              retryCount, maxRetries);
+                  delay(100); // Short delay between retries
+              }
+          }
+      }
+      
+      if (iType == -1) {
+          Serial.println("Failed to initialize CST820 after all attempts =[");
+      }
   #endif
 
   #ifdef HAS_SCREEN

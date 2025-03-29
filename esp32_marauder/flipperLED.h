@@ -8,7 +8,7 @@
 
 #include <Arduino.h>
 
-#if defined(CYD_28) || defined(CYD_24G) || defined(CYD_24CAP)
+#if defined(CYD_28) || defined(CYD_24G) || defined(CYD_24CAP) || defined(CYD_22CAP)
   #define B_PIN 17
   #define G_PIN 16
   #define R_PIN 4

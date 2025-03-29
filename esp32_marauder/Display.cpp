@@ -38,7 +38,7 @@ void Display::RunSetup()
       uint16_t calData[5] = { 350, 3465, 188, 3431, 2 };
     #elif defined(CYD_24)
       uint16_t calData[5] = { 481, 3053, 433, 3296, 3 };
-    #elif defined(CYD_24CAP)
+    #elif defined(CYD_24CAP) || defined(CYD_22CAP)
       uint16_t calData[5] = { 405, 3209, 297, 3314, 2 };
     #elif defined(CYD_24G)
       uint16_t calData[5] = { 405, 3209, 297, 3314, 2 };
@@ -122,6 +122,7 @@ void Display::tftDrawColorKey()
 
 void Display::tftDrawXScaleButtons(byte x_scale)
 {
+  tft.drawFastVLine(234, 0, 20, TFT_WHITE);
   tft.setCursor(208, 21); tft.setTextColor(TFT_WHITE); tft.setTextSize(1); tft.print("X Scale:"); tft.print(x_scale);
   key[0].initButton(&tft, 220, 10, 20, 20, TFT_BLACK, TFT_CYAN, TFT_BLACK, "-", 2);
   key[1].initButton(&tft, 249, 10, 20, 20, TFT_BLACK, TFT_CYAN, TFT_BLACK, "+", 2);
@@ -133,6 +134,7 @@ void Display::tftDrawXScaleButtons(byte x_scale)
 
 void Display::tftDrawYScaleButtons(byte y_scale)
 {
+  tft.drawFastVLine(290, 0, 20, TFT_WHITE);
   tft.setCursor(265, 21); tft.setTextColor(TFT_WHITE); tft.setTextSize(1); tft.print("Y Scale:"); tft.print(y_scale);
   key[2].initButton(&tft, 276, 10, 20, 20, TFT_BLACK, TFT_MAGENTA, TFT_BLACK, "-", 2);
   key[3].initButton(&tft, 305, 10, 20, 20, TFT_BLACK, TFT_MAGENTA, TFT_BLACK, "+", 2);
@@ -144,6 +146,7 @@ void Display::tftDrawYScaleButtons(byte y_scale)
 
 void Display::tftDrawChannelScaleButtons(int set_channel)
 {
+  tft.drawFastVLine(178, 0, 20, TFT_WHITE);
   tft.setCursor(145, 21); tft.setTextColor(TFT_WHITE); tft.setTextSize(1); tft.print(text10); tft.print(set_channel);
   key[4].initButton(&tft, 164, 10, 20, 20, TFT_BLACK, TFT_BLUE, TFT_BLACK, "-", 2);
   key[5].initButton(&tft, 193, 10, 20, 20, TFT_BLACK, TFT_BLUE, TFT_BLACK, "+", 2);
