@@ -171,12 +171,19 @@ MenuFunctions::MenuFunctions()
     lv_indev_drv_init(&indev_drv);             
     indev_drv.type = LV_INDEV_TYPE_POINTER;    
     indev_drv.read_cb = my_touchpad_read;      
-    lv_indev_drv_register(&indev_drv);         
+    lv_indev_drv_register(&indev_drv);
+
+  //#if defined(CYD_32CAP) || defined(CYD_35CAP)
+  //  touch.setMaxCoordinates(SCREEN_WIDTH, SCREEN_HEIGHT);
+  //  touch.setSwapXY(false);
+  //  touch.setMirrorXY(false, false);
+  //#endif
+      //display_obj.exit_draw = true;         
   }
   
   
   void MenuFunctions::deinitLVGL() {
-      Serial.println(F("Deinit LVGL"));
+      //Serial.println(F("Deinit LVGL"));
       #if defined(CYD_32CAP) || defined(CYD_35CAP)
         touch.setMaxCoordinates(SCREEN_WIDTH, SCREEN_HEIGHT);
         touch.setSwapXY(false);
@@ -394,14 +401,17 @@ MenuFunctions::MenuFunctions()
     list_btn = lv_list_add_btn(list1, LV_SYMBOL_CLOSE, text09);
     lv_obj_set_event_cb(list_btn, ap_list_cb);
   
-    if (type == "AP") {
+    if ((type == "AP") || (type == "AP Info")) {
       for (int i = 0; i < access_points->size(); i++) {
         char buf[access_points->get(i).essid.length() + 1] = {};
         access_points->get(i).essid.toCharArray(buf, access_points->get(i).essid.length() + 1);
         
         list_btn = lv_list_add_btn(list1, LV_SYMBOL_WIFI, buf);
         lv_btn_set_checkable(list_btn, true);
-        lv_obj_set_event_cb(list_btn, ap_list_cb);
+        if (type == "AP")
+          lv_obj_set_event_cb(list_btn, ap_list_cb);
+        else if (type == "AP Info")
+          lv_obj_set_event_cb(list_btn, ap_info_list_cb);
     
         if (access_points->get(i).selected)
           lv_btn_toggle(list_btn);
@@ -547,6 +557,43 @@ MenuFunctions::MenuFunctions()
     }
   }
   
+  void ap_info_list_cb(lv_obj_t * btn, lv_event_t event) {
+    extern LinkedList<AccessPoint>* access_points;
+    extern MenuFunctions menu_function_obj;
+    extern WiFiScan wifi_scan_obj;
+  
+    String btn_text = lv_list_get_btn_text(btn);
+    String display_string = "";
+    
+    // Exit function
+    if (event == LV_EVENT_CLICKED) {
+      if (btn_text != text09) {
+        for (int i = 0; i < access_points->size(); i++) {
+          if (access_points->get(i).essid == btn_text) {
+            lv_obj_del_async(lv_obj_get_parent(lv_obj_get_parent(btn)));
+  
+            printf("LV_EVENT_CANCEL\n");
+            menu_function_obj.deinitLVGL();
+            wifi_scan_obj.StartScan(WIFI_SCAN_OFF);
+            //display_obj.exit_draw = true; // set everything back to normal
+            menu_function_obj.orientDisplay();
+            menu_function_obj.changeMenu(&menu_function_obj.apInfoMenu);
+            wifi_scan_obj.RunAPInfo(i);
+          }
+        }
+      }
+      else {
+        Serial.println("Exiting...");
+        lv_obj_del_async(lv_obj_get_parent(lv_obj_get_parent(btn)));
+  
+        printf("LV_EVENT_CANCEL\n");
+        menu_function_obj.deinitLVGL();
+        wifi_scan_obj.StartScan(WIFI_SCAN_OFF);
+        display_obj.exit_draw = true; // set everything back to normal
+      }
+    }
+  }
+
   void MenuFunctions::addSSIDGFX(){
     extern LinkedList<ssid>* ssids;
     
@@ -715,30 +762,32 @@ void MenuFunctions::main(uint32_t currentTime)
     }
 
     if (currentTime != 0) {
-        if (currentTime - initTime >= BANNER_TIME) {
-            this->initTime = millis();
-            if ((wifi_scan_obj.currentScanMode != LV_JOIN_WIFI) &&
-                (wifi_scan_obj.currentScanMode != LV_ADD_SSID))
-                this->updateStatusBar();
-                
-              // Do channel analyzer stuff
-              if ((wifi_scan_obj.currentScanMode == WIFI_SCAN_CHAN_ANALYZER) ||
-                  (wifi_scan_obj.currentScanMode == BT_SCAN_ANALYZER)){
-              #ifdef HAS_SCREEN
-                this->setGraphScale(this->graphScaleCheck(wifi_scan_obj._analyzer_values));
-                this->drawGraph(wifi_scan_obj._analyzer_values);
-              #endif
-            }
+      if (currentTime - initTime >= BANNER_TIME) {
+        this->initTime = millis();
+        if ((wifi_scan_obj.currentScanMode != LV_JOIN_WIFI) &&
+            (wifi_scan_obj.currentScanMode != LV_ADD_SSID))
+          this->updateStatusBar();
+
+        // Do channel analyzer stuff
+        if ((wifi_scan_obj.currentScanMode == WIFI_SCAN_CHAN_ANALYZER) ||
+            (wifi_scan_obj.currentScanMode == BT_SCAN_ANALYZER)){
+          #ifdef HAS_SCREEN
+            this->setGraphScale(this->graphScaleCheck(wifi_scan_obj._analyzer_values));
+
+            this->drawGraph(wifi_scan_obj._analyzer_values);
+          #endif
         }
+      }
     }
 
+    static bool ignore_first_touch = true;
+
+    
     boolean pressed = false;
 
     #if defined(CYD_32CAP) || defined(CYD_35CAP)
       int16_t t_x[5] = {0, 0, 0, 0, 0}, t_y[5] = {0, 0, 0, 0, 0}; // To store the touch coordinates
       int16_t points = 0;
-    #elif defined(CYD_24CAP) || defined(CYD_22CAP)
-      uint16_t t_x = 0, t_y = 0;
     #else
       uint16_t t_x = 0, t_y = 0;
     #endif
@@ -760,7 +809,10 @@ void MenuFunctions::main(uint32_t currentTime)
         (wifi_scan_obj.currentScanMode != WIFI_ATTACK_RICK_ROLL))
       display_obj.displayBuffer();
 
+
+#ifdef CYD_24CAP
   int pre_getTouch = millis();
+#endif
 
 #ifdef CYD_24CAP || defined(CYD_22CAP)
   int pre_getTouchBBC = millis();
@@ -771,9 +823,6 @@ void MenuFunctions::main(uint32_t currentTime)
       if (!this->disable_touch)
         points = this->updateTouch(t_x, t_y);
         pressed = points && points > 0;
-    #elif defined(CYD_24CAP) || defined(CYD_22CAP)
-      if (!this->disable_touch)
-      pressed = this->updateTouch(&t_x, &t_y);
     #else
       if (!this->disable_touch)
       pressed = this->updateTouch(&t_x, &t_y);
@@ -791,14 +840,13 @@ void MenuFunctions::main(uint32_t currentTime)
         //Stop the current scan
         if ((wifi_scan_obj.currentScanMode == WIFI_SCAN_PROBE) ||
             (wifi_scan_obj.currentScanMode == WIFI_SCAN_STATION_WAR_DRIVE) ||
-            (wifi_scan_obj.currentScanMode == WIFI_SCAN_RAW_CAPTURE) ||
             (wifi_scan_obj.currentScanMode == WIFI_SCAN_STATION) ||
             (wifi_scan_obj.currentScanMode == WIFI_SCAN_AP) ||
             (wifi_scan_obj.currentScanMode == WIFI_SCAN_WAR_DRIVE) ||
             (wifi_scan_obj.currentScanMode == WIFI_SCAN_EVIL_PORTAL) ||
-            (wifi_scan_obj.currentScanMode == WIFI_SCAN_SIG_STREN) ||
             (wifi_scan_obj.currentScanMode == WIFI_SCAN_TARGET_AP) ||
             (wifi_scan_obj.currentScanMode == WIFI_SCAN_TARGET_AP_FULL) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_AP_STA) ||
             (wifi_scan_obj.currentScanMode == WIFI_SCAN_PWN) ||
             (wifi_scan_obj.currentScanMode == WIFI_SCAN_ESPRESSIF) ||
             (wifi_scan_obj.currentScanMode == WIFI_SCAN_ALL) ||
@@ -830,12 +878,17 @@ void MenuFunctions::main(uint32_t currentTime)
             wifi_scan_obj.StartScan(WIFI_SCAN_OFF);
             display_obj.tft.init();
             changeMenu(current_menu);
+            delay(100);
         }
 
         x = -1;
         y = -1;
 
         return;
+        
+        /*for (int i = 0; i < BUTTON_ARRAY_LEN; i++) {
+          display_obj.key[i].press(false);
+        }*/
       }
   #endif
 
@@ -861,6 +914,7 @@ void MenuFunctions::main(uint32_t currentTime)
             (wifi_scan_obj.currentScanMode == WIFI_SCAN_SIG_STREN) ||
             (wifi_scan_obj.currentScanMode == WIFI_SCAN_TARGET_AP) ||
             (wifi_scan_obj.currentScanMode == WIFI_SCAN_TARGET_AP_FULL) ||
+            (wifi_scan_obj.currentScanMode == WIFI_SCAN_AP_STA) ||
             (wifi_scan_obj.currentScanMode == WIFI_SCAN_PWN) ||
             (wifi_scan_obj.currentScanMode == WIFI_SCAN_ESPRESSIF) ||
             (wifi_scan_obj.currentScanMode == WIFI_SCAN_ALL) ||
@@ -892,15 +946,17 @@ void MenuFunctions::main(uint32_t currentTime)
             (wifi_scan_obj.currentScanMode == BT_SCAN_ANALYZER))
           {
             wifi_scan_obj.StartScan(WIFI_SCAN_OFF);
-            
             display_obj.tft.init();
-            
             changeMenu(current_menu);
+            delay(100); // Brief delay to ignore residual touches after exit
           }
 
         x = -1;
         y = -1;
 
+        /*for (int i = 0; i < BUTTON_ARRAY_LEN; i++) {
+          display_obj.key[i].press(false);
+        }*/
         return;
     }
   #endif
@@ -915,6 +971,10 @@ void MenuFunctions::main(uint32_t currentTime)
         (wifi_scan_obj.currentScanMode != WIFI_ATTACK_DEAUTH_MANUAL) &&
         (wifi_scan_obj.currentScanMode != WIFI_ATTACK_DEAUTH_TARGETED) &&
         (wifi_scan_obj.currentScanMode != WIFI_ATTACK_MIMIC) &&
+        (wifi_scan_obj.currentScanMode != WIFI_SCAN_PACKET_RATE) &&
+        (wifi_scan_obj.currentScanMode != WIFI_SCAN_RAW_CAPTURE) &&
+        (wifi_scan_obj.currentScanMode != WIFI_SCAN_CHAN_ANALYZER) &&
+        (wifi_scan_obj.currentScanMode != WIFI_SCAN_SIG_STREN) &&
         (wifi_scan_obj.currentScanMode != WIFI_ATTACK_RICK_ROLL)) 
         {
           #if defined(CYD_32CAP) || defined(CYD_35CAP)
@@ -955,41 +1015,43 @@ void MenuFunctions::main(uint32_t currentTime)
                     display_obj.tft.drawXBitmap(0,
                                                 KEY_Y + b * (KEY_H + KEY_SPACING_Y) - (ICON_H / 2),
                                                 menu_icons[current_menu->list->get(b).icon],
-                                                ICON_W, ICON_H,
-                                                icon_color, TFT_BLACK);
-                    Serial.println("Pressed icon for " + current_menu->list->get(b).name + " with color: " + String(icon_color, HEX));
+                                                ICON_W, 
+                                                ICON_H,
+                                                this->getColor(current_menu->list->get(b).color),
+                                                TFT_BLACK);
+                    //Serial.println("Pressed icon for " + current_menu->list->get(b).name + " with color: " + String(icon_color, HEX));
                 }
             }
 
-            if (display_obj.key[b].justReleased()) {
-                display_obj.key[b].drawButton(false, current_menu->list->get(b).name); // Released state
-                if (!pressed) {
-                    // Execute callable when fully released (no touch held)
-                    display_obj.tft.fillScreen(TFT_BLACK);
-                    display_obj.tft.setCursor(0, 0);
-                    //Serial.println("Full screen clear before callable: " + current_menu->list->get(b).name);
-                    current_menu->list->get(b).callable();
-                } else {
-                    // Redraw icon with correct color when touch is still active
-                    if (current_menu->list->get(b).name != text09) {
-                        uint16_t icon_color = this->getColor(current_menu->list->get(b).color);
-                        display_obj.tft.setTextColor(icon_color, TFT_BLACK); // Reset color state
-                        display_obj.tft.drawXBitmap(0,
-                                                    KEY_Y + b * (KEY_H + KEY_SPACING_Y) - (ICON_H / 2),
-                                                    menu_icons[current_menu->list->get(b).icon],
-                                                    ICON_W, ICON_H,
-                                                    icon_color, TFT_BLACK);
-                        //Serial.println("Released icon redraw for " + current_menu->list->get(b).name + " with color: " + String(icon_color, HEX));
-                    }
-                }
-            }
-
-            display_obj.tft.setFreeFont(NULL);
-          }
+            // If button was just release, execute the button's function
+        if ((display_obj.key[b].justReleased()) && (!pressed))
+        {
+          display_obj.key[b].drawButton(false, current_menu->list->get(b).name);
+          current_menu->list->get(b).callable();
+        }
+        // This
+        else if ((display_obj.key[b].justReleased()) && (pressed)) {
+          display_obj.key[b].drawButton(false, current_menu->list->get(b).name);
+          if (current_menu->list->get(b).name != text09)
+            display_obj.tft.drawXBitmap(0,
+                                        KEY_Y + b * (KEY_H + KEY_SPACING_Y) - (ICON_H / 2),
+                                        menu_icons[current_menu->list->get(b).icon],
+                                        ICON_W,
+                                        ICON_H,
+                                        TFT_BLACK,
+                                        this->getColor(current_menu->list->get(b).color));
+        }
+  
+        display_obj.tft.setFreeFont(NULL);
       }
-      x = -1;
-      y = -1;
-      #endif
+    }
+    x = -1;
+    y = -1;
+
+    /*for (int i = 0; i < BUTTON_ARRAY_LEN; i++) {
+          display_obj.key[i].press(false);
+        }*/
+  #endif
 
   // Menu navigation and paging
   #ifdef HAS_BUTTONS
@@ -1021,10 +1083,15 @@ void MenuFunctions::main(uint32_t currentTime)
                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_EAPOL) ||
                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_CHAN_ANALYZER) ||
                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_PACKET_RATE) ||
+                  (wifi_scan_obj.currentScanMode == WIFI_SCAN_RAW_CAPTURE) ||
                   (wifi_scan_obj.currentScanMode == WIFI_SCAN_SIG_STREN)) {
-            wifi_scan_obj.changeChannel(wifi_scan_obj.set_channel < 14 ? wifi_scan_obj.set_channel + 1 : 1);
+            if (wifi_scan_obj.set_channel < 14)
+              wifi_scan_obj.changeChannel(wifi_scan_obj.set_channel + 1);
+            else
+              wifi_scan_obj.changeChannel(1);
+          }
         }
-    }
+    #endif
     if (d_btn.justPressed()) {
         if (wifi_scan_obj.currentScanMode == WIFI_SCAN_OFF || wifi_scan_obj.currentScanMode == OTA_UPDATE) {
             if (current_menu->selected < current_menu->list->size() - 1) {
@@ -1062,7 +1129,10 @@ void MenuFunctions::main(uint32_t currentTime)
                 (wifi_scan_obj.currentScanMode == WIFI_SCAN_CHAN_ANALYZER) ||
                 (wifi_scan_obj.currentScanMode == WIFI_SCAN_PACKET_RATE) ||
                 (wifi_scan_obj.currentScanMode == WIFI_SCAN_SIG_STREN)) {
-          wifi_scan_obj.changeChannel(wifi_scan_obj.set_channel > 1 ? wifi_scan_obj.set_channel - 1 : 14);
+          if (wifi_scan_obj.set_channel > 1)
+            wifi_scan_obj.changeChannel(wifi_scan_obj.set_channel - 1);
+          else
+            wifi_scan_obj.changeChannel(14);
         }
       }
       if(c_btn_press){
@@ -1070,7 +1140,6 @@ void MenuFunctions::main(uint32_t currentTime)
       }
     #endif
   #endif
-#endif
 }
 
 
@@ -1517,7 +1586,7 @@ void MenuFunctions::orientDisplay()
       uint16_t calData[5] = { 350, 3465, 188, 3431, 2 }; // tft.setRotation(0); // Portrait with TFT Shield
     #elif defined(CYD_24)
       uint16_t calData[5] = { 481, 3053, 433, 3296, 3 }; // tft.setRotation(0); // Portrait with TFT Shield
-    #elif defined(CYD_24CAP) || defined(CYD_22CAP)
+    #elif defined(CYD_24CAP)
       uint16_t calData[5] = { 405, 3209, 297, 3314, 2 };
     #elif defined(CYD_24G)
       uint16_t calData[5] = { 405, 3209, 297, 3314, 2 }; // tft.setRotation(0); // Portrait with TFT Shield
@@ -1625,6 +1694,9 @@ void MenuFunctions::RunSetup()
   #endif
   wifiGeneralMenu.list = new LinkedList<MenuNode>();
   wifiAPMenu.list = new LinkedList<MenuNode>();
+  apInfoMenu.list = new LinkedList<MenuNode>();
+  setMacMenu.list = new LinkedList<MenuNode>();
+  genAPMacMenu.list = new LinkedList<MenuNode>();
   #ifdef HAS_BT
     airtagMenu.list = new LinkedList<MenuNode>();
   #endif
@@ -1691,6 +1763,9 @@ void MenuFunctions::RunSetup()
   clearSSIDsMenu.name = text_table1[28];
   clearAPsMenu.name = text_table1[29];
   wifiAPMenu.name = "Access Points";
+  apInfoMenu.name = "AP Info";
+  setMacMenu.name = "Set MACs";
+  genAPMacMenu.name = "Generate AP MAC";
   #ifdef HAS_BT
     airtagMenu.name = "Select Airtag";
   #endif
@@ -1766,6 +1841,13 @@ void MenuFunctions::RunSetup()
     this->drawStatusBar();
     wifi_scan_obj.StartScan(WIFI_SCAN_DEAUTH, TFT_RED);
   });
+
+  this->addNodes(&wifiSnifferMenu, "Packet Count", TFTORANGE, NULL, PACKET_MONITOR, [this]() {
+    display_obj.clearScreen();
+    this->drawStatusBar();
+    wifi_scan_obj.StartScan(WIFI_SCAN_PACKET_RATE, TFT_ORANGE);
+    wifi_scan_obj.renderPacketRate();
+  });
   
   #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789)
     this->addNodes(&wifiSnifferMenu, text_table1[46], TFTVIOLET, NULL, EAPOL, [this]() {
@@ -1774,7 +1856,7 @@ void MenuFunctions::RunSetup()
     this->addNodes(&wifiSnifferMenu, text_table1[45], TFTBLUE, NULL, PACKET_MONITOR, [this]() {
       wifi_scan_obj.StartScan(WIFI_PACKET_MONITOR, TFT_BLUE);
     });
-  #else
+  #else // No touch
     this->addNodes(&wifiSnifferMenu, text_table1[46], TFTVIOLET, NULL, EAPOL, [this]() {
       display_obj.clearScreen();
       this->drawStatusBar();
@@ -1785,45 +1867,54 @@ void MenuFunctions::RunSetup()
       this->drawStatusBar();
       wifi_scan_obj.StartScan(WIFI_PACKET_MONITOR, TFT_BLUE);
     });
-    this->addNodes(&wifiSnifferMenu, "Channel Analyzer", TFTCYAN, NULL, PACKET_MONITOR, [this]() {
-      display_obj.clearScreen();
-      this->drawStatusBar();
-      this->renderGraphUI(WIFI_SCAN_CHAN_ANALYZER);
-      wifi_scan_obj.StartScan(WIFI_SCAN_CHAN_ANALYZER, TFT_CYAN);
-    });
-    this->addNodes(&wifiSnifferMenu, "Packet Rate", TFTORANGE, NULL, PACKET_MONITOR, [this]() {
+    /*this->addNodes(&wifiSnifferMenu, "Packet Count", TFTORANGE, NULL, PACKET_MONITOR, [this]() {
       display_obj.clearScreen();
       this->drawStatusBar();
       wifi_scan_obj.StartScan(WIFI_SCAN_PACKET_RATE, TFT_ORANGE);
       wifi_scan_obj.renderPacketRate();
-    });
+    });*/
   #endif
-
-  this->addNodes(&wifiSnifferMenu, text_table1[47], TFTRED, NULL, PWNAGOTCHI, [this]() {
+  this->addNodes(&wifiSnifferMenu, "Channel Analyzer", TFTCYAN, NULL, PACKET_MONITOR, [this]() {
     display_obj.clearScreen();
     this->drawStatusBar();
-    wifi_scan_obj.StartScan(WIFI_SCAN_PWN, TFT_RED);
-  });
-  this->addNodes(&wifiSnifferMenu, text_table1[49], TFTMAGENTA, NULL, BEACON_SNIFF, [this]() {
-    display_obj.clearScreen();
-    this->drawStatusBar();
-    wifi_scan_obj.StartScan(WIFI_SCAN_TARGET_AP, TFT_MAGENTA);
+    this->renderGraphUI(WIFI_SCAN_CHAN_ANALYZER);
+    wifi_scan_obj.StartScan(WIFI_SCAN_CHAN_ANALYZER, TFT_CYAN);
   });
   this->addNodes(&wifiSnifferMenu, text_table1[58], TFTWHITE, NULL, PACKET_MONITOR, [this]() {
     display_obj.clearScreen();
     this->drawStatusBar();
     wifi_scan_obj.StartScan(WIFI_SCAN_RAW_CAPTURE, TFT_WHITE);
   });
+  this->addNodes(&wifiSnifferMenu, text_table1[47], TFTRED, NULL, PWNAGOTCHI, [this]() {
+    display_obj.clearScreen();
+    this->drawStatusBar();
+    wifi_scan_obj.StartScan(WIFI_SCAN_PWN, TFT_RED);
+  });
+  #if !defined(HAS_ILI9341) && !defined(HAS_ST7789) && !defined(HAS_ST7796)
+    this->addNodes(&wifiSnifferMenu, text_table1[49], TFTMAGENTA, NULL, BEACON_SNIFF, [this]() {
+      display_obj.clearScreen();
+      this->drawStatusBar();
+      wifi_scan_obj.StartScan(WIFI_SCAN_TARGET_AP, TFT_MAGENTA);
+    });
+  #endif
+  this->addNodes(&wifiSnifferMenu, "Scan All", TFTLIME, NULL, BEACON_SNIFF, [this]() {
+    display_obj.clearScreen();
+    this->drawStatusBar();
+    wifi_scan_obj.StartScan(WIFI_SCAN_AP_STA, 0x97e0);
+  });
+  #if !defined(HAS_ILI9341) && !defined(HAS_ST7789) && !defined(HAS_ST7796)
   this->addNodes(&wifiSnifferMenu, text_table1[59], TFTORANGE, NULL, PACKET_MONITOR, [this]() {
     display_obj.clearScreen();
     this->drawStatusBar();
     wifi_scan_obj.StartScan(WIFI_SCAN_STATION, TFT_WHITE);
   });
+  #endif
   this->addNodes(&wifiSnifferMenu, "Signal Monitor", TFTCYAN, NULL, PACKET_MONITOR, [this]() {
     display_obj.clearScreen();
     this->drawStatusBar();
     wifi_scan_obj.StartScan(WIFI_SCAN_SIG_STREN, TFT_CYAN);
   });
+  
   // Build Wardriving menu
   #ifdef HAS_GPS
   wardrivingMenu.parentMenu = &wifiMenu; // Main Menu is second menu parent
@@ -1876,6 +1967,7 @@ void MenuFunctions::RunSetup()
     display_obj.clearScreen();
     this->drawStatusBar();
     wifi_scan_obj.StartScan(WIFI_SCAN_EVIL_PORTAL, TFT_ORANGE);
+    wifi_scan_obj.setMac();
   });
   this->addNodes(&wifiAttackMenu, text_table1[54], TFTRED, NULL, DEAUTH_SNIFF, [this]() {
     display_obj.clearScreen();
@@ -1950,46 +2042,31 @@ void MenuFunctions::RunSetup()
       wifi_scan_obj.StartScan(LV_ADD_SSID, TFT_RED);  
       selectEPHTMLGFX();
     });
+    apInfoMenu.parentMenu = &wifiGeneralMenu;
+    this->addNodes(&apInfoMenu, text09, TFTLIGHTGREY, NULL, 0, [this]() {
+      this->changeMenu(apInfoMenu.parentMenu);
+    });
   #else // Mini EP HTML select
     this->addNodes(&wifiGeneralMenu, "Select EP HTML File", TFTCYAN, NULL, KEYBOARD_ICO, [this](){
+      // Add the back button
+      htmlMenu.list->clear();
+        this->addNodes(&htmlMenu, text09, TFTLIGHTGREY, NULL, 0, [this]() {
+        this->changeMenu(htmlMenu.parentMenu);
+      });
+
+      // Populate the menu with buttons
+      for (int i = 0; i < evil_portal_obj.html_files->size(); i++) {
+        // This is the menu node
+        this->addNodes(&htmlMenu, evil_portal_obj.html_files->get(i), TFTCYAN, NULL, 255, [this, i](){
+          evil_portal_obj.selected_html_index = i;
+          evil_portal_obj.target_html_name = evil_portal_obj.html_files->get(evil_portal_obj.selected_html_index);
+          Serial.println("Set Evil Portal HTML as " + evil_portal_obj.target_html_name);
+          evil_portal_obj.using_serial_html = false;
+          this->changeMenu(htmlMenu.parentMenu);
+          return;
+        });
+      }
       this->changeMenu(&htmlMenu);
-      #if (defined(HAS_BUTTONS) && defined(HAS_SD)) 
-        #if !(defined(MARAUDER_V6) || defined(MARAUDER_V6_1))
-          while(true) {
-            if (d_btn.justPressed()) {
-              if (evil_portal_obj.selected_html_index > 0)
-                evil_portal_obj.selected_html_index--;
-              else
-                evil_portal_obj.selected_html_index = evil_portal_obj.html_files->size() - 1;
-
-              this->htmlMenu.list->set(0, MenuNode{evil_portal_obj.html_files->get(evil_portal_obj.selected_html_index), false, TFTCYAN, 0, NULL, true, NULL});
-              this->buildButtons(&htmlMenu);
-              this->displayCurrentMenu();
-            }
-            #ifndef MARAUDER_M5STICKC
-              if (u_btn.justPressed()) {
-                if (evil_portal_obj.selected_html_index < evil_portal_obj.html_files->size() - 1)
-                  evil_portal_obj.selected_html_index++;
-                else
-                  evil_portal_obj.selected_html_index = 0;
-
-                this->htmlMenu.list->set(0, MenuNode{evil_portal_obj.html_files->get(evil_portal_obj.selected_html_index), false, TFTCYAN, 0, NULL, true, NULL});
-                this->buildButtons(&htmlMenu, 0, evil_portal_obj.html_files->get(evil_portal_obj.selected_html_index));
-                this->displayCurrentMenu();
-              }
-            #endif
-            if (c_btn.justPressed()) {
-              if (evil_portal_obj.html_files->get(evil_portal_obj.selected_html_index) != "Back") {
-                evil_portal_obj.target_html_name = evil_portal_obj.html_files->get(evil_portal_obj.selected_html_index);
-                Serial.println("Set Evil Portal HTML as " + evil_portal_obj.target_html_name);
-                evil_portal_obj.using_serial_html = false;
-              }
-              this->changeMenu(htmlMenu.parentMenu);
-              break;
-            }
-          }
-        #endif
-      #endif
     });
 
     #if (!defined(HAS_ILI9341) && !defined(HAS_ST7796) && !defined(HAS_ST7789) && defined(HAS_BUTTONS))
@@ -2011,15 +2088,8 @@ void MenuFunctions::RunSetup()
         this->changeMenu(wifiAPMenu.parentMenu);
       });
 
-      // Determine how big the whole menu is going to be
-      int menu_limit = access_points->size();
-      /*if (access_points->size() <= BUTTON_ARRAY_LEN)
-        menu_limit = access_points->size();
-      else
-        menu_limit = BUTTON_ARRAY_LEN;*/
-
       // Populate the menu with buttons
-      for (int i = 0; i < menu_limit; i++) {
+      for (int i = 0; i < access_points->size(); i++) {
         this->addNodes(&wifiAPMenu, access_points->get(i).essid, TFTCYAN, NULL, 255, [this, i](){
         AccessPoint new_ap = access_points->get(i);
         new_ap.selected = !access_points->get(i).selected;
@@ -2035,6 +2105,29 @@ void MenuFunctions::RunSetup()
       this->changeMenu(&wifiAPMenu);
     });
 
+    this->addNodes(&wifiGeneralMenu, "View AP Info", TFTCYAN, NULL, KEYBOARD_ICO, [this](){
+      // Add the back button
+      wifiAPMenu.list->clear();
+        this->addNodes(&wifiAPMenu, text09, TFTLIGHTGREY, NULL, 0, [this]() {
+        this->changeMenu(wifiAPMenu.parentMenu);
+      });
+
+      // Populate the menu with buttons
+      for (int i = 0; i < access_points->size(); i++) {
+        // This is the menu node
+        this->addNodes(&wifiAPMenu, access_points->get(i).essid, TFTCYAN, NULL, 255, [this, i](){
+          this->changeMenu(&apInfoMenu);
+          wifi_scan_obj.RunAPInfo(i);
+        });
+      }
+      this->changeMenu(&wifiAPMenu);
+    });
+
+    apInfoMenu.parentMenu = &wifiAPMenu;
+    this->addNodes(&apInfoMenu, text09, TFTLIGHTGREY, NULL, 0, [this]() {
+      this->changeMenu(apInfoMenu.parentMenu);
+    });
+    
     wifiAPMenu.parentMenu = &wifiGeneralMenu;
     this->addNodes(&wifiAPMenu, text09, TFTLIGHTGREY, NULL, 0, [this]() {
       this->changeMenu(wifiAPMenu.parentMenu);
@@ -2105,6 +2198,83 @@ void MenuFunctions::RunSetup()
     });
   #endif
 
+  #if defined(HAS_ILI9341) || defined(HAS_ST7789) || defined(HAS_ST7796)
+    this->addNodes(&wifiGeneralMenu, "View AP Info", TFTLIGHTGREY, NULL, 0, [this]() {
+      display_obj.clearScreen();
+      wifi_scan_obj.currentScanMode = LV_ADD_SSID;
+      wifi_scan_obj.StartScan(LV_ADD_SSID, TFT_WHITE);
+      addAPGFX("AP Info");
+    });
+  #endif
+
+  this->addNodes(&wifiGeneralMenu, "Set MACs", TFTLIGHTGREY, NULL, 0, [this]() {
+    this->changeMenu(&setMacMenu);
+  });
+
+
+  // Menu for generating and setting MAC addrs for AP and STA
+  setMacMenu.parentMenu = &wifiGeneralMenu;
+  this->addNodes(&setMacMenu, text09, TFTLIGHTGREY, NULL, 0, [this]() {
+    this->changeMenu(setMacMenu.parentMenu);
+  });
+
+  // Generate random MAC for AP
+  this->addNodes(&setMacMenu, "Generate AP MAC", TFTLIME, NULL, 0, [this]() {
+    this->changeMenu(&genAPMacMenu);
+    wifi_scan_obj.RunGenerateRandomMac(true);
+  });
+
+  // Generate random MAC for AP
+  this->addNodes(&setMacMenu, "Generate STA MAC", TFTCYAN, NULL, 0, [this]() {
+    this->changeMenu(&genAPMacMenu);
+    wifi_scan_obj.RunGenerateRandomMac(false);
+  });
+
+  // Clone AP MAC to ESP32 for button folks
+  #if !defined(HAS_ILI9341) && !defined(HAS_ST7789) && !defined(HAS_ST7789)
+    this->addNodes(&setMacMenu, "Clone AP MAC", TFTRED, NULL, CLEAR_ICO, [this](){
+      // Add the back button
+      wifiAPMenu.list->clear();
+        this->addNodes(&wifiAPMenu, text09, TFTLIGHTGREY, NULL, 0, [this]() {
+        this->changeMenu(wifiAPMenu.parentMenu);
+      });
+
+      // Populate the menu with buttons
+      for (int i = 0; i < access_points->size(); i++) {
+        // This is the menu node
+        this->addNodes(&wifiAPMenu, access_points->get(i).essid, TFTLIME, NULL, 255, [this, i](){
+          this->changeMenu(&genAPMacMenu);
+          wifi_scan_obj.RunSetMac(access_points->get(i).bssid, true);
+        });
+      }
+      this->changeMenu(&wifiAPMenu);
+    });
+
+    this->addNodes(&setMacMenu, "Clone STA MAC", TFTMAGENTA, NULL, CLEAR_ICO, [this](){
+      // Add the back button
+      wifiAPMenu.list->clear();
+        this->addNodes(&wifiAPMenu, text09, TFTLIGHTGREY, NULL, 0, [this]() {
+        this->changeMenu(wifiAPMenu.parentMenu);
+      });
+
+      // Populate the menu with buttons
+      for (int i = 0; i < stations->size(); i++) {
+        // This is the menu node
+        this->addNodes(&wifiAPMenu, macToString(stations->get(i).mac), TFTMAGENTA, NULL, 255, [this, i](){
+          this->changeMenu(&genAPMacMenu);
+          wifi_scan_obj.RunSetMac(stations->get(i).mac, false);
+        });
+      }
+      this->changeMenu(&wifiAPMenu);
+    });
+  #endif
+
+  // Menu for generating and setting access point MAC (just goes bacK)
+  genAPMacMenu.parentMenu = &wifiGeneralMenu;
+  this->addNodes(&genAPMacMenu, text09, TFTLIGHTGREY, NULL, 0, [this]() {
+    this->changeMenu(genAPMacMenu.parentMenu);
+  });
+  
   // Build generate ssids menu
   generateSSIDsMenu.parentMenu = &wifiGeneralMenu;
   this->addNodes(&generateSSIDsMenu, text09, TFTLIGHTGREY, NULL, 0, [this]() {
@@ -2840,16 +3010,10 @@ void MenuFunctions::renderGraphUI(uint8_t scan_mode) {
   if (scan_mode == WIFI_SCAN_CHAN_ANALYZER)
     display_obj.tft.drawCentreString("Frames/" + (String)BANNER_TIME + "ms", TFT_WIDTH / 2, TFT_HEIGHT - GRAPH_VERT_LIM - (CHAR_WIDTH * 2), 1);
   else if (scan_mode == BT_SCAN_ANALYZER)
-    display_obj.tft.setTextFont(1); // Force smallest font
-    display_obj.tft.drawCentreString("BLE Beacons/" + (String)BANNER_TIME + "ms", TFT_WIDTH / 2 - 10, TFT_HEIGHT - GRAPH_VERT_LIM - (CHAR_WIDTH * 2), 1);
-  
+    display_obj.tft.drawCentreString("BLE Beacons/" + (String)BANNER_TIME + "ms", TFT_WIDTH / 2, TFT_HEIGHT - GRAPH_VERT_LIM - (CHAR_WIDTH * 2), 1);
   display_obj.tft.drawLine(0, TFT_HEIGHT - GRAPH_VERT_LIM - 1, TFT_WIDTH, TFT_HEIGHT - GRAPH_VERT_LIM - 1, TFT_WHITE);
-  #if defined(CYD_35) || defined(CYD_35CAP)
-    display_obj.tft.setCursor(0, TFT_HEIGHT - GRAPH_VERT_LIM - (CHAR_WIDTH * 16));
-  #else
-    display_obj.tft.setCursor(0, TFT_HEIGHT - GRAPH_VERT_LIM - (CHAR_WIDTH * 8));
-  #endif
-  display_obj.tft.setTextSize(BANNER_TEXT_SIZE);
+  display_obj.tft.setCursor(0, TFT_HEIGHT - GRAPH_VERT_LIM - (CHAR_WIDTH * 8));
+  display_obj.tft.setTextSize(1);
   display_obj.tft.setTextColor(TFT_GREEN, TFT_BLACK);
   display_obj.tft.println("Max");
   display_obj.tft.setTextColor(TFT_ORANGE, TFT_BLACK);
@@ -2877,6 +3041,7 @@ uint16_t MenuFunctions::getColor(uint16_t color) {
   else if (color == TFTSILVER) return TFT_SILVER;
   else if (color == TFTDARKGREY) return TFT_DARKGREY;
   else if (color == TFTSKYBLUE) return TFT_SKYBLUE;
+  else if (color == TFTLIME) return 0x97e0;
   else return color;
 }
 
@@ -2888,6 +3053,8 @@ void MenuFunctions::changeMenu(Menu * menu)
   display_obj.tft.init();
   current_menu = menu;
 
+  current_menu->selected = 0;
+  
   buildButtons(menu);
 
   displayCurrentMenu();

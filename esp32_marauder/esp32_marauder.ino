@@ -159,6 +159,8 @@ void backlightOff() {
 
 void setup()
 {
+  esp_spiram_init();
+  
   #ifdef MARAUDER_M5STICKC
     axp192_obj.begin();
   #endif
@@ -342,7 +344,9 @@ void loop()
   bool mini = false;
 
   #ifdef SCREEN_BUFFER
-    mini = true;
+    #if !defined(HAS_ILI9341) && !defined(HAS_ST7789) && !defined(HAS_ST7796)
+      mini = true;
+    #endif
   #endif
 
   // Touch disable toggle for all touch-enabled devices
@@ -378,12 +382,12 @@ void loop()
   #endif
   settings_obj.main(currentTime);
 
-  if (((wifi_scan_obj.currentScanMode != WIFI_PACKET_MONITOR) && (wifi_scan_obj.currentScanMode != WIFI_SCAN_EAPOL)) || mini) {
+  if (((wifi_scan_obj.currentScanMode != WIFI_PACKET_MONITOR) && (wifi_scan_obj.currentScanMode != WIFI_SCAN_EAPOL)) ||
+      (mini)) {
     #ifdef HAS_SCREEN
       menu_function_obj.main(currentTime);
     #endif
   }
-
   #ifdef MARAUDER_FLIPPER
     flipper_led.main();
   #elif defined(MARAUDER_V4)

@@ -22,7 +22,7 @@
   //#define MARAUDER_REV_FEATHER
   //// END BOARD TARGETS
 
-  #define MARAUDER_VERSION "v1.3.1"
+  #define MARAUDER_VERSION "v1.4.2"
 
   #define GRAPH_REFRESH 100
 
@@ -128,16 +128,16 @@
     #define HAS_FULL_SCREEN
     #define HAS_SD
     #define USE_SD
-    //#define HAS_GPS
+    #define HAS_GPS
     //#define CYD_22CAP
     //#define CYD_24
-    #define CYD_24G
+    //#define CYD_24G
     //#define CYD_24CAP
     //#define CYD_28
     //#define CYD_32
     //#define CYD_32CAP
     //#define CYD_35
-    //#define CYD_35CAP
+    #define CYD_35CAP
   #endif
 
   #if defined(MARAUDER_V6) || defined(MARAUDER_V6_1)
@@ -420,7 +420,7 @@
       //#define MENU_FONT &FreeSans9pt7b
       //#define MENU_FONT &FreeSansBold9pt7b
       #define BUTTON_SCREEN_LIMIT 6
-      #define BUTTON_ARRAY_LEN 100
+      #define BUTTON_ARRAY_LEN BUTTON_SCREEN_LIMIT
       #define STATUS_BAR_WIDTH (TFT_HEIGHT/16)
       #define LVGL_TICK_PERIOD 6
     
@@ -586,7 +586,7 @@
             #define TFT_HEIGHT 320
         #endif
 
-        #define THROW_AWAY_TOUCH_COUNT 31
+        //#define THROW_AWAY_TOUCH_COUNT 31
         // Touchscreen pins (already in your config, kept as-is)
         #define TOUCH_SDA  33
         #define TOUCH_SCL  32
@@ -606,9 +606,9 @@
         #define TOUCH_WIDTH  240
         #define TOUCH_HEIGHT 320
 
-        #define SPI_FREQUENCY  55000000
-        #define SPI_READ_FREQUENCY  20000000
-        #define SPI_TOUCH_FREQUENCY  2500000
+        //#define SPI_FREQUENCY  55000000
+        //#define SPI_READ_FREQUENCY  20000000
+        //#define SPI_TOUCH_FREQUENCY  2500000
 
         // Generic commands used by TFT_eSPI.cpp
         #define TFT_NOP     0x00
@@ -967,14 +967,21 @@
       #endif
 
       #define GRAPH_VERT_LIM TFT_HEIGHT/2
-      
+
+      #define EXT_BUTTON_WIDTH 20
+
+    //#if defined(CYD_35) || defined(CYD_35CAP)
+      //#define TEXT_HEIGHT 24 // Height of text to be printed and scrolled
+    //#else
+      #define TEXT_HEIGHT 16 // Height of text to be printed and scrolled
+    //#endif
       #define CHAR_WIDTH 12
       #define SCREEN_WIDTH TFT_WIDTH
       #define SCREEN_HEIGHT TFT_HEIGHT
       #define HEIGHT_1 TFT_WIDTH
       #define WIDTH_1 TFT_HEIGHT
       #define STANDARD_FONT_CHAR_LIMIT (TFT_WIDTH / 6) // number of characters on a single line with normal font
-      #define TEXT_HEIGHT 16 // Height of text to be printed and scrolled
+      
       #define BOT_FIXED_AREA 0 // Number of lines in bottom fixed area (lines counted from bottom of screen)
       #define TOP_FIXED_AREA 48 // Number of lines in top fixed area (lines counted from top of screen)
       #define YMAX TFT_HEIGHT // Dynamically set based on the display height
@@ -985,7 +992,7 @@
       //#define MENU_FONT &FreeSans9pt7b
       //#define MENU_FONT &FreeSansBold9pt7b
       #define BUTTON_SCREEN_LIMIT 12
-      #define BUTTON_ARRAY_LEN 12
+      #define BUTTON_ARRAY_LEN BUTTON_SCREEN_LIMIT
       #define STATUS_BAR_WIDTH 16
       #define LVGL_TICK_PERIOD 6
 
@@ -1030,6 +1037,12 @@
     
       #define GRAPH_VERT_LIM TFT_HEIGHT/2
 
+      #define EXT_BUTTON_WIDTH 20
+
+      #define SCREEN_BUFFER
+
+      #define MAX_SCREEN_BUFFER 22
+
       #define CHAR_WIDTH 12
       #define SCREEN_WIDTH TFT_WIDTH
       #define SCREEN_HEIGHT TFT_HEIGHT
@@ -1047,7 +1060,7 @@
       //#define MENU_FONT &FreeSans9pt7b
       //#define MENU_FONT &FreeSansBold9pt7b
       #define BUTTON_SCREEN_LIMIT 12
-      #define BUTTON_ARRAY_LEN 12
+      #define BUTTON_ARRAY_LEN BUTTON_SCREEN_LIMIT
       #define STATUS_BAR_WIDTH 16
       #define LVGL_TICK_PERIOD 6
 
@@ -1092,7 +1105,10 @@
       #define SCREEN_BUFFER
 
       #define MAX_SCREEN_BUFFER 22
-    
+
+      #define EXT_BUTTON_WIDTH 0
+
+
       #define CHAR_WIDTH 12
       #define SCREEN_WIDTH TFT_WIDTH
       #define SCREEN_HEIGHT TFT_HEIGHT
@@ -1110,7 +1126,7 @@
       //#define MENU_FONT &FreeSans9pt7b
       //#define MENU_FONT &FreeSansBold9pt7b
       #define BUTTON_SCREEN_LIMIT 12
-      #define BUTTON_ARRAY_LEN 100
+      #define BUTTON_ARRAY_LEN BUTTON_SCREEN_LIMIT
       #define STATUS_BAR_WIDTH 16
       #define LVGL_TICK_PERIOD 6
 
@@ -1171,7 +1187,7 @@
       //#define MENU_FONT &FreeSans9pt7b
       //#define MENU_FONT &FreeSansBold9pt7b
       #define BUTTON_SCREEN_LIMIT 12
-      #define BUTTON_ARRAY_LEN 12
+      #define BUTTON_ARRAY_LEN BUTTON_SCREEN_LIMIT
       #define STATUS_BAR_WIDTH 16
       #define LVGL_TICK_PERIOD 6
 
@@ -1240,7 +1256,7 @@
       //#define MENU_FONT &FreeSans9pt7b
       //#define MENU_FONT &FreeSansBold9pt7b
       #define BUTTON_SCREEN_LIMIT 10
-      #define BUTTON_ARRAY_LEN 100
+      #define BUTTON_ARRAY_LEN BUTTON_SCREEN_LIMIT
       #define STATUS_BAR_WIDTH (TFT_HEIGHT/16)
       #define LVGL_TICK_PERIOD 6
 
@@ -1307,7 +1323,7 @@
       //#define MENU_FONT &FreeSans9pt7b
       //#define MENU_FONT &FreeSansBold9pt7b
       #define BUTTON_SCREEN_LIMIT 5
-      #define BUTTON_ARRAY_LEN 100
+      #define BUTTON_ARRAY_LEN BUTTON_SCREEN_LIMIT
       #define STATUS_BAR_WIDTH (TFT_HEIGHT/16)
       #define LVGL_TICK_PERIOD 6
 
@@ -1335,7 +1351,7 @@
   //// END DISPLAY DEFINITIONS
 
   //// MENU DEFINITIONS
-  #ifdef MARAUDER_V4
+  #if defined(MARAUDER_V4)
     #define BANNER_TIME 100
     
     #define COMMAND_PREFIX "!"
@@ -1538,6 +1554,7 @@
   #define TFTSILVER    15
   #define TFTDARKGREY  16
   #define TFTSKYBLUE   17
+  #define TFTLIME      18
   //// END SPACE SAVING COLORS
   
   //// SCREEN STUFF

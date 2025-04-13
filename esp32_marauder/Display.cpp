@@ -38,7 +38,7 @@ void Display::RunSetup()
       uint16_t calData[5] = { 350, 3465, 188, 3431, 2 };
     #elif defined(CYD_24)
       uint16_t calData[5] = { 481, 3053, 433, 3296, 3 };
-    #elif defined(CYD_24CAP) || defined(CYD_22CAP)
+    #elif defined(CYD_24CAP)
       uint16_t calData[5] = { 405, 3209, 297, 3314, 2 };
     #elif defined(CYD_24G)
       uint16_t calData[5] = { 405, 3209, 297, 3314, 2 };
@@ -144,21 +144,94 @@ void Display::tftDrawYScaleButtons(byte y_scale)
   key[3].drawButton();
 }
 
-void Display::tftDrawChannelScaleButtons(int set_channel)
+void Display::tftDrawChannelScaleButtons(int set_channel, bool lnd_an)
 {
-  tft.drawFastVLine(178, 0, 20, TFT_WHITE);
-  tft.setCursor(145, 21); tft.setTextColor(TFT_WHITE); tft.setTextSize(1); tft.print(text10); tft.print(set_channel);
-  key[4].initButton(&tft, 164, 10, 20, 20, TFT_BLACK, TFT_BLUE, TFT_BLACK, "-", 2);
-  key[5].initButton(&tft, 193, 10, 20, 20, TFT_BLACK, TFT_BLUE, TFT_BLACK, "+", 2);
+  if (lnd_an) {
+    tft.drawFastVLine(178, 0, 20, TFT_WHITE);
+    tft.setCursor(145, 21); tft.setTextColor(TFT_WHITE); tft.setTextSize(1); tft.print(text10); tft.print(set_channel);
+
+    key[4].initButton(&tft, // channel - box
+                          164,
+                          10, // x, y, w, h, outline, fill, text
+                          EXT_BUTTON_WIDTH,
+                          EXT_BUTTON_WIDTH,
+                          TFT_BLACK, // Outline
+                          TFT_BLUE, // Fill
+                          TFT_BLACK, // Text
+                          "-",
+                          2);
+    key[5].initButton(&tft, // channel + box
+                          193,
+                          10, // x, y, w, h, outline, fill, text
+                          EXT_BUTTON_WIDTH,
+                          EXT_BUTTON_WIDTH,
+                          TFT_BLACK, // Outline
+                          TFT_BLUE, // Fill
+                          TFT_BLACK, // Text
+                          "+",
+                          2);
+  }
+
+  else {
+    key[4].initButton(&tft, // channel - box
+                          (EXT_BUTTON_WIDTH / 2) * 6,
+                          (STATUS_BAR_WIDTH * 2) + CHAR_WIDTH - 1, // x, y, w, h, outline, fill, text
+                          EXT_BUTTON_WIDTH,
+                          EXT_BUTTON_WIDTH,
+                          TFT_BLACK, // Outline
+                          TFT_BLUE, // Fill
+                          TFT_BLACK, // Text
+                          "-",
+                          2);
+    key[5].initButton(&tft, // channel + box
+                          (EXT_BUTTON_WIDTH / 2) * 10,
+                          (STATUS_BAR_WIDTH * 2) + CHAR_WIDTH - 1, // x, y, w, h, outline, fill, text
+                          EXT_BUTTON_WIDTH,
+                          EXT_BUTTON_WIDTH,
+                          TFT_BLACK, // Outline
+                          TFT_BLUE, // Fill
+                          TFT_BLACK, // Text
+                          "+",
+                          2);
+  }
+
   key[4].setLabelDatum(1, 5, MC_DATUM);
   key[5].setLabelDatum(1, 5, MC_DATUM);
+
   key[4].drawButton();
   key[5].drawButton();
 }
 
-void Display::tftDrawExitScaleButtons()
+void Display::tftDrawExitScaleButtons(bool lnd_an)
 {
-  key[6].initButton(&tft, 137, 10, 20, 20, TFT_ORANGE, TFT_RED, TFT_BLACK, "X", 2);
+  //tft.drawFastVLine(178, 0, 20, TFT_WHITE);
+  //tft.setCursor(145, 21); tft.setTextColor(TFT_WHITE); tft.setTextSize(1); tft.print("Channel:"); tft.print(set_channel);
+  if (lnd_an) {
+
+    key[6].initButton(&tft, // Exit box
+                      137,
+                      10, // x, y, w, h, outline, fill, text
+                      EXT_BUTTON_WIDTH,
+                      EXT_BUTTON_WIDTH,
+                      TFT_ORANGE, // Outline
+                      TFT_RED, // Fill
+                      TFT_BLACK, // Text
+                      "X",
+                      2);
+  }
+
+  else {
+    key[6].initButton(&tft, // Exit box
+                      EXT_BUTTON_WIDTH / 2,
+                      (STATUS_BAR_WIDTH * 2) + CHAR_WIDTH - 1, // x, y, w, h, outline, fill, text
+                      EXT_BUTTON_WIDTH,
+                      EXT_BUTTON_WIDTH,
+                      TFT_ORANGE, // Outline
+                      TFT_RED, // Fill
+                      TFT_BLACK, // Text
+                      "X",
+                      2);
+  }
   key[6].setLabelDatum(1, 5, MC_DATUM);
   key[6].drawButton();
 }
@@ -184,8 +257,14 @@ void Display::touchToExit()
 
 void Display::clearScreen()
 {
-  tft.fillScreen(TFT_BLACK);
-  tft.setCursor(0, 0);
+  //Serial.println(F("clearScreen()"));
+  #ifndef MARAUDER_V7
+    tft.fillScreen(TFT_BLACK);
+    tft.setCursor(0, 0);
+  #else
+    tft.fillRect(0, 0, TFT_WIDTH, TFT_HEIGHT, TFT_BLACK);
+    tft.setCursor(0, 0);
+  #endif
 }
 
 #ifdef SCREEN_BUFFER
@@ -246,14 +325,16 @@ void Display::displayBuffer(bool do_clear)
           blank[(18+(yStart - TOP_FIXED_AREA_2) / TEXT_HEIGHT)%19] = xPos;
       #else
         xPos = 0;
-        if (this->screen_buffer->size() >= MAX_SCREEN_BUFFER) 
+        if (this->screen_buffer->size() >= MAX_SCREEN_BUFFER)
           this->scrollScreenBuffer();
         screen_buffer->add(display_buffer->shift());
         for (int i = 0; i < this->screen_buffer->size(); i++) {
           tft.setCursor(xPos, (i * 12) + (SCREEN_HEIGHT / 6));
           String spaces = String(' ', TFT_WIDTH / CHAR_WIDTH);
+
           tft.print(spaces);
           tft.setCursor(xPos, (i * 12) + (SCREEN_HEIGHT / 6));
+
           this->processAndPrintString(tft, this->screen_buffer->get(i));
         }
       #endif

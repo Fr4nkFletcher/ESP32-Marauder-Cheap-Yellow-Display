@@ -87,6 +87,7 @@ PROGMEM static void ta_event_cb(lv_obj_t * ta, lv_event_t event);
 PROGMEM static void add_ssid_keyboard_event_cb(lv_obj_t * keyboard, lv_event_t event);
 PROGMEM static void html_list_cb(lv_obj_t * btn, lv_event_t event);
 PROGMEM static void ap_list_cb(lv_obj_t * btn, lv_event_t event);
+PROGMEM static void ap_info_list_cb(lv_obj_t * btn, lv_event_t event);
 PROGMEM static void at_list_cb(lv_obj_t * btn, lv_event_t event);
 PROGMEM static void station_list_cb(lv_obj_t * btn, lv_event_t event);
 PROGMEM static void setting_dropdown_cb(lv_obj_t * btn, lv_event_t event);
@@ -151,7 +152,6 @@ class MenuFunctions
     Menu updateMenu;
     Menu settingsMenu;
     Menu specSettingMenu;
-    Menu infoMenu;
     Menu languageMenu;
     Menu sdDeleteMenu;
 
@@ -166,7 +166,7 @@ class MenuFunctions
     #ifdef HAS_BT
       Menu airtagMenu;
     #endif
-    #if !defined(HAS_ILI9341) && !defined(HAS_ST7796) && !defined(HAS_ST7789)
+    #if !defined(HAS_ILI9341) && !defined(HAS_ST7789) && !defined(HAS_ST7796)
       Menu wifiStationMenu;
     #endif
 
@@ -174,6 +174,9 @@ class MenuFunctions
     Menu htmlMenu;
     Menu miniKbMenu;
     Menu saveFileMenu;
+    Menu genAPMacMenu;
+    Menu cloneAPMacMenu;
+    Menu setMacMenu;
 
     // Bluetooth menu stuff
     Menu bluetoothSnifferMenu;
@@ -234,6 +237,9 @@ class MenuFunctions
       Menu gpsInfoMenu;
     #endif
 
+    Menu infoMenu;
+    Menu apInfoMenu;
+    
     Ticker tick;
     uint16_t x = -1, y = -1;
     boolean pressed = false;

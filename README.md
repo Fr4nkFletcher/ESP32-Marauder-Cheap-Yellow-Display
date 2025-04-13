@@ -6,7 +6,7 @@
 
 <p align="center">
   <img src="https://github.com/Fr4nkFletcher/Adafruit_WebSerial_ESPTool/actions/workflows/pages.yml/badge.svg" alt="GitHub Actions Badge" />
-  <img src="https://img.shields.io/badge/version-1.2.1-000000?style=flat" alt="GitHub Release Version Badge" />
+  <img src="https://img.shields.io/badge/version-1.3.1-000000?style=flat" alt="GitHub Release Version Badge" />
   <img src="https://img.shields.io/github/issues/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display?style=flat&color=2EA44F" alt="GitHub Issues" />
   <br>
   <img src="https://img.shields.io/github/commits-since/Fr4nkFletcher/ESP32-Marauder-Cheap-Yellow-Display/latest?style=flat&color=1F285E" />
@@ -20,8 +20,16 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 
 ---
 
-## 🏴‍☠️ Latest Update Highlights — v1.3.1 with other significant improvements (03/29/25) 🏴‍☠️
+## 🏴‍☠️ Latest Update Highlights — v1.4.2 (04/13/25) 🏴‍☠️
 
+- Add WiFi analyzer
+- Add quick names to channel analyzer graph
+- Fix evil portal AP name character limit
+- Add packet count function
+- Add AP info
+- Add Raw Capture
+- Add single scan for AP and Stations
+- Add generate random MACs for AP and Station WiFi interface
 - Fixed sniffer output overlapping 
 - Reduced memory usage
 - Add index number to AP scan display

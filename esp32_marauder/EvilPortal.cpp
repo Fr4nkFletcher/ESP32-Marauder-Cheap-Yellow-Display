@@ -12,9 +12,7 @@ void EvilPortal::setup() {
   this->has_html = false;
   this->has_ap = false;
 
-  html_files = new LinkedList<String>();
-
-  html_files->add("Back");
+  html_files = new LinkedList<String>();  
 
   #ifdef HAS_SD
     if (sd_obj.supported) {
