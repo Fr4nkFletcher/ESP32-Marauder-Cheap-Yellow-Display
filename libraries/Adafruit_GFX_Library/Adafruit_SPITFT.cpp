@@ -17,9 +17,10 @@
 
  * @section dependencies Dependencies
  *
- * This library depends on <a href="https://github.com/adafruit/Adafruit_GFX">
- * Adafruit_GFX</a> being present on your system. Please make sure you have
- * installed the latest version before using this library.
+ * This library depends on
+ * <a href="https://github.com/adafruit/Adafruit-GFX-Library">Adafruit_GFX</a>
+ * being present on your system. Please make sure you have installed the latest
+ * version before using this library.
  *
  * @section author Author
  *
@@ -31,7 +32,8 @@
  * BSD license, all text here must be included in any redistribution.
  */
 
-#if !defined(__AVR_ATtiny85__) // Not for ATtiny, at all
+// Not for ATtiny, at all
+#if !defined(__AVR_ATtiny85__) && !defined(__AVR_ATtiny84__)
 
 #include "Adafruit_SPITFT.h"
 
@@ -39,6 +41,13 @@
 #if defined(__AVR_XMEGA__) // only tested with __AVR_ATmega4809__
 #define AVR_WRITESPI(x)                                                        \
   for (SPI0_DATA = (x); (!(SPI0_INTFLAGS & _BV(SPI_IF_bp)));)
+#elif defined(__LGT8F__)
+#define AVR_WRITESPI(x)                                                        \
+  SPDR = (x);                                                                  \
+  asm volatile("nop");                                                         \
+  while ((SPFR & _BV(RDEMPT)))                                                 \
+    ;                                                                          \
+  SPFR = _BV(RDEMPT) | _BV(WREMPT)
 #else
 #define AVR_WRITESPI(x) for (SPDR = (x); (!(SPSR & _BV(SPIF)));)
 #endif
@@ -870,7 +879,7 @@ void Adafruit_SPITFT::initSPI(uint32_t freq, uint8_t spiMode) {
                   DMA_ADDRESS_INCREMENT_STEP_SIZE_1;
               descriptor[d].DSTADDR.reg = (uint32_t)tft8.writePort;
             }
-#endif      // __SAMD51
+#endif // __SAMD51
           } // end parallel-specific DMA setup
 
           lastFillColor = 0x0000;
@@ -878,13 +887,13 @@ void Adafruit_SPITFT::initSPI(uint32_t freq, uint8_t spiMode) {
           dma.setCallback(dma_callback);
           return; // Success!
                   // else clean up any partial allocation...
-        }         // end descriptor memalign()
+        } // end descriptor memalign()
         free(pixelBuf[0]);
         pixelBuf[0] = pixelBuf[1] = NULL;
-      }         // end pixelBuf malloc()
-                // Don't currently have a descriptor delete function in
-                // ZeroDMA lib, but if we did, it would be called here.
-    }           // end addDescriptor()
+      } // end pixelBuf malloc()
+        // Don't currently have a descriptor delete function in
+        // ZeroDMA lib, but if we did, it would be called here.
+    } // end addDescriptor()
     dma.free(); // Deallocate DMA channel
   }
 #endif // end USE_SPI_DMA
@@ -1035,6 +1044,15 @@ void Adafruit_SPITFT::writePixels(uint16_t *colors, uint32_t len, bool block,
                     SPI_SSPCR0_DSS_BITS);
   } else {
     spi_write_blocking(pi_spi, (uint8_t *)colors, len * 2);
+  }
+  return;
+#elif defined(ARDUINO_ARCH_RTTHREAD)
+  if (!bigEndian) {
+    swapBytes(colors, len); // convert little-to-big endian for display
+  }
+  hwspi._spi->transfer(colors, 2 * len);
+  if (!bigEndian) {
+    swapBytes(colors, len); // big-to-little endian to restore pixel buffer
   }
   return;
 #elif defined(USE_SPI_DMA) &&                                                  \
@@ -1244,7 +1262,44 @@ void Adafruit_SPITFT::writeColor(uint16_t color, uint32_t len) {
     rtos_free(pixbuf);
     return;
   }
-#else                      // !ESP32
+#elif defined(ARDUINO_ARCH_RTTHREAD)
+  uint16_t pixbufcount;
+  uint16_t *pixbuf;
+  int16_t lines = height() / 4;
+#define QUICKPATH_MAX_LEN 16
+  uint16_t quickpath_buffer[QUICKPATH_MAX_LEN];
+
+  do {
+    pixbufcount = min(len, (lines * width()));
+    if (pixbufcount > QUICKPATH_MAX_LEN) {
+      pixbuf = (uint16_t *)rt_malloc(2 * pixbufcount);
+    } else {
+      pixbuf = quickpath_buffer;
+    }
+    lines -= 2;
+  } while (!pixbuf && lines > 0);
+
+  if (pixbuf) {
+    uint16_t const swap_color = __builtin_bswap16(color);
+
+    while (len) {
+      uint16_t count = min(len, pixbufcount);
+      // fill buffer with color
+      for (uint16_t i = 0; i < count; i++) {
+        pixbuf[i] = swap_color;
+      }
+      // Don't need to swap color inside the function
+      // It has been done outside this function
+      writePixels(pixbuf, count, true, true);
+      len -= count;
+    }
+    if (pixbufcount > QUICKPATH_MAX_LEN) {
+      rt_free(pixbuf);
+    }
+#undef QUICKPATH_MAX_LEN
+    return;
+  }
+#else // !ESP32
 #if defined(USE_SPI_DMA) && (defined(__SAMD51__) || defined(ARDUINO_SAMD_ZERO))
   if (((connection == TFT_HARD_SPI) || (connection == TFT_PARALLEL)) &&
       (len >= 16)) { // Don't bother with DMA on short pixel runs
@@ -1318,11 +1373,11 @@ void Adafruit_SPITFT::writeColor(uint16_t color, uint32_t len) {
       dma.trigger();
     while (dma_busy)
       ; // Wait for completion
-      // Unfortunately blocking is necessary. An earlier version returned
-      // immediately and checked dma_busy on startWrite() instead, but it
-      // turns out to be MUCH slower on many graphics operations (as when
-      // drawing lines, pixel-by-pixel), perhaps because it's a volatile
-      // type and doesn't cache. Working on this.
+        // Unfortunately blocking is necessary. An earlier version returned
+        // immediately and checked dma_busy on startWrite() instead, but it
+        // turns out to be MUCH slower on many graphics operations (as when
+        // drawing lines, pixel-by-pixel), perhaps because it's a volatile
+        // type and doesn't cache. Working on this.
 #if defined(__SAMD51__) || defined(ARDUINO_SAMD_ZERO)
     if (connection == TFT_HARD_SPI) {
       // SAMD51: SPI DMA seems to leave the SPI peripheral in a freaky
@@ -2034,9 +2089,9 @@ uint16_t Adafruit_SPITFT::readcommand16(uint16_t addr) {
     result = *(volatile uint16_t *)tft8.readPort; // 16-bit read
     *(volatile uint16_t *)tft8.dirSet = 0xFFFF;   // Output state
 #else                                             // !HAS_PORT_SET_CLR
-    *(volatile uint16_t *)tft8.portDir = 0x0000;    // Input state
-    result = *(volatile uint16_t *)tft8.readPort;   // 16-bit read
-    *(volatile uint16_t *)tft8.portDir = 0xFFFF;    // Output state
+    *(volatile uint16_t *)tft8.portDir = 0x0000;  // Input state
+    result = *(volatile uint16_t *)tft8.readPort; // 16-bit read
+    *(volatile uint16_t *)tft8.portDir = 0xFFFF;  // Output state
 #endif                                            // end !HAS_PORT_SET_CLR
     TFT_RD_HIGH();                                // Read line HIGH
     endWrite();
@@ -2191,17 +2246,17 @@ uint8_t Adafruit_SPITFT::spiRead(void) {
       w = *tft8.readPort;   // Read value from port
       *tft8.portDir = 0xFF; // Restore port to output
 #else                       // !__AVR__
-      if (!tft8.wide) {                             // 8-bit TFT connection
+      if (!tft8.wide) { // 8-bit TFT connection
 #if defined(HAS_PORT_SET_CLR)
-        *tft8.dirClr = 0xFF;                        // Set port to input state
-        w = *tft8.readPort;                         // Read value from port
-        *tft8.dirSet = 0xFF;                        // Restore port to output
+        *tft8.dirClr = 0xFF; // Set port to input state
+        w = *tft8.readPort;  // Read value from port
+        *tft8.dirSet = 0xFF; // Restore port to output
 #else  // !HAS_PORT_SET_CLR
-        *tft8.portDir = 0x00;                        // Set port to input state
-        w = *tft8.readPort;                          // Read value from port
-        *tft8.portDir = 0xFF;                        // Restore port to output
+        *tft8.portDir = 0x00; // Set port to input state
+        w = *tft8.readPort;   // Read value from port
+        *tft8.portDir = 0xFF; // Restore port to output
 #endif // end HAS_PORT_SET_CLR
-      } else {                                      // 16-bit TFT connection
+      } else { // 16-bit TFT connection
 #if defined(HAS_PORT_SET_CLR)
         *(volatile uint16_t *)tft8.dirClr = 0xFFFF; // Input state
         w = *(volatile uint16_t *)tft8.readPort;    // 16-bit read
@@ -2212,7 +2267,7 @@ uint8_t Adafruit_SPITFT::spiRead(void) {
         *(volatile uint16_t *)tft8.portDir = 0xFFFF; // Output state
 #endif // end !HAS_PORT_SET_CLR
       }
-      TFT_RD_HIGH();                                 // Read line HIGH
+      TFT_RD_HIGH(); // Read line HIGH
 #endif // end !__AVR__
 #else  // !USE_FAST_PINIO
       w = 0; // Parallel TFT is NOT SUPPORTED without USE_FAST_PINIO
@@ -2402,6 +2457,8 @@ void Adafruit_SPITFT::SPI_WRITE16(uint16_t w) {
     spi_inst_t *pi_spi = hwspi._spi == &SPI ? spi0 : spi1;
     w = __builtin_bswap16(w);
     spi_write_blocking(pi_spi, (uint8_t *)&w, 2);
+#elif defined(ARDUINO_ARCH_RTTHREAD)
+    hwspi._spi->transfer16(w);
 #else
     // MSB, LSB because TFTs are generally big-endian
     hwspi._spi->transfer(w >> 8);
@@ -2458,6 +2515,9 @@ void Adafruit_SPITFT::SPI_WRITE32(uint32_t l) {
     spi_inst_t *pi_spi = hwspi._spi == &SPI ? spi0 : spi1;
     l = __builtin_bswap32(l);
     spi_write_blocking(pi_spi, (uint8_t *)&l, 4);
+#elif defined(ARDUINO_ARCH_RTTHREAD)
+    hwspi._spi->transfer16(l >> 16);
+    hwspi._spi->transfer16(l);
 #else
     hwspi._spi->transfer(l >> 24);
     hwspi._spi->transfer(l >> 16);
@@ -2558,4 +2618,4 @@ inline void Adafruit_SPITFT::TFT_RD_LOW(void) {
 #endif // end !USE_FAST_PINIO
 }
 
-#endif // end __AVR_ATtiny85__
+#endif // end __AVR_ATtiny85__ __AVR_ATtiny84__

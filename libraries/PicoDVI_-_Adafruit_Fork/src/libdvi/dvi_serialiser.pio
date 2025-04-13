@@ -1,0 +1,53 @@
+.program dvi_serialiser
+.side_set 2
+.origin 0
+
+; Single-ended -> differential serial
+
+	out pc, 1    side 0b10
+	out pc, 1    side 0b01
+
+.program dvi_serialiser_debug
+.side_set 1 opt
+
+; The debug variant behaves as a UART with 1 start bit, 10 data bits, 1 stop
+; bit, and 5/6ths the data throughput of the TMDS version.
+
+	pull ifempty  side 1 ; Extend stop bit with FIFO stall
+	nop           side 0
+	out pins, 1          ; Unrolled because we require 1 bit / clk
+	out pins, 1
+	out pins, 1
+	out pins, 1
+	out pins, 1
+	out pins, 1
+	out pins, 1
+	out pins, 1
+	out pins, 1
+	out pins, 1
+	
+% c-sdk {
+#include "dvi_config_defs.h"
+
+static inline void dvi_serialiser_program_init(PIO pio, uint sm, uint offset, uint data_pins, bool debug) {
+    pio_sm_set_pins_with_mask(pio, sm, 2u << data_pins, 3u << data_pins);
+    pio_sm_set_pindirs_with_mask(pio, sm, ~0u, 3u << data_pins);
+    pio_gpio_init(pio, data_pins);
+    pio_gpio_init(pio, data_pins + 1);
+
+    pio_sm_config c;
+    if (debug) {
+        c = dvi_serialiser_debug_program_get_default_config(offset);
+    }
+    else {
+        c = dvi_serialiser_program_get_default_config(offset);
+    }
+    sm_config_set_sideset_pins(&c, data_pins);
+    if (debug)
+	    sm_config_set_out_pins(&c, data_pins, 1);
+    sm_config_set_out_shift(&c, true, !debug, 10 * DVI_SYMBOLS_PER_WORD);
+    sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
+    pio_sm_init(pio, sm, offset, &c);
+    pio_sm_set_enabled(pio, sm, false);
+}
+%}

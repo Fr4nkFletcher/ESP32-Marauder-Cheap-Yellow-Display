@@ -1,0 +1,5 @@
+#EXTM3U
+#EXTINF:18,Bjarne Liller - Olsen Banden (Titelmusik der Olsenbande) - Olsen-Banden.mp3
+https://raw.githubusercontent.com/schreibfaul1/ESP32-audioI2S/master/additional_info/Testfiles/Olsen-Banden.mp3
+#EXTINF:10,Santiano-Wellermann - Santiano-Wellerman.flac
+https://raw.githubusercontent.com/schreibfaul1/ESP32-audioI2S/master/additional_info/Testfiles/Santiano-Wellerman.flac

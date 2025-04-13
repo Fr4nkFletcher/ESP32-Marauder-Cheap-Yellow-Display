@@ -1,0 +1,17 @@
+bb_spi_lcd Linux instructions
+-----------------------------
+For Linux, the bb_spi_lcd library gets built as a static C library.
+
+Compile the library by running make from the command line. The include file and binary will be copied to the directories where they can be accessed by all.
+
+Next, compile and run the sample program like so:
+>make -f make_sample
+>sudo ./sample
+
+This will initialize the display and draw some blue text. Press ENTER to exit.
+
+To display images/animations on your TFT hat, build the hatpic sample program:
+>make -f make_hatpic
+>sudo ./hatpic <image file>
+
+

@@ -1,0 +1,16 @@
+menu "SensorLib Configuration"
+
+    choice SensorLib_ESP_IDF_API
+        prompt "SensorLib library esp-idf api version"
+        default SENSORLIB_ESP_IDF_NEW_API
+        help
+            Define API version
+
+        config SENSORLIB_ESP_IDF_NEW_API
+            bool "Use esp-idf higher version (>= 5.0) API"
+        config SENSORLIB_ESP_IDF_OLD_API
+            bool "Use esp-idf lower version ( < 5.0) API , Compatible with lower versions of esp-idf"
+    endchoice
+
+
+endmenu

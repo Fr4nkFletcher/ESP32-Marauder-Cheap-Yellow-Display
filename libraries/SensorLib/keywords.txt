@@ -1,0 +1,387 @@
+#######################################
+# Syntax Coloring Map For SensorLib By lewis He
+# github:https://github.com/lewisxhe
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+ExtensionIOXL9555	KEYWORD1
+
+SensorPCF8563	KEYWORD1
+SensorQMC6310	KEYWORD1
+SensorBMM150	KEYWORD1
+SensorBHI260AP	KEYWORD1
+SensorBMA423	KEYWORD1
+SensorCM32181	KEYWORD1
+SensorDRV2605	KEYWORD1
+SensorLTR553	KEYWORD1
+SensorPCF85063	KEYWORD1
+SensorWireHelper	KEYWORD1
+TouchDrvCHSC5816	KEYWORD1
+TouchDrvCST92xx	KEYWORD1
+TouchDrvCSTXXX	KEYWORD1
+TouchDrvFT6X36	KEYWORD1
+TouchDrvGT911	KEYWORD1
+TouchDrvInterface	KEYWORD1
+TouchClassCST226	KEYWORD1
+TouchClassCST816	KEYWORD1
+
+
+RTC_DateTime	KEYWORD1
+RTC_Alarm	KEYWORD1
+MagRange	KEYWORD1
+OutputRate	KEYWORD1
+CtrlReg	KEYWORD1
+OverSampleRatio	KEYWORD1
+DownSampleRatio	KEYWORD1
+
+SensorQMI8658	KEYWORD1
+AccelRange	KEYWORD1
+GyroRange	KEYWORD1
+AccelODR	KEYWORD1
+GyroODR	KEYWORD1
+LpfMode	KEYWORD1
+MotionEvent	KEYWORD1
+IntPin	KEYWORD1
+FIFO_Samples	KEYWORD1
+FIFO_Mode	KEYWORD1
+SampleMode	KEYWORD1
+CommandTable	KEYWORD1
+StatusReg	KEYWORD1
+TapDetectionPriority	KEYWORD1
+SensorStatus	KEYWORD1
+ioEvent_t	KEYWORD1
+
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+### XL9555 Coloring Map ###
+
+init	KEYWORD2
+deinit	KEYWORD2
+pinMode	KEYWORD2
+digitalRead	KEYWORD2
+digitalWrite	KEYWORD2
+digitalToggle	KEYWORD2
+readPort	KEYWORD2
+writePort	KEYWORD2
+readConfig	KEYWORD2
+configPort	KEYWORD2
+update	KEYWORD2
+removePinEvent	KEYWORD2
+setPinEvent	KEYWORD2
+write	KEYWORD2
+read	KEYWORD2
+transferDataBits	KEYWORD2
+transfer9	KEYWORD2
+transfer8	KEYWORD2
+setBitOrder	KEYWORD2
+beginSPI	KEYWORD2
+
+
+### PCF8563 Coloring Map ###
+
+setDateTime	KEYWORD2
+getDateTime	KEYWORD2
+getAlarm	KEYWORD2
+enableAlarm	KEYWORD2
+disableAlarm	KEYWORD2
+resetAlarm	KEYWORD2
+isAlarmActive	KEYWORD2
+setAlarm	KEYWORD2
+setAlarmByMinutes	KEYWORD2
+setAlarmByDays	KEYWORD2
+setAlarmByHours	KEYWORD2
+setAlarmByWeekDay	KEYWORD2
+isCountdownTimerEnable	KEYWORD2
+isCountdownTimerActive	KEYWORD2
+enableCountdownTimer	KEYWORD2
+disableCountdownTimer	KEYWORD2
+setCountdownTimer	KEYWORD2
+clearCountdownTimer	KEYWORD2
+enableCLK	KEYWORD2
+strftime	KEYWORD2
+conversionUnixTime	KEYWORD2
+hwClockRead	KEYWORD2
+hwClockWrite	KEYWORD2
+getDayOfWeek	KEYWORD2
+getNextMonth	KEYWORD2
+getNextYear	KEYWORD2
+getLeapYear	KEYWORD2
+getDaysInMonth	KEYWORD2
+
+### SensorQMC6310 Coloring Map ###
+
+reset	KEYWORD2
+getChipID	KEYWORD2
+getStatus	KEYWORD2
+isDataReady	KEYWORD2
+isDataOverflow	KEYWORD2
+setSelfTest	KEYWORD2
+setMode	KEYWORD2
+setCtrlRegister	KEYWORD2
+setDataOutputRate	KEYWORD2
+setOverSampleRate	KEYWORD2
+setDownSampleRate	KEYWORD2
+setSign	KEYWORD2
+configMagnetometer	KEYWORD2
+setMagRange	KEYWORD2
+setOffset	KEYWORD2
+readData	KEYWORD2
+setDeclination	KEYWORD2
+readPolar	KEYWORD2
+getRawX	KEYWORD2
+getRawY	KEYWORD2
+getRawZ	KEYWORD2
+getX	KEYWORD2
+getY	KEYWORD2
+getZ	KEYWORD2
+getMag	KEYWORD2
+dumpCtrlRegister	KEYWORD2
+
+### SensorQMI8658 Coloring Map ###
+
+whoAmI	KEYWORD2
+getTimestamp	KEYWORD2
+getTemperature_C	KEYWORD2
+enableINT	KEYWORD2
+getIrqStatus	KEYWORD2
+enableDataReadyINT	KEYWORD2
+configAccelerometer	KEYWORD2
+configGyroscope	KEYWORD2
+configFIFO	KEYWORD2
+getFifoNeedBytes	KEYWORD2
+readFromFifo	KEYWORD2
+enableAccelerometer	KEYWORD2
+disableAccelerometer	KEYWORD2
+isEnableAccelerometer	KEYWORD2
+isEnableGyroscope	KEYWORD2
+enableGyroscope	KEYWORD2
+disableGyroscope	KEYWORD2
+getAccelRaw	KEYWORD2
+getAccelerometer	KEYWORD2
+getAccelerometerScales	KEYWORD2
+getGyroscopeScales	KEYWORD2
+getGyroRaw	KEYWORD2
+getGyroscope	KEYWORD2
+getDataReady	KEYWORD2
+enableSyncSampleMode	KEYWORD2
+disableSyncSampleMode	KEYWORD2
+enableLockingMechanism	KEYWORD2
+disableLockingMechanism	KEYWORD2
+powerDown	KEYWORD2
+powerOn	KEYWORD2
+getStatusRegister	KEYWORD2
+configActivityInterruptMap	KEYWORD2
+configPedometer	KEYWORD2
+getPedometerCounter	KEYWORD2
+clearPedometerCounter	KEYWORD2
+enablePedometer	KEYWORD2
+disablePedometer	KEYWORD2
+configTap	KEYWORD2
+enableTap	KEYWORD2
+disableTap	KEYWORD2
+getTapStatus	KEYWORD2
+configMotion	KEYWORD2
+enableMotionDetect	KEYWORD2
+disableMotionDetect	KEYWORD2
+configWakeOnMotion	KEYWORD2
+getChipUsid	KEYWORD2
+getChipFirmwareVersion	KEYWORD2
+setWakeupMotionEventCallBack	KEYWORD2
+setTapEventCallBack	KEYWORD2
+setPedometerEventCallBack	KEYWORD2
+setNoMotionEventCallBack	KEYWORD2
+setAnyMotionEventCallBack	KEYWORD2
+setSignificantMotionEventCallBack	KEYWORD2
+setGyroDataReadyCallBack	KEYWORD2
+setAccelDataReadyEventCallBack	KEYWORD2
+setDataLockingEventCallBack	KEYWORD2
+
+### SensorBMM150 Coloring Map ###
+sleep   KEYWORD2
+setMode KEYWORD2
+setThreshold    KEYWORD2
+setInterruptLevel   KEYWORD2
+enabledDataReady    KEYWORD2
+disabledDataReady   KEYWORD2
+# getIrqStatus  KEYWORD2
+# isDataReady   KEYWORD2
+isLowThreshold  KEYWORD2
+isHighThreshold KEYWORD2
+# getMag    KEYWORD2
+
+### SensorBHI260AP Coloring Map ###
+setPins KEYWORD2
+setBootFormFlash    KEYWORD2
+getHandler  KEYWORD2
+printSensors    KEYWORD2
+printInfo   KEYWORD2
+setInterruptCtrl    KEYWORD2
+getInterruptCtrl    KEYWORD2
+printInterruptCtrl  KEYWORD2
+isReady KEYWORD2
+getKernelVersion    KEYWORD2
+onEvent KEYWORD2
+removeEvent KEYWORD2
+onResultEvent   KEYWORD2
+removeResultEvent   KEYWORD2
+setProcessBufferSize    KEYWORD2
+uploadFirmware  KEYWORD2
+getError    KEYWORD2
+configure   KEYWORD2
+getConfigure    KEYWORD2
+getScaling  KEYWORD2
+setFirmware KEYWORD2
+getSensorName   KEYWORD2
+getAccuracy KEYWORD2
+
+### SensorBMA423 Coloring Map ###
+enablePowerSave KEYWORD2
+disablePowerSave    KEYWORD2
+disableInterruptCtrl    KEYWORD2
+enableInterruptCtrl KEYWORD2
+enableAccelerometer KEYWORD2
+disableAccelerometer    KEYWORD2
+configAccelerometer KEYWORD2
+getAccelRaw KEYWORD2
+getAccelerometer    KEYWORD2
+getTemperature  KEYWORD2
+direction   KEYWORD2
+setRemapAxes    KEYWORD2
+setStepCounterWatermark KEYWORD2
+resetPedometer  KEYWORD2
+enableFeature   KEYWORD2
+readIrqStatus   KEYWORD2
+configInterrupt KEYWORD2
+configFeatureInterrupt  KEYWORD2
+enablePedometerIRQ  KEYWORD2
+enableTiltIRQ   KEYWORD2
+enableWakeupIRQ KEYWORD2
+enableAnyNoMotionIRQ    KEYWORD2
+enableActivityIRQ   KEYWORD2
+disablePedometerIRQ KEYWORD2
+disableTiltIRQ  KEYWORD2
+disableWakeupIRQ    KEYWORD2
+disableAnyNoMotionIRQ   KEYWORD2
+disableActivityIRQ  KEYWORD2
+isActivity  KEYWORD2
+isTilt  KEYWORD2
+isDoubleTap KEYWORD2
+isAnyNoMotion   KEYWORD2
+isPedometer KEYWORD2
+
+### SensorCM32181 Coloring Map ###
+setSampling KEYWORD2
+setIntThreshold KEYWORD2
+powerSave   KEYWORD2
+getRaw  KEYWORD2
+getLux  KEYWORD2
+
+
+### SensorDRV2605 Coloring Map ###
+setWaveform KEYWORD2
+selectLibrary   KEYWORD2
+run KEYWORD2
+stop    KEYWORD2
+setMode KEYWORD2
+setRealtimeValue    KEYWORD2
+useERM  KEYWORD2
+useLRA  KEYWORD2
+
+### SensorLTR553 Coloring Map ###
+setIRQLevel KEYWORD2
+enableIRQ   KEYWORD2
+disableIRQ  KEYWORD2
+psAvailable KEYWORD2
+setLightSensorThreshold KEYWORD2
+setLightSensorPersists  KEYWORD2
+setLightSensorRate  KEYWORD2
+enableLightSensor   KEYWORD2
+disableLightSensor  KEYWORD2
+setLightSensorGain  KEYWORD2
+getLightSensor  KEYWORD2
+setProximityPersists    KEYWORD2
+setProximityThreshold   KEYWORD2
+setProximityRate    KEYWORD2
+enableProximity KEYWORD2
+disableProximity    KEYWORD2
+enablePsIndicator   KEYWORD2
+disablePsIndicator  KEYWORD2
+getProximity    KEYWORD2
+setPsLedPulsePeriod KEYWORD2
+setPsLedDutyCycle   KEYWORD2
+setPsLedCurrent KEYWORD2
+setPsLedPulses  KEYWORD2
+getPartID   KEYWORD2
+getRevisionID   KEYWORD2
+getManufacturerID   KEYWORD2
+
+
+### SensorWireHelper Coloring Map ###
+regdump KEYWORD2
+dumpDevices KEYWORD2
+hexdump KEYWORD2
+
+### TouchDrvCHSC5816 Coloring Map ###
+getPoint    KEYWORD2
+isPressed   KEYWORD2
+getModelName    KEYWORD2
+sleep   KEYWORD2
+wakeup  KEYWORD2
+idle    KEYWORD2
+getSupportTouchPoint    KEYWORD2
+getResolution   KEYWORD2
+setGpioCallback KEYWORD2
+
+### TouchDrvCST92xx Coloring Map ###
+jumpCheck   KEYWORD2
+setCoverScreenCallback  KEYWORD2
+
+### TouchDrvCSTXXX Coloring Map ###
+setCenterButtonCoordinate   KEYWORD2
+setHomeButtonCallback   KEYWORD2
+disableAutoSleep    KEYWORD2
+enableAutoSleep KEYWORD2
+setSwapXY   KEYWORD2
+setMirrorXY KEYWORD2
+setMaxCoordinates   KEYWORD2
+
+### TouchDrvFT6X36 Coloring Map ###
+getDeviceMode   KEYWORD2
+getGesture  KEYWORD2
+getThreshold    KEYWORD2
+getMonitorTime  KEYWORD2
+setMonitorTime  KEYWORD2
+getLibraryVersion   KEYWORD2
+interruptPolling    KEYWORD2
+interruptTrigger    KEYWORD2
+getVendorID KEYWORD2
+getErrorCode    KEYWORD2
+
+
+### TouchDrvGT911 Coloring Map ###
+setInterruptMode    KEYWORD2
+getInterruptMode    KEYWORD2
+getFwVersion    KEYWORD2
+getConfigVersion    KEYWORD2
+updateRefreshRate   KEYWORD2
+getRefreshRate  KEYWORD2
+writeConfig KEYWORD2
+loadConfig  KEYWORD2
+reloadConfig    KEYWORD2
+dumpRegister    KEYWORD2
+setMaxTouchPoint    KEYWORD2
+getMaxTouchPoint    KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+
+
+

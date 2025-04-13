@@ -6,6 +6,7 @@
 #if !defined(SPI_INTERFACES_COUNT) ||                                          \
     (defined(SPI_INTERFACES_COUNT) && (SPI_INTERFACES_COUNT > 0))
 
+#include <Adafruit_GenericDevice.h>
 #include <Adafruit_I2CDevice.h>
 #include <Adafruit_SPIDevice.h>
 
@@ -57,6 +58,11 @@ public:
                           uint8_t width = 1, uint8_t byteorder = LSBFIRST,
                           uint8_t address_width = 1);
 
+  Adafruit_BusIO_Register(Adafruit_GenericDevice *genericdevice,
+                          uint16_t reg_addr, uint8_t width = 1,
+                          uint8_t byteorder = LSBFIRST,
+                          uint8_t address_width = 1);
+
   bool read(uint8_t *buffer, uint8_t len);
   bool read(uint8_t *value);
   bool read(uint16_t *value);
@@ -77,6 +83,7 @@ public:
 private:
   Adafruit_I2CDevice *_i2cdevice;
   Adafruit_SPIDevice *_spidevice;
+  Adafruit_GenericDevice *_genericdevice;
   Adafruit_BusIO_SPIRegType _spiregtype;
   uint16_t _address;
   uint8_t _width, _addrwidth, _byteorder;

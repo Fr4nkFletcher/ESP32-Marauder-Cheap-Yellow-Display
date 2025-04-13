@@ -1,0 +1,23 @@
+{
+    "name": "Adafruit TinyUSB Library",
+    "keywords": "usb, arduino, tinyusb",
+    "description": "Arduino library for TinyUSB",
+    "version": "3.4.1",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/adafruit/Adafruit_TinyUSB_Arduino.git"
+    },
+    "frameworks": "*",
+    "platforms": "*",
+    "build": {
+        "libArchive": false,
+        "flags": "-DUSE_TINYUSB"
+    },
+    "authors":
+    [
+      {
+         "name": "Adafruit",
+         "maintainer": true
+      }
+    ]
+}

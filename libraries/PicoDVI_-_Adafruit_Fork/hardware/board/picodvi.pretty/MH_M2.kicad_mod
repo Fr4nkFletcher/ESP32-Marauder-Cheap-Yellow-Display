@@ -1,0 +1,11 @@
+(module MH_M2 (layer F.Cu) (tedit 5F12D2E7)
+  (fp_text reference REF** (at 0 0) (layer F.SilkS) hide
+    (effects (font (size 0.8 0.8) (thickness 0.12)))
+  )
+  (fp_text value MH_M2 (at 0 0) (layer F.Fab) hide
+    (effects (font (size 0.0254 0.0254) (thickness 0.00635)))
+  )
+  (fp_circle (center 0 0) (end 2 0) (layer F.CrtYd) (width 0.15))
+  (pad "" np_thru_hole circle (at 0 0) (size 2.4 2.4) (drill 2.4) (layers *.Cu *.Mask)
+    (solder_mask_margin 0.75))
+)

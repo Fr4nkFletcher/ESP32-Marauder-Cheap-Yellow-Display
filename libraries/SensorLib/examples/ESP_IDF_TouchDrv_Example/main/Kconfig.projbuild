@@ -1,0 +1,52 @@
+menu "SensorLib Example Configuration"
+
+    choice I2C_COMMUNICATION_METHOD
+        prompt "SensorLib read and write methods"
+        default I2C_COMMUNICATION_METHOD_BUILTIN_RW
+        help
+            Define SensorLib read and write methods
+
+        config I2C_COMMUNICATION_METHOD_BUILTIN_RW
+            bool "Implemented using built-in read and write methods"
+        config I2C_COMMUNICATION_METHOD_CALLBACK_RW
+            bool "Implemented using read and write callback methods"
+    endchoice
+
+    config I2C_MASTER_PORT_NUM
+        int "Sensor I2C Port Number"
+        default 1
+        help
+            Port number for I2C Master device.
+
+    config I2C_MASTER_FREQUENCY
+        int "Master Frequency"
+        default 100000
+        help
+            I2C Speed of Master device.
+
+    config SENSOR_SCL
+        int "Sensor SCL GPIO Num"
+        default 17
+        help
+            GPIO number for I2C clock line.
+
+    config SENSOR_SDA
+        int "Sensor SDA GPIO Num"
+        default 18
+        help
+            GPIO number for I2C data line.
+
+    config SENSOR_IRQ
+        int "Sensor Interrupt Pin"
+        default 16
+        help
+            Sensor interrupt pin.
+
+    config SENSOR_RST
+        int "Sensor reset Pin"
+        default 21
+        help
+            Sensor reset pin.
+
+
+endmenu

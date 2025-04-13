@@ -1,0 +1,25 @@
+#!/bin/bash
+
+if [[ $# == 0 ]]; then
+  echo "Supply image files as arguments, e.g."
+  echo "  ./builduf2 img1.png img2.jpg"
+  exit
+fi
+
+if [[ $# -gt 2 ]]; then
+  echo "Warning: Not enough memory for more that 2 images in Pico flash"
+  echo "         (this can be ignored if you are using a different board)"
+fi
+
+if [[ -f imgdata.bin ]]; then rm imgdata.bin; fi
+touch imgdata.bin
+
+for fname in $@; do
+  gm convert $fname -resize 1280x720\! -colors 256 -compress NONE img.bmp
+  python3 bmp-dump.py
+done
+
+dd if=/dev/zero bs=1 count=16 >> imgdata.bin 2>/dev/null
+
+uf2conv -f rp2040 -b 0x1003c000 imgdata.bin -o imgdata.uf2
+
