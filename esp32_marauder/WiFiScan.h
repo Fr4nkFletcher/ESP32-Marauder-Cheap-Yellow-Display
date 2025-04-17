@@ -112,6 +112,31 @@
 
 #define MAX_CHANNEL 14
 
+#define WIFI_SECURITY_OPEN   0
+#define WIFI_SECURITY_WEP    1
+#define WIFI_SECURITY_WPA    2
+#define WIFI_SECURITY_WPA2   3
+#define WIFI_SECURITY_WPA3   4
+#define WIFI_SECURITY_WPA_WPA2_MIXED 5
+#define WIFI_SECURITY_WPA2_ENTERPRISE 6
+#define WIFI_SECURITY_WPA3_ENTERPRISE 7
+#define WIFI_SECURITY_WAPI 8
+#define WIFI_SECURITY_UNKNOWN 255
+
+#define WPS_CONFIG_USBA              0x0001
+#define WPS_CONFIG_ETHERNET          0x0002
+#define WPS_CONFIG_LABEL             0x0004
+#define WPS_CONFIG_DISPLAY           0x0008
+#define WPS_CONFIG_EXT_NFC_TOKEN     0x0010
+#define WPS_CONFIG_INT_NFC_TOKEN     0x0020
+#define WPS_CONFIG_NFC_INTERFACE     0x0040
+#define WPS_CONFIG_PUSH_BUTTON       0x0080
+#define WPS_CONFIG_KEYPAD            0x0100
+#define WPS_CONFIG_VIRT_PUSH_BUTTON  0x1000
+#define WPS_CONFIG_PHY_PUSH_BUTTON   0x2000
+#define WPS_CONFIG_VIRT_DISPLAY      0x4000
+#define WPS_CONFIG_PHY_DISPLAY       0x8000
+
 extern EvilPortal evil_portal_obj;
 
 #ifdef HAS_SCREEN
@@ -310,6 +335,10 @@ class WiFiScan
       NimBLEAdvertisementData GetUniversalAdvertisementData(EBLEPayloadType type);
     #endif
 
+    String extractManufacturer(const uint8_t* payload);
+    int checkMatchAP(char addr[]);
+    bool beaconHasWPS(const uint8_t* payload, int len);
+    uint8_t getSecurityType(const uint8_t* beacon, uint16_t len);
     void addAnalyzerValue(int16_t value, int rssi_avg, int16_t target_array[], int array_size);
     bool seen_mac(unsigned char* mac);
     bool mac_cmp(struct mac_addr addr1, struct mac_addr addr2);
@@ -369,6 +398,13 @@ class WiFiScan
     // Stuff for RAW stats
     uint32_t mgmt_frames = 0;
     uint32_t data_frames = 0;
+    uint32_t beacon_frames = 0;
+    uint32_t req_frames = 0;
+    uint32_t resp_frames = 0;
+    uint32_t deauth_frames = 0;
+    uint32_t eapol_frames = 0;
+    int8_t min_rssi = 0;
+    int8_t max_rssi = -128;
     
     String analyzer_name_string = "";
     

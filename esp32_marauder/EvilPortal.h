@@ -55,6 +55,9 @@ struct AccessPoint {
   int8_t rssi;
   LinkedList<uint16_t>* stations;
   uint16_t packets;
+  uint8_t sec;
+  bool wps;
+  String man;
 };
 
 class CaptiveRequestHandler : public AsyncWebHandler {

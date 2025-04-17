@@ -22,7 +22,7 @@
   //#define MARAUDER_REV_FEATHER
   //// END BOARD TARGETS
 
-  #define MARAUDER_VERSION "v1.4.2"
+  #define MARAUDER_VERSION "v1.4.3"
 
   #define GRAPH_REFRESH 100
 
@@ -133,11 +133,11 @@
     //#define CYD_24
     //#define CYD_24G
     //#define CYD_24CAP
-    //#define CYD_28
+    #define CYD_28
     //#define CYD_32
     //#define CYD_32CAP
     //#define CYD_35
-    #define CYD_35CAP
+    //#define CYD_35CAP
   #endif
 
   #if defined(MARAUDER_V6) || defined(MARAUDER_V6_1)
@@ -1560,6 +1560,8 @@
   //// SCREEN STUFF
   #ifndef HAS_SCREEN
 
+    #define BANNER_TIME GRAPH_REFRESH
+    
     #define TFT_WHITE 0
     #define TFT_CYAN 0
     #define TFT_BLUE 0
