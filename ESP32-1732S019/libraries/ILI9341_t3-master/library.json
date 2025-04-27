@@ -1,0 +1,28 @@
+{
+  "name": "ILI9341_t3",
+  "keywords": "display, tft, lcd, graphics, spi",
+  "description": "Optimized ILI9341 (320x240 Color TFT) Display",
+  "authors": [
+    {
+        "name": "Limor Fried",
+        "url": "http://ladyada.net"
+    },
+    {
+        "name": "Paul Stoffregen",
+        "email": "paul@pjrc.com",
+        "url": "http://www.pjrc.com",
+        "maintainer": true
+    }    
+  ],
+  "exclude": [
+    "extras",
+    "*.bmp"
+  ],
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/PaulStoffregen/ILI9341_t3.git"
+  },
+  "frameworks": "arduino",
+  "platforms": "*"
+}

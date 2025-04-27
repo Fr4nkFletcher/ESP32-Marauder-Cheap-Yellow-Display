@@ -1,0 +1,1 @@
+# Adafruit IS31FL3731 [![Build Status](https://github.com/adafruit/Adafruit_IS31FL3731/workflows/Arduino%20Library%20CI/badge.svg)](https://github.com/adafruit/Adafruit_IS31FL3731/actions)[![Documentation](https://github.com/adafruit/ci-arduino/blob/master/assets/doxygen_badge.svg)](http://adafruit.github.io/Adafruit_IS31FL3731/html/index.html)

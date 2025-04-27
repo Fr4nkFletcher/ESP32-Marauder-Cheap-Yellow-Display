@@ -1,0 +1,22 @@
+{
+  "name": "SwitchLib",
+  "version": "1.1.1",
+  "keywords": "Arduino, Pico, RP2040, STM32, ESP8266, NodeMCU, ESP32, M5Stack, Button, Switch, Tactile, Toggle, Pull-Up, Pull-Down",
+  "description": "An Arduino Library for handling tactile switches...or anything else.",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/justcallmekoko/SwitchLib"
+  },
+  "authors":
+  [
+    {
+        "name": "justcallmekoko",
+        "email": "at.the.red.team@gmail.com",
+        "maintainer": true
+    }
+  ],
+  "frameworks": "arduino",
+  "platforms": "rp2040, espressif8266, espressif32, ststm32",
+  "headers": "SwitchLib.h"
+}

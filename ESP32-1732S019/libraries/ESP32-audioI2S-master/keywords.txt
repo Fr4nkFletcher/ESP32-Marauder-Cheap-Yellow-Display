@@ -1,0 +1,60 @@
+#######################################
+# Syntax Coloring Map For Ultrasound
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Audio	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+audio_bitrate	KEYWORD2
+audio_commercial	KEYWORD2
+audio_eof_mp3	KEYWORD2
+audio_eof_speech	KEYWORD2
+audio_icyurl	KEYWORD2
+audio_info	KEYWORD2
+audio_id3data	KEYWORD2
+audio_lasthost	KEYWORD2
+audio_showstreamtitle	KEYWORD2
+audio_showstation	KEYWORD2
+audio_eof_stream	KEYWORD2
+audio_id3image	KEYWORD2
+connecttoSD	KEYWORD2
+connecttoFS	KEYWORD2
+connecttohost	KEYWORD2
+getAudioCurrentTime	KEYWORD2
+getAudioFileDuration	KEYWORD2
+getDatamode	KEYWORD2
+getFilePos	KEYWORD2
+getFileSize	KEYWORD2
+getVolume	KEYWORD2
+loop	KEYWORD2
+pauseResume	KEYWORD2
+setDatamode	KEYWORD2
+setFilePos	KEYWORD2
+setPinout	KEYWORD2
+setVolume	KEYWORD2
+stopSong	KEYWORD2
+streamavail	KEYWORD2
+isRunning	KEYWORD2
+inBufferFilled	KEYWORD2
+inBufferFree	KEYWORD2
+i2s_mclk_pin_select	KEYWORD2
+setFileLoop	KEYWORD2
+setTone	KEYWORD2
+setBalance	KEYWORD2
+forceMono	KEYWORD2
+setInternalDAC	KEYWORD2
+setI2SCommFMT_LSB	KEYWORD2
+setTimeOffset KEYWORD2
+
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################

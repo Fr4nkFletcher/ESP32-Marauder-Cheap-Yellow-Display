@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name "picodvi")(type "Legacy")(uri "${KIPRJMOD}/picodvi.lib")(options "")(descr ""))
+  (lib (name "picodvi-rescue")(type "Legacy")(uri "${KIPRJMOD}/picodvi-rescue.lib")(options "")(descr ""))
+)

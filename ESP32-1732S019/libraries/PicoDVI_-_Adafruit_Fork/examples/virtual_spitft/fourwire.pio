@@ -1,0 +1,24 @@
+.program fourwire
+; Sample bits using an external clock, and push groups of bits into the RX FIFO.
+; - IN pin 0 is the data pin   (GPIO18)
+; - IN pin 1 is the dc pin     (GPIO19)
+; - IN pin 2 is the clock pin  (GPIO20)
+; - JMP pin is the chip select (GPIO21)
+; - Autopush is enabled, threshold 8
+;
+; This program waits for chip select to be asserted (low) before it begins
+; clocking in data. Whilst chip select is low, data is clocked continuously. If
+; chip select is deasserted part way through a data byte, the partial data is
+; discarded. This makes use of the fact a mov to isr clears the input shift
+; counter.
+flush:
+    mov isr, null         ; Clear ISR and input shift counter
+    jmp check_chip_select ; Poll chip select again
+.wrap_target
+do_bit:
+    wait 0 pin 2          ; Detect rising edge and sample input data
+    wait 1 pin 2          ; (autopush takes care of moving each complete
+    in pins, 2            ; data word to the FIFO)
+check_chip_select:
+    jmp pin, flush        ; Bail out if we see chip select high
+.wrap

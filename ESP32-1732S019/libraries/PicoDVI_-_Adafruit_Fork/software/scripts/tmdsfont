@@ -1,0 +1,127 @@
+#!/usr/bin/env python3
+
+# Pack a pixel font as a set of canned DC-balanced TMDS sequences
+
+from PIL import Image
+import argparse
+import os
+import struct
+
+class BinHeader:
+	def __init__(self, filename, arrayname=None):
+		if arrayname is None:
+			arrayname = filename.split(".")[0]
+		self.f = open(filename, "w")
+		self.out_count = 0
+		self.f.write("static char __attribute__((aligned(4))) {}[] = {{\n\t".format(arrayname))
+
+	def write(self, bs):
+		for b in bs:
+			self.f.write("0x{:02x}".format(b) + (",\n\t" if self.out_count % 16 == 15 else ", "))
+			self.out_count += 1
+
+	def close(self):
+		self.f.write("\n};\n")
+		self.f.close()
+
+
+def popcount(x):
+	n = 0
+	while x:
+		n += 1
+		x = x & (x - 1)
+	return n
+
+# Equivalent to N1(q) - N0(q) in the DVI spec
+def byteimbalance(x):
+	return 2 * popcount(x) - 8
+
+# This is a direct translation of "Figure 3-5. T.M.D.S. Encode Algorithm" on
+# page 29 of DVI 1.0 spec
+
+class TMDSEncode:
+	ctrl_syms = {
+		0b00: 0b1101010100,
+		0b01: 0b0010101011,
+		0b10: 0b0101010100,
+		0b11: 0b1010101011
+	}
+	def __init__(self):
+		self.imbalance = 0
+
+	def encode(self, d, c, de):
+		if not de:
+			self.imbalance = 0
+			return self.ctrl_syms[c]
+		# Minimise transitions
+		q_m = d & 0x1
+		if popcount(d) > 4 or (popcount(d) == 4 and not d & 0x1):
+			for i in range(7):
+				q_m = q_m | (~(q_m >> i ^ d >> i + 1) & 0x1) << i + 1
+		else:
+			for i in range(7):
+				q_m = q_m | ( (q_m >> i ^ d >> i + 1) & 0x1) << i + 1
+			q_m = q_m | 0x100
+		# Correct DC balance
+		inversion_mask = 0x2ff
+		q_out = 0
+		if self.imbalance == 0 or byteimbalance(q_m & 0xff) == 0:
+			q_out = q_m ^ (0 if q_m & 0x100 else inversion_mask)
+			if q_m & 0x100:
+				self.imbalance += byteimbalance(q_m & 0xff)
+			else:
+				self.imbalance -= byteimbalance(q_m & 0xff)
+		elif (self.imbalance > 0) == (byteimbalance(q_m & 0xff) > 0):
+			q_out = q_m ^ inversion_mask
+			self.imbalance += ((q_m & 0x100) >> 7) - byteimbalance(q_m & 0xff)
+		else:
+			q_out = q_m
+			self.imbalance += byteimbalance(q_m & 0xff) - ((~q_m & 0x100) >> 7)
+		return q_out
+
+# Turn a bitmap of width n into n pairs of pseudo-differential bits
+def differentialise(x, n):
+	accum = 0
+	for i in range(n):
+		accum <<= 2
+		if x & (1 << (n - 1)):
+			accum |= 0b01
+		else:
+			accum |= 0b10
+		x <<= 1
+	return accum
+
+if __name__ == "__main__":
+	parser = argparse.ArgumentParser()
+	parser.add_argument("input", help="Input file name")
+	parser.add_argument("output", help="Output file name")
+	parser.add_argument("--width", "-w", default=8, type=int, help="Width of each character in pixels")
+	args = parser.parse_args()
+	img = Image.open(args.input)
+
+	if args.output.endswith(".h"):
+		ofile = BinHeader(args.output, arrayname = os.path.basename(args.input).split(".")[0])
+	else:
+		ofile = open(args.output, "wb")
+
+	enc = TMDSEncode()
+
+	for y in range(img.height):
+		for x0 in range(0, img.width, args.width):
+			pixrun = list((254 if img.getpixel((x0 + i, y))[0] else 0) for i in range(args.width))
+			for toggle_mask in range(1 << args.width):
+				enc.imbalance = 0
+				for i in range(args.width):
+					enc.encode(pixrun[i] ^ (toggle_mask >> i & 0x1), 0, True)
+				if enc.imbalance == 0:
+					break
+			else:
+				raise Exception("Couldn't find DC-balanced representation for '{:!r}'".format(pixrun))
+
+			enc.imbalance = 0
+			for i in range(args.width):
+				ofile.write(struct.pack("<L", differentialise(
+					enc.encode(pixrun[i] ^ (toggle_mask >> i & 0x1), 0, True),
+					10
+				)))
+	ofile.close()

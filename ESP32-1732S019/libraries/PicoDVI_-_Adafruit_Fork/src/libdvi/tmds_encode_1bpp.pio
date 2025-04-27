@@ -1,0 +1,46 @@
+.program tmds_encode_1bpp
+
+; 1bpp black/white pixels go in, TMDS symbols come out.
+; Each output word contains two output symbols, each 10 bits in size,
+; right-justified. The least-significant symbol is displayed first.
+;
+; We can encode using the following LUT: (yes this is compliant)
+;
+; x % 2 | colour | symbol
+; ------+--------+-------
+; 0     | 0      | 0x100
+; 0     | 1      | 0x200
+; 1     | 0      | 0x1ff
+; 1     | 1      | 0x2ff
+;
+; OSR: shift to right, autopull, threshold 32
+; ISR: shift to right, autopush, threshold 24
+;
+; Note the ISR needs to be shifted to *right* so that we can get the first
+; pixel in the less-significant position. Threshold 24 so we can get 8x 0-bits
+; at the LSBs for free :)
+
+even_pixel:
+    out x, 1
+    mov y, ~x
+    in y, 1
+    in x, 1
+
+odd_pixel:
+    mov x, ~null
+    in x, 8
+    out x, 1
+    mov y, ~x
+    in y, 1
+    in x, 13     ; Bring total shift to 24, triggering push.
+
+% c-sdk {
+static inline void tmds_encode_1bpp_init(PIO pio, uint sm) {
+    uint offset = pio_add_program(pio, &tmds_encode_1bpp_program);
+    pio_sm_config c = tmds_encode_1bpp_program_get_default_config(offset);
+    sm_config_set_out_shift(&c, true, true, 32);
+    sm_config_set_in_shift(&c, true, true, 24);
+    pio_sm_init(pio, sm, offset, &c);
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}

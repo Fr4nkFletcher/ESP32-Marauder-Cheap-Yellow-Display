@@ -20,8 +20,9 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 
 ---
 
-## 🏴‍☠️ Latest Update Highlights — v1.4.3 (04/16/25) 🏴‍☠️
+## 🏴‍☠️ Latest Update Highlights — added ESP32-1732S019N (04/27/25) 🏴‍☠️
 
+- Add support for ESP32-1732S019 1.9" ST7789 Display no touch ESP32-S3
 - Add security check to AP scanning
 - Add WPS and Manufacturer check for AP scan
 - Add more stats to Raw Capture
@@ -136,6 +137,7 @@ For a step-by-step guide, refer to [Smoochiee's tutorial](https://github.com/smo
 
 The project has been successfully tested on:
 
+- [1.9" ESP32-S3 No Touch](https://www.aliexpress.us/item/3256807423694742.html)
 - [2.4" Capacitive Touch](https://a.co/d/bTSoo9Z)
 - [2.4" Resistive Touch](https://a.co/d/fhM7s0J)
 - [2.4" Resistive Touch Guition](https://www.aliexpress.us/item/3256806436471011.html)

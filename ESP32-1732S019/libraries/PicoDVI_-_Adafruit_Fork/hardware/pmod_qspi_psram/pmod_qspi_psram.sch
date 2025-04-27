@@ -1,0 +1,353 @@
+EESchema Schematic File Version 4
+EELAYER 26 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title "QSPI PSRAM PMOD breakout"
+Date "2020-08-19"
+Rev "1"
+Comp "Luke Wren"
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Connector_Generic:Conn_02x06_Odd_Even J1
+U 1 1 5F3D11ED
+P 3900 4000
+F 0 "J1" H 3950 3475 50  0000 C CNN
+F 1 "2.54mm_2x06" H 3950 3566 50  0000 C CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_2x06_P2.54mm_Horizontal" H 3900 4000 50  0001 C CNN
+F 3 "~" H 3900 4000 50  0001 C CNN
+	1    3900 4000
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	4100 4200 4200 4200
+Wire Wire Line
+	4100 4100 4200 4100
+Wire Wire Line
+	4100 4000 4200 4000
+Wire Wire Line
+	4100 3900 4200 3900
+Wire Wire Line
+	4100 3800 4150 3800
+Wire Wire Line
+	4150 3800 4150 4300
+Wire Wire Line
+	3600 3800 3550 3800
+Wire Wire Line
+	3550 3800 3550 4300
+Wire Wire Line
+	3600 4100 3500 4100
+Wire Wire Line
+	3600 4200 3500 4200
+$Comp
+L power:GND #PWR0101
+U 1 1 5F3D1583
+P 3550 4300
+F 0 "#PWR0101" H 3550 4050 50  0001 C CNN
+F 1 "GND" H 3555 4127 50  0000 C CNN
+F 2 "" H 3550 4300 50  0001 C CNN
+F 3 "" H 3550 4300 50  0001 C CNN
+	1    3550 4300
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0102
+U 1 1 5F3D1597
+P 4150 4300
+F 0 "#PWR0102" H 4150 4050 50  0001 C CNN
+F 1 "GND" H 4155 4127 50  0000 C CNN
+F 2 "" H 4150 4300 50  0001 C CNN
+F 3 "" H 4150 4300 50  0001 C CNN
+	1    4150 4300
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+3V3 #PWR0103
+U 1 1 5F3D15F4
+P 4150 3450
+F 0 "#PWR0103" H 4150 3300 50  0001 C CNN
+F 1 "+3V3" H 4165 3623 50  0000 C CNN
+F 2 "" H 4150 3450 50  0001 C CNN
+F 3 "" H 4150 3450 50  0001 C CNN
+	1    4150 3450
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+3V3 #PWR0104
+U 1 1 5F3D1608
+P 3550 3450
+F 0 "#PWR0104" H 3550 3300 50  0001 C CNN
+F 1 "+3V3" H 3565 3623 50  0000 C CNN
+F 2 "" H 3550 3450 50  0001 C CNN
+F 3 "" H 3550 3450 50  0001 C CNN
+	1    3550 3450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3550 3700 3600 3700
+Wire Wire Line
+	3550 3450 3550 3700
+Wire Wire Line
+	4100 3700 4150 3700
+Wire Wire Line
+	4150 3700 4150 3450
+Text Label 4200 3900 0    50   ~ 0
+SD3
+Text Label 4200 4000 0    50   ~ 0
+SD2
+Text Label 4200 4100 0    50   ~ 0
+SD1
+Text Label 4200 4200 0    50   ~ 0
+SD0
+Text Label 3500 4200 2    50   ~ 0
+SCK
+Text Label 3500 4100 2    50   ~ 0
+~CS~
+$Comp
+L Memory_Flash:AT25SF081-XMHF-X U1
+U 1 1 5F3D1B45
+P 8150 3900
+F 0 "U1" H 7750 4350 50  0000 L CNN
+F 1 "LY68L6400" H 8250 4350 50  0000 L CNN
+F 2 "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm" H 8150 3300 50  0001 C CNN
+F 3 "https://www.adestotech.com/wp-content/uploads/DS-AT25SF081_045.pdf" H 8150 3900 50  0001 C CNN
+	1    8150 3900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7550 3700 7450 3700
+Wire Wire Line
+	7550 3800 7450 3800
+Wire Wire Line
+	7550 3900 7450 3900
+Wire Wire Line
+	7550 4000 7450 4000
+Wire Wire Line
+	7550 4100 7450 4100
+Text Label 7450 3700 2    50   ~ 0
+SD0
+Text Label 7450 3800 2    50   ~ 0
+SCK
+Text Label 7450 3900 2    50   ~ 0
+~CS~
+Text Label 7450 4000 2    50   ~ 0
+SD2
+Text Label 7450 4100 2    50   ~ 0
+SD3
+Text Label 8750 3700 0    50   ~ 0
+SD1
+$Comp
+L power:+3V3 #PWR0105
+U 1 1 5F3D1ED8
+P 8150 3300
+F 0 "#PWR0105" H 8150 3150 50  0001 C CNN
+F 1 "+3V3" H 8165 3473 50  0000 C CNN
+F 2 "" H 8150 3300 50  0001 C CNN
+F 3 "" H 8150 3300 50  0001 C CNN
+	1    8150 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0106
+U 1 1 5F3D1F3F
+P 8150 4500
+F 0 "#PWR0106" H 8150 4250 50  0001 C CNN
+F 1 "GND" H 8155 4327 50  0000 C CNN
+F 2 "" H 8150 4500 50  0001 C CNN
+F 3 "" H 8150 4500 50  0001 C CNN
+	1    8150 4500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8150 4400 8150 4500
+Wire Wire Line
+	8150 3300 8150 3400
+$Comp
+L power:+3V3 #PWR0107
+U 1 1 5F3D238D
+P 6950 3300
+F 0 "#PWR0107" H 6950 3150 50  0001 C CNN
+F 1 "+3V3" H 6965 3473 50  0000 C CNN
+F 2 "" H 6950 3300 50  0001 C CNN
+F 3 "" H 6950 3300 50  0001 C CNN
+	1    6950 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0108
+U 1 1 5F3D239C
+P 6950 4500
+F 0 "#PWR0108" H 6950 4250 50  0001 C CNN
+F 1 "GND" H 6955 4327 50  0000 C CNN
+F 2 "" H 6950 4500 50  0001 C CNN
+F 3 "" H 6950 4500 50  0001 C CNN
+	1    6950 4500
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C1
+U 1 1 5F3D23D2
+P 6950 3900
+F 0 "C1" H 7065 3946 50  0000 L CNN
+F 1 "100n" H 7065 3855 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0402_1005Metric" H 6988 3750 50  0001 C CNN
+F 3 "~" H 6950 3900 50  0001 C CNN
+	1    6950 3900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6950 3750 6950 3300
+Wire Wire Line
+	6950 4050 6950 4500
+Text Notes 7350 4900 0    50   ~ 0
+Yup that's it\n
+Wire Wire Line
+	5150 4300 5250 4300
+Wire Wire Line
+	5150 4200 5250 4200
+Wire Wire Line
+	5150 4100 5250 4100
+Wire Wire Line
+	5150 4000 5250 4000
+Wire Wire Line
+	5150 3900 5250 3900
+Wire Wire Line
+	5150 3800 5250 3800
+Text Label 5250 4100 0    50   ~ 0
+SD3
+Text Label 5250 4200 0    50   ~ 0
+SD2
+Text Label 5250 4000 0    50   ~ 0
+SD1
+Text Label 5250 3800 0    50   ~ 0
+SD0
+Text Label 5250 3900 0    50   ~ 0
+SCK
+Text Label 5250 4300 0    50   ~ 0
+~CS~
+Text Notes 5250 4500 0    50   ~ 0
+Debug header\n
+$Comp
+L Switch:SW_Push SW1
+U 1 1 5F3D5B10
+P 3600 5950
+F 0 "SW1" V 3554 6098 50  0000 L CNN
+F 1 "SW_Push" V 3645 6098 50  0000 L CNN
+F 2 "picodvi:SW_SPST_PTS815" H 3600 6150 50  0001 C CNN
+F 3 "" H 3600 6150 50  0001 C CNN
+	1    3600 5950
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	3600 6150 3600 6250
+$Comp
+L power:GND #PWR0110
+U 1 1 5F3D608E
+P 3600 6250
+F 0 "#PWR0110" H 3600 6000 50  0001 C CNN
+F 1 "GND" H 3605 6077 50  0000 C CNN
+F 2 "" H 3600 6250 50  0001 C CNN
+F 3 "" H 3600 6250 50  0001 C CNN
+	1    3600 6250
+	1    0    0    -1  
+$EndComp
+$Comp
+L Switch:SW_Push SW2
+U 1 1 5F3D60DA
+P 4200 5950
+F 0 "SW2" V 4154 6098 50  0000 L CNN
+F 1 "SW_Push" V 4245 6098 50  0000 L CNN
+F 2 "picodvi:SW_SPST_PTS815" H 4200 6150 50  0001 C CNN
+F 3 "" H 4200 6150 50  0001 C CNN
+	1    4200 5950
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4200 6150 4200 6250
+$Comp
+L power:GND #PWR0111
+U 1 1 5F3D60E2
+P 4200 6250
+F 0 "#PWR0111" H 4200 6000 50  0001 C CNN
+F 1 "GND" H 4205 6077 50  0000 C CNN
+F 2 "" H 4200 6250 50  0001 C CNN
+F 3 "" H 4200 6250 50  0001 C CNN
+	1    4200 6250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3600 5750 3600 5650
+Wire Wire Line
+	4200 5750 4200 5650
+Text Label 3600 5650 2    50   ~ 0
+BUTTON_A
+Text Label 3500 3900 2    50   ~ 0
+BUTTON_A
+Text Label 4200 5650 2    50   ~ 0
+BUTTON_B
+Text Label 3500 4000 2    50   ~ 0
+BUTTON_B
+Wire Wire Line
+	3600 3900 3500 3900
+Wire Wire Line
+	3600 4000 3500 4000
+Text Notes 3000 4750 0    50   ~ 0
+Want data bus to be on consecutive ascending GPIOs\nto make things easier on the PIO side
+$Comp
+L Connector_Generic:Conn_01x06 J2
+U 1 1 5F3D958D
+P 4950 4100
+F 0 "J2" H 4870 3575 50  0000 C CNN
+F 1 "Conn_01x06" H 4870 3666 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical" H 4950 4100 50  0001 C CNN
+F 3 "~" H 4950 4100 50  0001 C CNN
+	1    4950 4100
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x02 J3
+U 1 1 5F3D9CD2
+P 5750 4300
+F 0 "J3" H 5750 4000 50  0000 C CNN
+F 1 "Conn_01x02" H 5800 4100 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 5750 4300 50  0001 C CNN
+F 3 "~" H 5750 4300 50  0001 C CNN
+	1    5750 4300
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	5950 4300 6000 4300
+Wire Wire Line
+	6000 4300 6000 4350
+$Comp
+L power:GND #PWR0109
+U 1 1 5F3DA468
+P 6000 4350
+F 0 "#PWR0109" H 6000 4100 50  0001 C CNN
+F 1 "GND" H 6005 4177 50  0000 C CNN
+F 2 "" H 6000 4350 50  0001 C CNN
+F 3 "" H 6000 4350 50  0001 C CNN
+	1    6000 4350
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+3V3 #PWR0112
+U 1 1 5F3DA4DE
+P 6000 4150
+F 0 "#PWR0112" H 6000 4000 50  0001 C CNN
+F 1 "+3V3" H 6015 4323 50  0000 C CNN
+F 2 "" H 6000 4150 50  0001 C CNN
+F 3 "" H 6000 4150 50  0001 C CNN
+	1    6000 4150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5950 4200 6000 4200
+Wire Wire Line
+	6000 4200 6000 4150
+$EndSCHEMATC

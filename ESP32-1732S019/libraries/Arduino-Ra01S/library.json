@@ -1,0 +1,19 @@
+{
+"name": "Arduino-Ra01S",
+"frameworks": "Arduino",
+"keywords": "SX1262, SX1268, Ra-01S, RA-01SH",
+"description": "Implement a driver for LoRa chipset SX1262/1268, tested with module Ai-Thinker RA-01S/01SH",
+"authors":
+[
+    {
+        "name": "nopnop2002",
+        "url": "",
+        "maintainer": true
+    },
+],
+"repository":
+{
+    "type": "git",
+    "url": "https://github.com/nopnop2002/Arduino-Ra01S"
+}
+}
