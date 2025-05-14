@@ -23,6 +23,7 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 ## 🏴‍☠️ Latest Update Highlights — added ESP32-1732S019N (04/27/25) 🏴‍☠️
 
 - Add support for ESP32-1732S019 1.9" ST7789 no touch ESP32-S3
+  - **Select button** → `BOOT`
   - **Down button** → `GPIO47`
 - Add security check to AP scanning
 - Add WPS and Manufacturer check for AP scan
