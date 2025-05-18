@@ -1172,9 +1172,17 @@ void MenuFunctions::updateStatusBar()
 
         display_obj.tft.drawString(gps_obj.getNumSatsString(), 22, 0, 2);
       #elif defined(HAS_SCREEN)
-        display_obj.tft.setTextColor(the_color, STATUSBAR_COLOR);
-        display_obj.tft.drawString("GPS", 0, 0, 1);
+          display_obj.tft.setTextColor(the_color, STATUSBAR_COLOR);
+          display_obj.tft.drawString("GPS", 3, 0, 1);
+
+          if (gps_obj.getFixStatus()) {
+              display_obj.tft.drawString("Sats: ", 26, 0, 1);
+              display_obj.tft.drawString(gps_obj.getNumSatsString(), 57, 0, 1);
+          } else {
+        display_obj.tft.drawString("NO FIX", 26, 0, 1);
+          }  
       #endif
+
     }
   #endif
 

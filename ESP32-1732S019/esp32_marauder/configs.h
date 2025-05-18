@@ -73,7 +73,7 @@
     //#define HAS_SD
     //#define USE_SD
     //#define HAS_TEMP_SENSOR
-    //#define HAS_GPS
+    #define HAS_GPS
   #endif
 
   #ifdef MARAUDER_MINI
@@ -447,7 +447,7 @@
       #define GREENBUTTON_W (FRAME_W/2)
       #define GREENBUTTON_H FRAME_H
     
-      #define STATUSBAR_COLOR 0x4A49
+      #define STATUSBAR_COLOR 0x18ED
 
     #endif
 
@@ -1278,8 +1278,8 @@
       #define mac_history_len 100
     #elif defined(MARAUDER_M5STICKC)
       #define GPS_SERIAL_INDEX 1
-      #define GPS_TX 33
-      #define GPS_RX 32
+      #define GPS_TX 17
+      #define GPS_RX 18
       #define mac_history_len 100
     #elif defined(MARAUDER_REV_FEATHER)
       #define GPS_SERIAL_INDEX 1
