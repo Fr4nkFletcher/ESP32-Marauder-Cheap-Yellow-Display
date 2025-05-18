@@ -20,7 +20,7 @@ The aim of this project is to port the ESP32-Marauder firmware to the Cheap Yell
 
 ---
 
-## 🏴‍☠️ Latest Update Highlights — added wardriving to ESP32-1732S019N (05/17/25) 🏴‍☠️
+## 🏴‍☠️ Latest Update Highlights — added wardriving to ESP32-1732S019N (05/18/25) 🏴‍☠️
 
 - Add support for ESP32-1732S019 1.9" ST7789 no touch ESP32-S3
   - **Select button** → `BOOT`
