@@ -1161,28 +1161,20 @@ void MenuFunctions::updateStatusBar()
         the_color = TFT_RED;
         
       #ifdef HAS_FULL_SCREEN
-        display_obj.tft.drawXBitmap(4,
-                                    0,
-                                    menu_icons[STATUS_GPS],
-                                    16,
-                                    16,
-                                    STATUSBAR_COLOR,
-                                    the_color);
+        display_obj.tft.drawXBitmap(4, 0, menu_icons[STATUS_GPS], 16, 16, STATUSBAR_COLOR, the_color);
         display_obj.tft.setTextColor(TFT_WHITE, STATUSBAR_COLOR);
-
         display_obj.tft.drawString(gps_obj.getNumSatsString(), 22, 0, 2);
       #elif defined(HAS_SCREEN)
-          display_obj.tft.setTextColor(the_color, STATUSBAR_COLOR);
-          display_obj.tft.drawString("GPS", 3, 0, 1);
+        display_obj.tft.setTextColor(the_color, STATUSBAR_COLOR);
+        display_obj.tft.drawString("GPS", 3, 0, 1);
 
-          if (gps_obj.getFixStatus()) {
-              display_obj.tft.drawString("Sats: ", 26, 0, 1);
-              display_obj.tft.drawString(gps_obj.getNumSatsString(), 57, 0, 1);
-          } else {
-        display_obj.tft.drawString("NO FIX", 26, 0, 1);
-          }  
+        if (gps_obj.getFixStatus()) {
+            display_obj.tft.drawString("Sats: ", 26, 0, 1);
+            display_obj.tft.drawString(gps_obj.getNumSatsString(), 57, 0, 1);
+        } else {
+            display_obj.tft.drawString("NO FIX", 26, 0, 1);
+        }  
       #endif
-
     }
   #endif
 
