@@ -235,7 +235,7 @@ extern "C" {
           size_t len = advertisedDevice->getPayloadLength();
 
           bool match = false;
-          for (int i = 0; i <= len - 4; i++) {
+          for (size_t i = 0; i + 4 <= len; i++) {
             if (payLoad[i] == 0x1E && payLoad[i+1] == 0xFF && payLoad[i+2] == 0x4C && payLoad[i+3] == 0x00) {
               match = true;
               break;
@@ -296,7 +296,7 @@ extern "C" {
 
           bool match = false;
           String color = "";
-          for (int i = 0; i <= len - 4; i++) {
+          for (size_t i = 0; i + 4 <= len; i++) {
             if (payLoad[i] == 0x81 && payLoad[i+1] == 0x30) {
               match = true;
               color = "Black";
