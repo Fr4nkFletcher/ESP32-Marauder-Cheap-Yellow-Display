@@ -1481,7 +1481,7 @@ void MenuFunctions::drawStatusBar()
     display_obj.tft.fillRect(50, 0, TFT_WIDTH * 0.21, STATUS_BAR_WIDTH, STATUSBAR_COLOR);
   #endif
   #ifdef HAS_FULL_SCREEN
-    #if defined(CYD_35CAP) || defined(CYD_35)
+    #if defined(CYD_35CAP) || defined(CYD_35) || defined(CYD_40)
       display_obj.tft.drawString("CH: " + (String)wifi_scan_obj.set_channel, 68, 0, 2);
     #else
       display_obj.tft.drawString("CH: " + (String)wifi_scan_obj.set_channel, 50, 0, 2);
@@ -1497,7 +1497,7 @@ void MenuFunctions::drawStatusBar()
   wifi_scan_obj.old_free_ram = wifi_scan_obj.free_ram;
   display_obj.tft.fillRect(100, 0, 60, STATUS_BAR_WIDTH, STATUSBAR_COLOR);
   #ifdef HAS_FULL_SCREEN
-    #if defined(CYD_35CAP) || defined(CYD_35)
+    #if defined(CYD_35CAP) || defined(CYD_35) || defined(CYD_40)
       display_obj.tft.drawString((String)wifi_scan_obj.free_ram + "B", 130, 0, 2);
     #else
       display_obj.tft.drawString((String)wifi_scan_obj.free_ram + "B", 100, 0, 2);
@@ -1594,6 +1594,8 @@ void MenuFunctions::orientDisplay()
       uint16_t calData[5] = { 251, 3539, 331, 3534, 6 }; // tft.setRotation(0); // Portrait with TFT Shield
     #elif defined(CYD_35)
       uint16_t calData[5] = { 309, 3465, 297, 3552, 6 };
+    #elif defined(CYD_40)
+      uint16_t calData[5] = { 227, 3618, 285, 3641, 4 }; // Portrait cal measured on E32R40T hardware
     #elif defined(TFT_DIY)
       uint16_t calData[5] = { 339, 3470, 237, 3438, 2 }; // tft.setRotation(0); // Portrait with DIY TFT
     #endif
